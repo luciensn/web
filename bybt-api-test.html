@@ -1,0 +1,61 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>bybyt funding rates</title>
+
+	<style type="text/css">
+		body {
+			font-family: "Verdana";
+			background-color: #191923;
+			color: #ffffff;
+			margin: 16px;
+		}
+		a:link, a:visited {
+			text-decoration: none;
+			color: #00ffff;
+		}
+		a:hover, a:active {
+			text-decoration: underline;
+		}
+
+		.price {
+			font-size: 20pt;
+		}
+
+		
+
+	</style>
+</head>
+<body>
+<div>bybt API</div>
+
+
+
+	<script type="text/javascript">
+
+
+		var btcUrl = "https://open-api.bybt.com/api/pro/v1/futures/funding_rates?symbol=btc";
+
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", btcUrl);
+
+		xhr.setRequestHeader("bybtSecret", "bc233bdc92e04401a1d86efa16052457");
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.setRequestHeader("Access-Control-Allow-Origin", "http://localhost:8000");
+
+		xhr.onreadystatechange = function () {
+		   if (xhr.readyState === 4) {
+		      console.log(xhr.status);
+		      console.log(xhr.responseText);
+		   }};
+
+		xhr.send();
+
+
+
+</script>
+
+</body>
+</html>
