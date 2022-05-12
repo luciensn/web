@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<!--ROBOTS-->
+	<meta name="robots" content="nofollow">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+	<title id="title">google search</title>
+	<meta name="description" content="" />
+    <link rel="shortcut icon nofollow" type="image/png" href="g.png">
+
+    <!-- Custom CSS -->
+    <style type="text/css">
+		body {
+			background: #fff;
+		}
+
+		.center {
+		  margin: auto;
+		  margin-top: 64px;
+		  width: 75%;
+		  /*border: 1px solid green;*/
+		}
+
+		.btn {
+			margin: auto;
+			margin-top: 16px;
+		  width: 40%;
+		  /*border: 1px solid blue;*/
+		}
+
+		input[type=text] {
+		  /*float: right;*/
+		  /*max-width: 900px;*/
+		  width: 98%;
+		  padding: 8px;
+		  padding-left: 16px;
+		  border: 1px solid #fff;
+		  box-shadow: 0px 1px 6px #ddd;
+		  /*margin-top: 8px;
+		  margin-right: 32px;*/
+		  font-size: 17px;
+		  border-radius: 18px;
+		}
+
+		button {
+		  padding: 8px;
+		  width: 100%;
+		  background: #eee;
+		  font-size: 17px;
+		  color: #333;
+		  border: 1px solid #eee;
+		  cursor: pointer;
+		  text-align: center;
+		  border-radius: 6px;
+		}
+
+		button:hover {
+		  background: #ddd;
+		}
+
+    </style>
+</head>
+<body>
+
+	<!-- Search box -->
+	<div class="center" style="">
+			<input type="text" id="searchBox" placeholder="Search" autofocus>
+			<div class="btn">
+		    <button type="submit" onclick="javascript:doSearch();">Goog</button>
+		  </div>
+	</div>
+
+	<!-- JavaScript -->
+	<script type="text/javascript">
+			var box = document.getElementById("searchBox");
+			box.addEventListener("keydown", function (e) {
+			    if (e.code === "Enter") {  //checks whether the pressed key is "Enter"
+			        doSearch();
+			    }
+			});
+    	function doSearch() {
+    		var term = box.value;
+    		window.open("https://www.google.com/search?q="+term,"_self");
+    	}
+  </script>
+
+</body>
+</html>
