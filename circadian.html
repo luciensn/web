@@ -1,0 +1,1063 @@
+<!-- vibe-coded with ChatGPT 🤝 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cincinnati Solar Dashboard</title>
+
+<style>
+:root{
+  --bg:#0f172a;
+  --panel:#1e293b;
+  --text:#f1f5f9;
+  --muted:#94a3b8;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  padding:16px;
+}
+
+/* =========================
+   TOP BAR
+========================= */
+#topBar{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  padding:14px 16px;
+  margin-bottom:18px;
+  background:#0f172a;
+  /*border-bottom:1px solid #1e293b;*/
+}
+
+.location-name{
+  font-weight:600;
+  font-size:15px;
+  color:#e2e8f0;
+}
+
+.location-coords{
+  font-size:12px;
+  color:#94a3b8;
+}
+
+#dateTimeBlock{text-align:right}
+
+#dateLine{
+  font-size:14px;
+  color:#e2e8f0;
+}
+
+#timeLine{
+  font-size:13px;
+  color:#94a3b8;
+}
+
+/* =========================
+   PANELS
+========================= */
+.panel{
+  background:var(--panel);
+  border-radius:18px;
+  padding:20px;
+  margin-bottom:16px;
+}
+
+h2{
+  margin:0 0 12px 0;
+  font-size:14px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+.temp{
+  font-size:52px;
+  font-weight:700;
+}
+
+
+.grid2{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:14px;
+  color:var(--muted);
+}
+
+.weatherRow{
+  position:relative;
+}
+
+.weatherRow > div:first-child{
+  width:50%;
+}
+
+.weatherDetails{
+  position:absolute;
+  left:50%;
+  bottom:0;
+  width:50%;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:14px;
+  color:var(--muted);
+  text-align:left;
+}
+
+#highLow {
+  font-size:14px;
+  color:var(--muted);
+}
+
+
+
+#solarContent {
+  position: relative;
+}
+
+#solarNoonLabel {
+  text-align:center;
+  margin-top: 40px;
+  margin-bottom: 6px;
+}
+
+.sunTimeLabel {
+  font-size:12px;
+  color:#e2e8f0;
+  line-height:1.2;
+}
+
+/* =========================
+   YEAR PROGRESS BAR
+========================= */
+
+#yearSection{
+  position:relative;
+  margin-top:28px;
+  width:100%;
+  /*max-width:360px;
+  margin-left:auto;
+  margin-right:auto;*/
+}
+
+#yearBar{
+  display:flex;
+  height:22px;
+  border-radius:8px;
+  overflow:hidden;
+  background:#334155;
+}
+
+.month{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+  color:#cbd5e1;
+  border-right:1px solid #1e293b;
+}
+
+.month:last-child{
+  border-right:none;
+}
+
+#yearArrow{
+  position:absolute;
+  top:-14px;
+  width:0;
+  height:0;
+  border-left:6px solid transparent;
+  border-right:6px solid transparent;
+  border-top:10px solid #ffffff;
+  transform:translateX(-50%);
+}
+
+/* =========================
+   SEASONAL GRADIENT
+========================= */
+
+#yearGradient{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:22px;            /* match bar height */
+  border-radius:10px;     /* match bar radius */
+  pointer-events:none;
+  z-index:2;              /* ABOVE the bar */
+  background:linear-gradient(
+    to right,
+    rgba(148,163,184,0.25) 0%,
+    rgba(148,163,184,0.15) 15%,
+    rgba(250,204,21,0.25) 45%,
+    rgba(250,204,21,0.35) 50%,
+    rgba(250,204,21,0.25) 55%,
+    rgba(148,163,184,0.15) 85%,
+    rgba(148,163,184,0.25) 100%
+  );
+}
+
+
+#yearBar{
+  position:relative;
+  z-index:1;
+}
+
+
+/* =========================
+   SEASON MARKERS
+========================= */
+
+.seasonMarker{
+  position:absolute;
+  top:-18px;
+  transform:translateX(-50%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  pointer-events:none;
+}
+
+.seasonTick{
+  width:2px;
+  height:10px;
+  background:#f1f5f9;
+  opacity:0.6;
+}
+
+.seasonLabel{
+  font-size:9px;
+  margin-bottom:2px;
+  color:#94a3b8;
+  letter-spacing:.05em;
+}
+
+
+/* =========================
+   UV PANEL
+========================= */
+
+#uvValue{
+  font-size:56px;
+  font-weight:700;
+  margin-bottom:18px;
+}
+
+/* =========================
+   UV SCALE
+========================= */
+
+#uvScaleSection{
+  position:relative;
+  width:100%;
+}
+
+#uvScaleBar{
+  height:18px;
+  border-radius:10px;
+  background:linear-gradient(
+    to right,
+    #22c55e 0%,     /* Low */
+    #84cc16 20%,
+    #eab308 40%,    /* Moderate */
+    #f97316 60%,    /* High */
+    #ef4444 80%,    /* Very High */
+    #7c3aed 100%    /* Extreme */
+  );
+}
+
+#uvArrow{
+  position:absolute;
+  top:-10px;
+  width:0;
+  height:0;
+  border-left:6px solid transparent;
+  border-right:6px solid transparent;
+  border-top:10px solid #ffffff;
+  transform:translateX(-50%);
+}
+
+#uvScaleLabels{
+  display:flex;
+  justify-content:space-between;
+  font-size:10px;
+  margin-top:6px;
+  color:#94a3b8;
+}
+
+/* =========================
+   MOON PANEL LAYOUT
+========================= */
+
+#moonRow{
+  display:flex;
+  align-items:center;
+  gap:24px;
+}
+
+/* Left visual */
+
+#moonVisualWrapper{
+  display:flex;
+  justify-content:flex-start;
+}
+
+#moonDisc{
+  position:relative;
+  width:110px;
+  height:110px;
+  border-radius:50%;
+  background:#f1f5f9;
+  overflow:hidden;
+  box-shadow:0 0 20px rgba(241,245,249,0.15);
+}
+
+#moonShadow{
+  position:absolute;
+  top:0;
+  bottom:0;
+  width:50%;
+  background:#0f172a;
+  border-radius:50%;
+}
+
+/* Right details */
+
+#moonDetails{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:14px;
+  color:#94a3b8;
+}
+
+/* Phase label bold */
+
+.moonPhaseLabel{
+  font-weight:600;
+  font-size:16px;
+  color:#f1f5f9;
+}
+
+
+
+</style>
+</head>
+<body>
+
+<!-- =========================
+     TOP BAR
+========================= -->
+<div id="topBar">
+  <div>
+    <div class="location-name">Cincinnati, Ohio</div>
+    <div class="location-coords">
+      39.1036° N • 84.5136° W
+    </div>
+  </div>
+  <div id="dateTimeBlock">
+    <div id="dateLine"></div>
+    <div id="timeLine"></div>
+  </div>
+</div>
+
+<!-- =========================
+     PANEL 1 — WEATHER
+========================= -->
+<div class="panel">
+  <h2>Weather</h2>
+
+  <div class="weatherRow">
+
+    <!-- LEFT SIDE -->
+    <div>
+      <div class="temp" id="temp">--°</div>
+      <div id="condition">Loading...</div>
+      <div id="highLow"></div>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="weatherDetails">
+      <div id="wind"></div>
+      <div id="humidity"></div>
+    </div>
+
+  </div>
+
+
+</div>
+
+<!-- =========================
+     PANEL 2 — UV INDEX
+========================= -->
+<div class="panel">
+  <h2>UV Index</h2>
+
+  <div id="uvValue">--</div>
+
+  <div id="uvScaleSection">
+
+    <div id="uvArrow"></div>
+
+    <div id="uvScaleBar"></div>
+
+    <div id="uvScaleLabels">
+      <span>0</span>
+      <span>3</span>
+      <span>6</span>
+      <span>8</span>
+      <span>11+</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- =========================
+     PANEL 3 — SOLAR CYCLE
+========================= -->
+<div class="panel">
+  <h2>24-Hour Solar Cycle</h2>
+
+  <!-- Solar Noon Label -->
+  <div id="solarNoonLabel" class="sunTimeLabel"></div>
+
+  <!-- SVG Wrapper -->
+  <div id="solarContent">
+    
+    <div style="position: relative;width:100%;max-width:360px;margin:auto;">
+
+    <!-- Sunrise Label -->
+    <div id="sunriseLabel" class="sunTimeLabel"
+         style="position:absolute;left:-70px;top:130px;text-align:right;">
+    </div>
+
+    <!-- Sunset Label -->
+    <div id="sunsetLabel" class="sunTimeLabel"
+         style="position:absolute;right:-70px;top:130px;text-align:left;">
+    </div>
+
+    <svg viewBox="0 0 300 330"
+         style="width:100%;display:block">
+
+      <!-- Night Ring -->
+      <circle cx="150" cy="150" r="120"
+              fill="none"
+              stroke="#334155"
+              stroke-width="22" />
+
+      <!-- Daylight Segment -->
+      <path id="daySegment"
+            fill="none"
+            stroke="#f1f5f9"
+            stroke-width="22"
+            stroke-linecap="round" />
+
+      <!-- UVA Segment (Middle Red Arc) -->
+      <path id="uvaSegment"
+            fill="none"
+            stroke="#f87171"
+            stroke-width="10"
+            stroke-linecap="round" />
+
+
+      <!-- UVB Segment (Inner Blue Arc) -->
+      <path id="uvbSegment"
+            fill="none"
+            stroke="#3b82f6"
+            stroke-width="10"
+            stroke-linecap="round" />
+
+
+      <!-- Sunrise / Sunset Dots -->
+      <circle id="sunriseDot" r="4" fill="#64748b"/>
+      <circle id="sunsetDot" r="4" fill="#64748b"/>
+
+      <!-- Solar Noon Arrow -->
+      <polygon id="noonMarker" fill="#ffffff"/>
+
+      <!-- Midnight Dot -->
+      <circle id="midnightMarker"
+              r="4"
+              fill="#64748b"/>
+
+      <!-- Sun -->
+      <circle id="sunMarker"
+        r="16"
+        fill="#facc15"
+        opacity="1"/>
+
+      <!-- Center Info -->
+      <text id="centerSunAngle"
+            x="150"
+            y="135"
+            text-anchor="middle"
+            font-size="14"
+            fill="#f1f5f9"
+            font-weight="600">
+      </text>
+
+      <text id="centerUVA"
+            x="150"
+            y="155"
+            text-anchor="middle"
+            font-size="12"
+            fill="#f87171">
+      </text>
+
+      <text id="centerUVB"
+            x="150"
+            y="172"
+            text-anchor="middle"
+            font-size="12"
+            fill="#3b82f6">
+      </text>
+    </svg>
+    </div>
+
+    <!-- =========================
+         YEAR PROGRESS BAR
+    ========================= -->
+    <div id="yearSection">
+
+      <!-- Gradient Overlay -->
+      <div id="yearGradient"></div>
+
+      <!-- Equinox/Solstice Ticks -->
+      <div class="seasonMarker" id="springMarker">
+        <div class="seasonLabel">E</div>
+        <div class="seasonTick"></div>
+      </div>
+
+      <div class="seasonMarker" id="summerMarker">
+        <div class="seasonLabel">S</div>
+        <div class="seasonTick"></div> 
+      </div>
+
+      <div class="seasonMarker" id="fallMarker">
+        <div class="seasonLabel">E</div>
+        <div class="seasonTick"></div>
+      </div>
+
+      <div class="seasonMarker" id="winterMarker">
+        <div class="seasonLabel">S</div>
+        <div class="seasonTick"></div>
+      </div>
+
+
+      <!-- Arrow -->
+      <div id="yearArrow"></div>
+
+      <!-- Bar -->
+      <div id="yearBar">
+        <div class="month">1</div>
+        <div class="month">2</div>
+        <div class="month">3</div>
+        <div class="month">4</div>
+        <div class="month">5</div>
+        <div class="month">6</div>
+        <div class="month">7</div>
+        <div class="month">8</div>
+        <div class="month">9</div>
+        <div class="month">10</div>
+        <div class="month">11</div>
+        <div class="month">12</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- =========================
+     PANEL 4 — MOON
+========================= -->
+<div class="panel">
+  <h2>Moon</h2>
+
+  <div id="moonRow">
+
+    <div id="moonVisualWrapper">
+      <div id="moonDisc">
+        <div id="moonShadow"></div>
+      </div>
+    </div>
+
+    <div id="moonDetails">
+      <div id="moonPhase" class="moonPhaseLabel"></div>
+      <div id="moonIllumination"></div>
+      <div id="moonRiseSet"></div>
+      <div id="moonVisible"></div>
+      <div id="moonNextFull"></div>
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+const apiKey = "7d1ecb85702cc08bf73fc5c424708126";   // <-- please regenerate
+const lat = 39.1036;
+const lon = -84.5136;
+
+/* =========================
+   DATE / TIME
+========================= */
+function updateDateTime(){
+  const now = new Date();
+  document.getElementById("dateLine").innerText =
+    now.toLocaleDateString([],{
+      weekday:'long',month:'short',day:'numeric'
+    });
+  document.getElementById("timeLine").innerText = "at " +
+    formatTime(now);
+}
+updateDateTime();
+
+// Format Time
+function formatTime(date){
+  return date.toLocaleTimeString([],{
+    hour:'numeric',
+    minute:'2-digit',
+    hour12:true
+  });
+}
+
+
+/* =========================
+   OPENWEATHERMAP 2.5
+========================= */
+fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`)
+.then(res=>{
+  if(!res.ok) throw new Error("OWM error "+res.status);
+  return res.json();
+})
+.then(data=>{
+
+  document.getElementById("temp").innerText =
+    Math.round(data.main.temp)+"°";
+
+  document.getElementById("condition").innerText =
+    data.weather[0].description;
+
+  document.getElementById("wind").innerText =
+    "Wind: "+Math.round(data.wind.speed)+" mph";
+
+  document.getElementById("humidity").innerText =
+    "Humidity: "+data.main.humidity+"%";
+
+  document.getElementById("highLow").innerText =
+    "High / Low: "+
+    Math.round(data.main.temp_max)+"° / "+
+    Math.round(data.main.temp_min)+"°";
+
+  const sunrise = new Date(data.sys.sunrise*1000);
+  const sunset  = new Date(data.sys.sunset*1000);
+
+  plotSunPosition(sunrise,sunset);
+})
+.catch(err=>console.error(err));
+
+/* =========================
+   SOLAR ARC
+========================= */
+function plotSunPosition(sunrise,sunset){
+
+  const now = new Date();
+  const midnight = new Date();
+  midnight.setHours(0,0,0,0);
+
+  const nextMidnight = new Date(midnight);
+  nextMidnight.setDate(nextMidnight.getDate()+1);
+
+  const totalDay = nextMidnight - midnight;
+
+  const cx=150, cy=150, r=120;
+
+  const solarNoon =
+    new Date((sunrise.getTime()+sunset.getTime())/2);
+
+  const noonPercent =
+    (solarNoon-midnight)/totalDay;
+
+  const rotation =
+    (-Math.PI/2)-(noonPercent*2*Math.PI);
+
+  /* SUN POSITION */
+  const percentNow =
+    (now-midnight)/totalDay;
+
+  const angle =
+    percentNow*2*Math.PI+rotation;
+
+  document.getElementById("sunMarker")
+    .setAttribute("cx",cx+r*Math.cos(angle));
+  document.getElementById("sunMarker")
+    .setAttribute("cy",cy+r*Math.sin(angle));
+
+
+  /* DAY ARC */
+  const sunriseP=(sunrise-midnight)/totalDay;
+  const sunsetP=(sunset-midnight)/totalDay;
+
+  const a1=sunriseP*2*Math.PI+rotation;
+  const a2=sunsetP*2*Math.PI+rotation;
+
+  const x1=cx+r*Math.cos(a1);
+  const y1=cy+r*Math.sin(a1);
+  const x2=cx+r*Math.cos(a2);
+  const y2=cy+r*Math.sin(a2);
+
+  document.getElementById("daySegment")
+    .setAttribute("d",
+      `M ${x1} ${y1}
+       A ${r} ${r} 0 0 1 ${x2} ${y2}`);
+
+
+  /* =========================
+     STATIC UVA ARC (Fake Data)
+     9:00 AM – 5:00 PM
+  ========================= */
+
+  const uvaStart = new Date(midnight);
+  uvaStart.setHours(9,0,0,0);
+
+  const uvaEnd = new Date(midnight);
+  uvaEnd.setHours(17,0,0,0);
+
+  const uvaStartP = (uvaStart - midnight) / totalDay;
+  const uvaEndP   = (uvaEnd - midnight) / totalDay;
+
+  const uvaR = r;
+  //const uvaR = r - 12;   // between sun arc and UVB arc
+
+  const uvaA1 = uvaStartP * 2*Math.PI + rotation;
+  const uvaA2 = uvaEndP   * 2*Math.PI + rotation;
+
+  const uvaX1 = cx + uvaR * Math.cos(uvaA1);
+  const uvaY1 = cy + uvaR * Math.sin(uvaA1);
+  const uvaX2 = cx + uvaR * Math.cos(uvaA2);
+  const uvaY2 = cy + uvaR * Math.sin(uvaA2);
+
+  document.getElementById("uvaSegment")
+    .setAttribute("d",
+      `M ${uvaX1} ${uvaY1}
+       A ${uvaR} ${uvaR} 0 0 1 ${uvaX2} ${uvaY2}`);
+
+
+
+ /* =========================
+     STATIC UVB ARC (Fake Data)
+  ========================= */
+
+  // Fake UVB window
+  const uvbStart = new Date(midnight);
+  uvbStart.setHours(10,30,0,0);
+
+  const uvbEnd = new Date(midnight);
+  uvbEnd.setHours(15,30,0,0);
+
+  const uvbStartP = (uvbStart - midnight) / totalDay;
+  const uvbEndP   = (uvbEnd - midnight) / totalDay;
+
+  const innerR = r;
+  //const innerR = r - 20;
+
+  const ua1 = uvbStartP * 2*Math.PI + rotation;
+  const ua2 = uvbEndP   * 2*Math.PI + rotation;
+
+  const ux1 = cx + innerR * Math.cos(ua1);
+  const uy1 = cy + innerR * Math.sin(ua1);
+  const ux2 = cx + innerR * Math.cos(ua2);
+  const uy2 = cy + innerR * Math.sin(ua2);
+
+  document.getElementById("uvbSegment")
+    .setAttribute("d",
+      `M ${ux1} ${uy1}
+       A ${innerR} ${innerR} 0 0 1 ${ux2} ${uy2}`);
+
+
+  /* =========================
+     SUN ANGLE (Approximation)
+  ========================= */
+
+  let sunAngleDeg = 0;
+
+  if (now >= sunrise && now <= sunset) {
+
+    const daylightProgress =
+      (now - sunrise) / (sunset - sunrise);
+
+    const elevation =
+      Math.sin(daylightProgress * Math.PI);
+
+    sunAngleDeg = Math.round(elevation * 70);
+  }
+
+  document.getElementById("centerSunAngle")
+    .textContent = "Sun Angle: " + sunAngleDeg + "°";
+
+/* =========================
+   UVA LABEL
+========================= */
+
+document.getElementById("centerUVA")
+  .textContent =
+    "UVA: " +
+    formatTime(uvaStart) +
+    " – " +
+    formatTime(uvaEnd);
+
+/* =========================
+   UVB LABEL
+========================= */
+
+document.getElementById("centerUVB")
+  .textContent =
+    "UVB: " +
+    formatTime(uvbStart) +
+    " – " +
+    formatTime(uvbEnd);
+
+
+  /* =========================
+     SUNRISE / SUNSET DOTS
+  ========================= */
+
+  const sunriseAngle = sunriseP * 2 * Math.PI + rotation;
+  const sunsetAngle  = sunsetP  * 2 * Math.PI + rotation;
+
+  const srX = cx + r * Math.cos(sunriseAngle);
+  const srY = cy + r * Math.sin(sunriseAngle);
+
+  const ssX = cx + r * Math.cos(sunsetAngle);
+  const ssY = cy + r * Math.sin(sunsetAngle);
+
+  const sunriseDot = document.getElementById("sunriseDot");
+  const sunsetDot  = document.getElementById("sunsetDot");
+
+  sunriseDot.setAttribute("cx", srX);
+  sunriseDot.setAttribute("cy", srY);
+
+  sunsetDot.setAttribute("cx", ssX);
+  sunsetDot.setAttribute("cy", ssY);
+
+
+  /* =========================
+     SUNRISE / SUNSET LABELS
+  ========================= */
+  document.getElementById("sunriseLabel").innerHTML =
+    "Sunrise<br>"+
+    formatTime(sunrise);
+
+  document.getElementById("sunsetLabel").innerHTML =
+    "Sunset<br>"+
+    formatTime(sunset);
+
+  /* =========================
+     SOLAR NOON MARKER (Centered)
+  ========================= */
+
+  // Force to visual top of circle
+  const noonAngle = -Math.PI / 2;  // 12 o'clock
+  const nx = cx + (r + 18) * Math.cos(noonAngle);
+  const ny = cy + (r + 18) * Math.sin(noonAngle);
+
+  // Triangle
+  document.getElementById("noonMarker")
+    .setAttribute("points",
+      `${nx},${ny}
+       ${nx-6},${ny-12}
+       ${nx+6},${ny-12}`);
+
+
+  /* =========================
+     SOLAR NOON LABEL
+  ========================= */
+
+  const solarNoonLabel = document.getElementById("solarNoonLabel");
+
+  solarNoonLabel.innerHTML =
+    "Solar Noon<br>" +
+    formatTime(solarNoon);
+
+  /* =========================
+     MIDNIGHT DOT
+  ========================= */
+
+  const mx = cx + r * Math.cos(rotation);
+  const my = cy + r * Math.sin(rotation);
+
+  document.getElementById("midnightMarker")
+    .setAttribute("cx", mx);
+
+  document.getElementById("midnightMarker")
+    .setAttribute("cy", my);
+
+  updateYearProgress();
+  positionSeasonTicks();
+  updateUVIndex();  
+  updateMoonPanel();
+}
+
+/* =========================
+   YEAR PROGRESS
+========================= */
+
+function updateYearProgress(){
+
+  const now = new Date();
+  const start = new Date(now.getFullYear(),0,1);
+  const end   = new Date(now.getFullYear()+1,0,1);
+
+  const percent =
+    (now - start) / (end - start);
+
+  const bar = document.getElementById("yearBar");
+  const arrow = document.getElementById("yearArrow");
+
+  const barWidth = bar.offsetWidth;
+
+  arrow.style.left =
+    (percent * barWidth) + "px";
+}
+
+/* =========================
+   SEASON TICKS
+========================= */
+
+function positionSeasonTicks(){
+
+  const year = new Date().getFullYear();
+  const start = new Date(year,0,1);
+  const end   = new Date(year+1,0,1);
+
+  function percentOfYear(date){
+    return (date - start) / (end - start);
+  }
+
+  const spring = new Date(year,2,20);
+  const summer = new Date(year,5,21);
+  const fall   = new Date(year,8,22);
+  const winter = new Date(year,11,21);
+
+  const bar = document.getElementById("yearBar");
+  const width = bar.offsetWidth;
+
+  document.getElementById("springMarker").style.left =
+    percentOfYear(spring) * width + "px";
+
+  document.getElementById("summerMarker").style.left =
+    percentOfYear(summer) * width + "px";
+
+  document.getElementById("fallMarker").style.left =
+    percentOfYear(fall) * width + "px";
+
+  document.getElementById("winterMarker").style.left =
+    percentOfYear(winter) * width + "px";
+}
+
+
+/* =========================
+   UV INDEX (Dummy Data)
+========================= */
+
+function updateUVIndex(){
+
+  const uv = 4; // pretend value
+
+  const uvValue = document.getElementById("uvValue");
+  const uvArrow = document.getElementById("uvArrow");
+  const uvBar = document.getElementById("uvScaleBar");
+
+  uvValue.textContent = uv;
+
+  /* Color-code number by risk */
+
+  let color = "#22c55e"; // default low
+
+  if(uv >= 3 && uv < 6) color = "#eab308";
+  if(uv >= 6 && uv < 8) color = "#f97316";
+  if(uv >= 8 && uv < 11) color = "#ef4444";
+  if(uv >= 11) color = "#7c3aed";
+
+  uvValue.style.color = color;
+
+  /* Position arrow */
+
+  const maxUV = 11;
+  const percent = Math.min(uv / maxUV, 1);
+
+  const width = uvBar.offsetWidth;
+
+  uvArrow.style.left = (percent * width) + "px";
+}
+
+/* =========================
+   MOON DATA (Dummy)
+========================= */
+
+function updateMoonPanel(){
+
+  // Fake values
+  const phase = "Waxing Gibbous";
+  const illumination = 72; // percent
+  const moonrise = "3:42 PM";
+  const moonset = "4:58 AM";
+  const visibleNow = true;
+  const daysUntilFull = 3;
+
+  // Update text
+  document.getElementById("moonPhase").textContent =
+    phase;
+
+  document.getElementById("moonIllumination").textContent =
+    "Illumination: " + illumination + "%";
+
+  document.getElementById("moonRiseSet").textContent =
+    "Moonrise / Moonset: " + moonrise + " / " + moonset;
+
+  document.getElementById("moonVisible").textContent =
+    "Currently Visible: " + (visibleNow ? "Yes" : "No");
+
+  document.getElementById("moonNextFull").textContent =
+    "Next Full Moon: " + daysUntilFull + " days";
+
+  /* =========================
+     Simple Phase Visualization
+  ========================= */
+
+  const shadow = document.getElementById("moonShadow");
+
+  // Convert illumination to shadow position
+  // 0% = full shadow, 100% = no shadow
+  const shadowOffset = (100 - illumination);
+
+  shadow.style.width = shadowOffset + "%";
+
+  // Flip for waxing vs waning
+  if(phase.toLowerCase().includes("waxing")){
+    shadow.style.left = "0";
+  } else {
+    shadow.style.left = "auto";
+    shadow.style.right = "0";
+  }
+}
+
+
+
+</script>
+
+</body>
+</html>
