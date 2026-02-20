@@ -1,0 +1,826 @@
+<!-- vibe-coded with ChatGPT 🤝 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cincinnati Solar Dashboard</title>
+
+<style>
+:root{
+  --bg:#0f172a;
+  --panel:#1e293b;
+  --text:#f1f5f9;
+  --muted:#94a3b8;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  padding:16px;
+}
+
+/* =========================
+   TOP BAR
+========================= */
+#topBar{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  padding:14px 16px;
+  margin-bottom:18px;
+  background:#0f172a;
+  /*border-bottom:1px solid #1e293b;*/
+}
+
+.location-name{
+  font-weight:600;
+  font-size:15px;
+  color:#e2e8f0;
+}
+
+.location-coords{
+  font-size:12px;
+  color:#94a3b8;
+}
+
+#dateTimeBlock{text-align:right}
+
+#dateLine{
+  font-size:14px;
+  color:#e2e8f0;
+}
+
+#timeLine{
+  font-size:13px;
+  color:#94a3b8;
+}
+
+/* =========================
+   PANELS
+========================= */
+.panel{
+  background:var(--panel);
+  border-radius:18px;
+  padding:20px;
+  margin-bottom:16px;
+}
+
+h2{
+  margin:0 0 12px 0;
+  font-size:14px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+.temp{
+  font-size:52px;
+  font-weight:700;
+}
+
+
+.grid2{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:14px;
+  color:var(--muted);
+}
+
+.weatherRow{
+  position:relative;
+}
+
+.weatherRow > div:first-child{
+  width:50%;
+}
+
+.weatherDetails{
+  position:absolute;
+  left:50%;
+  bottom:0;
+  width:50%;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:14px;
+  color:var(--muted);
+  text-align:left;
+}
+
+#highLow {
+  font-size:14px;
+  color:var(--muted);
+}
+
+
+
+#solarContent {
+  position: relative;
+}
+
+#solarNoonLabel {
+  text-align:center;
+  margin-top: 40px;
+  margin-bottom: 6px;
+}
+
+.sunTimeLabel {
+  font-size:12px;
+  color:#e2e8f0;
+  line-height:1.2;
+}
+
+/* =========================
+   YEAR PROGRESS BAR
+========================= */
+
+#yearSection{
+  position:relative;
+  margin-top:28px;
+  width:100%;
+  /*max-width:360px;
+  margin-left:auto;
+  margin-right:auto;*/
+}
+
+#yearBar{
+  display:flex;
+  height:22px;
+  border-radius:8px;
+  overflow:hidden;
+  background:#334155;
+}
+
+.month{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+  color:#cbd5e1;
+  border-right:1px solid #1e293b;
+}
+
+.month:last-child{
+  border-right:none;
+}
+
+#yearArrow{
+  position:absolute;
+  top:-14px;
+  width:0;
+  height:0;
+  border-left:6px solid transparent;
+  border-right:6px solid transparent;
+  border-top:10px solid #ffffff;
+  transform:translateX(-50%);
+}
+
+/* =========================
+   SEASONAL GRADIENT
+========================= */
+
+#yearGradient{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:22px;            /* match bar height */
+  border-radius:10px;     /* match bar radius */
+  pointer-events:none;
+  z-index:2;              /* ABOVE the bar */
+  background:linear-gradient(
+    to right,
+    rgba(148,163,184,0.25) 0%,
+    rgba(148,163,184,0.15) 15%,
+    rgba(250,204,21,0.25) 45%,
+    rgba(250,204,21,0.35) 50%,
+    rgba(250,204,21,0.25) 55%,
+    rgba(148,163,184,0.15) 85%,
+    rgba(148,163,184,0.25) 100%
+  );
+}
+
+
+#yearBar{
+  position:relative;
+  z-index:1;
+}
+
+
+/* =========================
+   SEASON MARKERS
+========================= */
+
+.seasonMarker{
+  position:absolute;
+  top:-18px;
+  transform:translateX(-50%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  pointer-events:none;
+}
+
+.seasonTick{
+  width:2px;
+  height:10px;
+  background:#f1f5f9;
+  opacity:0.6;
+}
+
+.seasonLabel{
+  font-size:9px;
+  margin-bottom:2px;
+  color:#94a3b8;
+  letter-spacing:.05em;
+}
+
+
+/* =========================
+   UV PANEL
+========================= */
+
+#uvValue{
+  font-size:56px;
+  font-weight:700;
+  margin-bottom:18px;
+}
+
+/* =========================
+   UV SCALE
+========================= */
+
+#uvScaleSection{
+  position:relative;
+  width:100%;
+}
+
+#uvScaleBar{
+  height:18px;
+  border-radius:10px;
+  background:linear-gradient(
+    to right,
+    #22c55e 0%,     /* Low */
+    #84cc16 20%,
+    #eab308 40%,    /* Moderate */
+    #f97316 60%,    /* High */
+    #ef4444 80%,    /* Very High */
+    #7c3aed 100%    /* Extreme */
+  );
+}
+
+#uvArrow{
+  position:absolute;
+  top:-10px;
+  width:0;
+  height:0;
+  border-left:6px solid transparent;
+  border-right:6px solid transparent;
+  border-top:10px solid #ffffff;
+  transform:translateX(-50%);
+}
+
+#uvScaleLabels{
+  display:flex;
+  justify-content:space-between;
+  font-size:10px;
+  margin-top:6px;
+  color:#94a3b8;
+}
+
+/* =========================
+   MOON PANEL LAYOUT
+========================= */
+
+#moonRow{
+  display:flex;
+  align-items:center;
+  gap:24px;
+}
+
+/* Left visual */
+
+#moonVisualWrapper{
+  display:flex;
+  justify-content:flex-start;
+}
+
+#moonDisc{
+  position:relative;
+  width:110px;
+  height:110px;
+  border-radius:50%;
+  background:#f1f5f9;
+  overflow:hidden;
+  box-shadow:0 0 20px rgba(241,245,249,0.15);
+}
+
+#moonShadow{
+  position:absolute;
+  top:0;
+  bottom:0;
+  width:50%;
+  background:#0f172a;
+  border-radius:50%;
+}
+
+/* Right details */
+
+#moonDetails{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:14px;
+  color:#94a3b8;
+}
+
+/* Phase label bold */
+
+.moonPhaseLabel{
+  font-weight:600;
+  font-size:16px;
+  color:#f1f5f9;
+}
+
+
+
+</style>
+</head>
+<body>
+
+<!-- =========================
+     TOP BAR
+========================= -->
+<div id="topBar">
+  <div>
+    <div class="location-name">Cincinnati, Ohio</div>
+    <div class="location-coords">
+      39.1036° N • 84.5136° W
+    </div>
+  </div>
+  <div id="dateTimeBlock">
+    <div id="dateLine"></div>
+    <div id="timeLine"></div>
+  </div>
+</div>
+
+<!-- =========================
+     PANEL 1 — WEATHER
+========================= -->
+<div class="panel">
+  <h2>Weather</h2>
+
+  <div class="weatherRow">
+
+    <!-- LEFT SIDE -->
+    <div>
+      <div class="temp" id="temp">--°</div>
+      <div id="condition">Loading...</div>
+      <div id="highLow"></div>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="weatherDetails">
+      <div id="wind"></div>
+      <div id="humidity"></div>
+    </div>
+
+  </div>
+
+
+</div>
+
+<!-- =========================
+     PANEL 2 — UV INDEX
+========================= -->
+<div class="panel">
+  <h2>UV Index</h2>
+
+  <div id="uvValue">--</div>
+
+  <div id="uvScaleSection">
+
+    <div id="uvArrow"></div>
+
+    <div id="uvScaleBar"></div>
+
+    <div id="uvScaleLabels">
+      <span>0</span>
+      <span>3</span>
+      <span>6</span>
+      <span>8</span>
+      <span>11+</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- =========================
+     PANEL 3 — SOLAR CYCLE
+========================= -->
+<div class="panel">
+  <h2>24-Hour Solar Cycle</h2>
+
+  <!-- Solar Noon Label -->
+  <div id="solarNoonLabel" class="sunTimeLabel"></div>
+
+  <!-- SVG Wrapper -->
+  <div id="solarContent">
+    
+    <div style="position: relative;width:100%;max-width:360px;margin:auto;">
+
+    <!-- Sunrise Label -->
+    <div id="sunriseLabel" class="sunTimeLabel"
+         style="position:absolute;left:-70px;top:130px;text-align:right;">
+    </div>
+
+    <!-- Sunset Label -->
+    <div id="sunsetLabel" class="sunTimeLabel"
+         style="position:absolute;right:-70px;top:130px;text-align:left;">
+    </div>
+
+    <svg viewBox="0 0 300 330"
+         style="width:100%;display:block">
+
+      <!-- Night Ring -->
+      <circle cx="150" cy="150" r="120"
+              fill="none"
+              stroke="#334155"
+              stroke-width="22" />
+
+      <!-- Daylight Segment -->
+      <path id="daySegment"
+            fill="none"
+            stroke="#f1f5f9"
+            stroke-width="22"
+            stroke-linecap="round" />
+
+      <!-- UVA Segment (Middle Red Arc) -->
+      <path id="uvaSegment"
+            fill="none"
+            stroke="#f87171"
+            stroke-width="10"
+            stroke-linecap="round" />
+
+
+      <!-- UVB Segment (Inner Blue Arc) -->
+      <path id="uvbSegment"
+            fill="none"
+            stroke="#3b82f6"
+            stroke-width="10"
+            stroke-linecap="round" />
+
+
+      <!-- Sunrise / Sunset Dots -->
+      <circle id="sunriseDot" r="4" fill="#64748b"/>
+      <circle id="sunsetDot" r="4" fill="#64748b"/>
+
+      <!-- Solar Noon Arrow -->
+      <polygon id="noonMarker" fill="#ffffff"/>
+
+      <!-- Midnight Dot -->
+      <circle id="midnightMarker"
+              r="4"
+              fill="#64748b"/>
+
+      <!-- Sun -->
+      <circle id="sunMarker"
+        r="16"
+        fill="#facc15"
+        opacity="1"/>
+
+      <!-- Center Info -->
+      <text id="centerSunAngle"
+            x="150"
+            y="135"
+            text-anchor="middle"
+            font-size="14"
+            fill="#f1f5f9"
+            font-weight="600">
+      </text>
+
+      <text id="centerUVA"
+            x="150"
+            y="155"
+            text-anchor="middle"
+            font-size="12"
+            fill="#f87171">
+      </text>
+
+      <text id="centerUVB"
+            x="150"
+            y="172"
+            text-anchor="middle"
+            font-size="12"
+            fill="#3b82f6">
+      </text>
+    </svg>
+    </div>
+
+    <!-- =========================
+         YEAR PROGRESS BAR
+    ========================= -->
+    <div id="yearSection">
+
+      <!-- Gradient Overlay -->
+      <div id="yearGradient"></div>
+
+      <!-- Equinox/Solstice Ticks -->
+      <div class="seasonMarker" id="springMarker">
+        <div class="seasonLabel">E</div>
+        <div class="seasonTick"></div>
+      </div>
+
+      <div class="seasonMarker" id="summerMarker">
+        <div class="seasonLabel">S</div>
+        <div class="seasonTick"></div> 
+      </div>
+
+      <div class="seasonMarker" id="fallMarker">
+        <div class="seasonLabel">E</div>
+        <div class="seasonTick"></div>
+      </div>
+
+      <div class="seasonMarker" id="winterMarker">
+        <div class="seasonLabel">S</div>
+        <div class="seasonTick"></div>
+      </div>
+
+
+      <!-- Arrow -->
+      <div id="yearArrow"></div>
+
+      <!-- Bar -->
+      <div id="yearBar">
+        <div class="month">1</div>
+        <div class="month">2</div>
+        <div class="month">3</div>
+        <div class="month">4</div>
+        <div class="month">5</div>
+        <div class="month">6</div>
+        <div class="month">7</div>
+        <div class="month">8</div>
+        <div class="month">9</div>
+        <div class="month">10</div>
+        <div class="month">11</div>
+        <div class="month">12</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- =========================
+     PANEL 4 — MOON
+========================= -->
+<div class="panel">
+  <h2>Moon</h2>
+
+  <div id="moonRow">
+
+    <div id="moonVisualWrapper">
+      <div id="moonDisc">
+        <div id="moonShadow"></div>
+      </div>
+    </div>
+
+    <div id="moonDetails">
+      <div id="moonPhase" class="moonPhaseLabel"></div>
+      <div id="moonIllumination"></div>
+      <div id="moonRiseSet"></div>
+      <div id="moonVisible"></div>
+      <div id="moonNextFull"></div>
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+const lat = 39.1036;
+const lon = -84.5136;
+
+/* =========================
+   DATE / TIME
+========================= */
+function updateDateTime(){
+  const now = new Date();
+  document.getElementById("dateLine").innerText =
+    now.toLocaleDateString([],{
+      weekday:'long',month:'short',day:'numeric'
+    });
+  document.getElementById("timeLine").innerText =
+    "at " + formatTime(now);
+}
+updateDateTime();
+
+function formatTime(date){
+  return new Date(date).toLocaleTimeString([],{
+    hour:'numeric',
+    minute:'2-digit',
+    hour12:true
+  });
+}
+
+/* =========================
+   WEATHER + UV + SUN DATA
+   (Open-Meteo – No Key)
+========================= */
+
+async function loadWeather(){
+
+  const url =
+  `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}
+  &current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,uv_index
+  &daily=temperature_2m_max,temperature_2m_min,sunrise,sunset
+  &temperature_unit=fahrenheit
+  &wind_speed_unit=mph
+  &timezone=auto`;
+
+  const res = await fetch(url.replace(/\s/g,''));
+  const data = await res.json();
+
+  const current = data.current;
+  const daily = data.daily;
+
+  /* === WEATHER === */
+
+  document.getElementById("temp").innerText =
+    Math.round(current.temperature_2m)+"°";
+
+  document.getElementById("condition").innerText =
+    weatherCodeToText(current.weather_code);
+
+  document.getElementById("wind").innerText =
+    "Wind: "+Math.round(current.wind_speed_10m)+" mph";
+
+  document.getElementById("humidity").innerText =
+    "Humidity: "+current.relative_humidity_2m+"%";
+
+  document.getElementById("highLow").innerText =
+    "High / Low: "+
+    Math.round(daily.temperature_2m_max[0])+"° / "+
+    Math.round(daily.temperature_2m_min[0])+"°";
+
+  /* === UV INDEX === */
+
+  const uv = current.uv_index;
+  updateUVIndex(uv);
+
+  /* === SOLAR ARC === */
+
+  const sunrise = new Date(daily.sunrise[0]);
+  const sunset  = new Date(daily.sunset[0]);
+
+  plotSunPosition(sunrise,sunset);
+}
+
+loadWeather();
+
+/* =========================
+   WEATHER CODE MAPPING
+========================= */
+
+function weatherCodeToText(code){
+
+  const map = {
+    0:"Clear sky",
+    1:"Mainly clear",
+    2:"Partly cloudy",
+    3:"Overcast",
+    45:"Fog",
+    48:"Depositing rime fog",
+    51:"Light drizzle",
+    53:"Moderate drizzle",
+    55:"Dense drizzle",
+    61:"Light rain",
+    63:"Moderate rain",
+    65:"Heavy rain",
+    71:"Light snow",
+    73:"Moderate snow",
+    75:"Heavy snow",
+    95:"Thunderstorm"
+  };
+
+  return map[code] || "—";
+}
+
+/* =========================
+   UV INDEX (LIVE)
+========================= */
+
+function updateUVIndex(uv){
+
+  const uvValue = document.getElementById("uvValue");
+  const uvArrow = document.getElementById("uvArrow");
+  const uvBar = document.getElementById("uvScaleBar");
+
+  uvValue.textContent = uv.toFixed(1);
+
+  let color="#22c55e";
+  if(uv>=3 && uv<6) color="#eab308";
+  if(uv>=6 && uv<8) color="#f97316";
+  if(uv>=8 && uv<11) color="#ef4444";
+  if(uv>=11) color="#7c3aed";
+
+  uvValue.style.color=color;
+
+  const maxUV=11;
+  const percent=Math.min(uv/maxUV,1);
+  uvArrow.style.left=(percent*uvBar.offsetWidth)+"px";
+}
+
+/* =========================
+   MOON (REAL CALCULATION)
+========================= */
+
+function updateMoonPanel(){
+
+  const now = new Date();
+  const synodicMonth = 29.53058867;
+  const knownNewMoon =
+    new Date("2000-01-06T18:14:00Z");
+
+  const daysSince =
+    (now-knownNewMoon)/(1000*60*60*24);
+
+  const phase =
+    (daysSince % synodicMonth)/synodicMonth;
+
+  const illumination =
+    Math.round(
+      (1-Math.cos(phase*2*Math.PI))/2*100
+    );
+
+  let phaseName="";
+
+  if(phase<0.03) phaseName="New Moon";
+  else if(phase<0.22) phaseName="Waxing Crescent";
+  else if(phase<0.28) phaseName="First Quarter";
+  else if(phase<0.47) phaseName="Waxing Gibbous";
+  else if(phase<0.53) phaseName="Full Moon";
+  else if(phase<0.72) phaseName="Waning Gibbous";
+  else if(phase<0.78) phaseName="Last Quarter";
+  else phaseName="Waning Crescent";
+
+  document.getElementById("moonPhase").textContent =
+    phaseName;
+
+  document.getElementById("moonIllumination").textContent =
+    "Illumination: "+illumination+"%";
+
+  const daysUntilFull =
+    Math.ceil(((0.5-phase+1)%1)*synodicMonth);
+
+  document.getElementById("moonNextFull").textContent =
+    "Next Full Moon: "+daysUntilFull+" days";
+
+  loadMoonRiseSet();
+
+  /* Shadow rendering (unchanged visual logic) */
+  const shadow=document.getElementById("moonShadow");
+  shadow.style.width=(100-illumination)+"%";
+
+  if(phaseName.toLowerCase().includes("waxing")){
+    shadow.style.left="0";
+  }else{
+    shadow.style.left="auto";
+    shadow.style.right="0";
+  }
+}
+
+updateMoonPanel();
+
+/* =========================
+   MOONRISE / MOONSET
+========================= */
+
+async function loadMoonRiseSet(){
+
+  const url =
+  `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}
+   &daily=moonrise,moonset&timezone=auto`;
+
+  const res=await fetch(url.replace(/\s/g,''));
+  const data=await res.json();
+
+  document.getElementById("moonRiseSet").textContent=
+    "Moonrise / Moonset: "+
+    formatTime(data.daily.moonrise[0])+" / "+
+    formatTime(data.daily.moonset[0]);
+}
+</script>
+
+
+</body>
+</html>
