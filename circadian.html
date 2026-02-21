@@ -37,7 +37,6 @@ body{
   padding:14px 16px;
   margin-bottom:18px;
   background:#0f172a;
-  /*border-bottom:1px solid #1e293b;*/
 }
 
 .location-name{
@@ -353,6 +352,11 @@ h2{
 }
 
 
+/* UV INDEX */
+#uvDescription {
+  margin-top:10px;font-size:13px;color:#94a3b8;
+}
+
 
 </style>
 </head>
@@ -364,9 +368,7 @@ h2{
 <div id="topBar">
   <div>
     <div class="location-name">Cincinnati, Ohio</div>
-    <div class="location-coords">
-      39.1036° N • 84.5136° W
-    </div>
+    <div class="location-coords">39.1036° N • 84.5136° W</div>
   </div>
   <div id="dateTimeBlock">
     <div id="dateLine"></div>
@@ -423,6 +425,9 @@ h2{
     </div>
 
   </div>
+
+  <div id="uvDescription"></div>
+
 </div>
 
 <!-- =========================
@@ -472,14 +477,12 @@ h2{
             stroke-width="10"
             stroke-linecap="round" />
 
-
       <!-- UVB Segment (Inner Blue Arc) -->
       <path id="uvbSegment"
             fill="none"
             stroke="#3b82f6"
             stroke-width="10"
             stroke-linecap="round" />
-
 
       <!-- Sunrise / Sunset Dots -->
       <circle id="sunriseDot" r="4" fill="#64748b"/>
@@ -1002,6 +1005,25 @@ function updateUVIndex(){
   const width = uvBar.offsetWidth;
 
   uvArrow.style.left = (percent * width) + "px";
+
+
+  /* =========================
+       Description Logic
+    ========================= */
+
+    let description = "";
+
+    if(uv < 3){
+      description = "UV is low. No concern.";
+    }
+    else if(uv >= 3 && uv < 6){
+      description = "UV is moderate. Safe for Vitamin D and melanin.";
+    }
+    else{
+      description = "UV is high. Fairer skin types should avoid direct sun (seek shade).";
+    }
+
+    uvDescription.textContent = description;
 }
 
 /* =========================
@@ -1025,8 +1047,8 @@ function updateMoonPanel(){
   document.getElementById("moonIllumination").textContent =
     "Illumination: " + illumination + "%";
 
-  document.getElementById("moonRiseSet").textContent =
-    "Moonrise / Moonset: " + moonrise + " / " + moonset;
+  //document.getElementById("moonRiseSet").textContent =
+  //  "Moonrise / Moonset: " + moonrise + " / " + moonset;
 
   document.getElementById("moonVisible").textContent =
     "Currently Visible: " + (visibleNow ? "Yes" : "No");
