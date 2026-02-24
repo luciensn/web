@@ -37,6 +37,10 @@ body{
   padding:16px;
 }
 
+a {
+  color: #f1f5f9;
+}
+
 /* =========================
    TOP BAR
 ========================= */
@@ -566,16 +570,36 @@ h2{
       <!-- Breakfast Arc -->
       <path id="breakfastSegment"
             fill="none"
-            stroke="#22c55e"
-            stroke-width="10"
+            stroke="#334155"
+            stroke-width="16"
             stroke-linecap="round" />
 
       <!-- Dinner Arc -->
       <path id="dinnerSegment"
             fill="none"
-            stroke="#22c55e"
-            stroke-width="10"
+            stroke="#334155"
+            stroke-width="16"
             stroke-linecap="round" />
+
+      <!-- Breakfast Label -->
+      <text id="breakfastLabel"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            font-size="10"
+            fill="#1e293b"
+            font-weight="600">
+          EAT
+      </text>
+
+      <!-- Dinner Label -->
+      <text id="dinnerLabel"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            font-size="10"
+            fill="#1e293b"
+            font-weight="600">
+          EAT
+      </text>
 
       <!-- Sunrise / Sunset Dots -->
       <circle id="sunriseDot" r="4" fill="#64748b"/>
@@ -713,6 +737,19 @@ h2{
 
 </div>
 
+<!-- FOOTER -->
+
+<div id="dataFooter" style="
+    text-align:center;
+    font-size:12px;
+    color:#888;
+    margin-top:20px;
+    padding:10px 0;
+    font-family:system-ui, -apple-system, sans-serif;
+    ">
+    Data from <a href="https://open-meteo.com">Open-Meteo<a/> • <span id="lastUpdated">Last updated: --:--:--</span>
+</div>
+
 
 <script>
 
@@ -722,6 +759,10 @@ const lon = -84.5136;
 /* =========================
    DATE / TIME
 ========================= */
+
+let lastRefreshTime = null;
+let elapsedTimer = null;
+
 function updateDateTime(){
   const now = new Date();
   document.getElementById("dateLine").innerText =
@@ -742,6 +783,34 @@ function formatTime(date){
   });
 }
 
+// Elapsed Timer
+function startElapsedTimer() {
+    lastRefreshTime = new Date();
+
+    // Clear existing timer if it exists
+    if (elapsedTimer) {
+        clearInterval(elapsedTimer);
+    }
+
+    function updateElapsed() {
+        const now = new Date();
+        const seconds = Math.floor((now - lastRefreshTime) / 1000);
+
+        let text;
+
+        if (seconds < 60) {
+            text = `Last updated ${seconds} second${seconds !== 1 ? 's' : ''} ago`;
+        } else {
+            const minutes = Math.floor(seconds / 60);
+            text = `Last updated ${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+        }
+
+        document.getElementById("lastUpdated").textContent = text;
+    }
+
+    updateElapsed(); // Run immediately
+    elapsedTimer = setInterval(updateElapsed, 30 * 1000); // Update every 30s
+}
 
 
 // -----------------------------------------------------------
@@ -1109,6 +1178,11 @@ fetch(url)
       shadow.style.left = "auto";
       shadow.style.right = "0";
     }
+
+
+    // timestamp
+    startElapsedTimer();
+
 });
 
 /* ---------------- Helper Functions ---------------- */
@@ -1303,7 +1377,7 @@ function plotSunPosition(sunrise,sunset,uvaWindow,uvbWindow){
   const breakfastStart = new Date(sunrise);
   const breakfastEnd = new Date(sunrise.getTime() + 60*60*1000);
 
-  const breakfastR = r - 20;   // inside main ring
+  const breakfastR = r - 22;   // inside main ring
 
   const breakfastStartP = (breakfastStart - midnight) / totalDay;
   const breakfastEndP   = (breakfastEnd - midnight) / totalDay;
@@ -1331,7 +1405,7 @@ function plotSunPosition(sunrise,sunset,uvaWindow,uvbWindow){
   const dinnerEnd = new Date(sunset);
   const dinnerStart = new Date(sunset.getTime() - 60*60*1000);
 
-  const dinnerR = r - 20;
+  const dinnerR = r - 22;
 
   const dinnerStartP = (dinnerStart - midnight) / totalDay;
   const dinnerEndP   = (dinnerEnd - midnight) / totalDay;
@@ -1348,6 +1422,58 @@ function plotSunPosition(sunrise,sunset,uvaWindow,uvbWindow){
     .setAttribute("d",
       `M ${dx1} ${dy1}
        A ${dinnerR} ${dinnerR} 0 0 1 ${dx2} ${dy2}`);
+
+
+  /* =========================
+     BREAKFAST LABEL
+  ========================= */
+
+  const breakfastMid = (bA1 + bA2) / 2;
+  const labelR = breakfastR;
+
+  const blx = cx + labelR * Math.cos(breakfastMid);
+  const bly = cy + labelR * Math.sin(breakfastMid);
+
+  const breakfastLabel = document.getElementById("breakfastLabel");
+
+  breakfastLabel.setAttribute("x", blx);
+  breakfastLabel.setAttribute("y", bly);
+
+  // Rotate to follow arc
+  //const breakfastDeg = breakfastMid * (180 / Math.PI) + 90;
+  let breakfastDeg = breakfastMid * (180 / Math.PI) + 90;
+  if (breakfastDeg > 180) breakfastDeg -= 180;
+
+  breakfastLabel.setAttribute(
+    "transform",
+    `rotate(${breakfastDeg} ${blx} ${bly})`
+  );
+
+
+  /* =========================
+     DINNER LABEL
+  ========================= */
+
+  const dinnerMid = (dA1 + dA2) / 2;
+
+  const dlx = cx + labelR * Math.cos(dinnerMid);
+  const dly = cy + labelR * Math.sin(dinnerMid);
+
+  const dinnerLabel = document.getElementById("dinnerLabel");
+
+  dinnerLabel.setAttribute("x", dlx);
+  dinnerLabel.setAttribute("y", dly);
+
+  // Rotate to follow arc
+  //const dinnerDeg = dinnerMid * (180 / Math.PI) + 90;
+  let dinnerDeg = dinnerMid * (180 / Math.PI) + 90;
+  if (dinnerDeg > 180) dinnerDeg -= 180;
+
+
+  dinnerLabel.setAttribute(
+    "transform",
+    `rotate(${dinnerDeg} ${dlx} ${dly})`
+  );
 
 
   /* =========================
@@ -1535,6 +1661,16 @@ document.getElementById("refreshButton")
   .addEventListener("click", () => {
       location.reload();
   });
+
+function updateTimestamp() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+    document.getElementById("lastUpdated").textContent = timeString;
+}
 
 
 </script>
