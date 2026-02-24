@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cincinnati Weather & Solar Data</title>
+
+<style>
+body {
+    font-family: system-ui, sans-serif;
+    background: #0f172a;
+    color: #f1f5f9;
+    padding: 30px;
+    line-height: 1.6;
+}
+h1 {
+    margin-bottom: 10px;
+}
+.section {
+    margin-top: 25px;
+    padding: 20px;
+    background: #1e293b;
+    border-radius: 12px;
+}
+.label {
+    color: #94a3b8;
+}
+.value {
+    font-size: 20px;
+    font-weight: 600;
+}
+</style>
+</head>
+<body>
+
+<h1>Cincinnati, Ohio</h1>
+<div>Lat: 39.1036 | Lon: -84.5136</div>
+
+<div class="section">
+    <h2>Weather</h2>
+    <div><span class="label">Temperature:</span> <span class="value" id="temp"></span></div>
+    <div><span class="label">Conditions:</span> <span class="value" id="conditions"></span></div>
+    <div><span class="label">High / Low:</span> <span class="value" id="highlow"></span></div>
+    <div><span class="label">Wind:</span> <span class="value" id="wind"></span></div>
+    <div><span class="label">Humidity:</span> <span class="value" id="humidity"></span></div>
+</div>
+
+<div class="section">
+    <h2>Solar & UV</h2>
+    <div><span class="label">UV Index:</span> <span class="value" id="uv"></span></div>
+    <div><span class="label">Sunrise:</span> <span class="value" id="sunrise"></span></div>
+    <div><span class="label">Sunset:</span> <span class="value" id="sunset"></span></div>
+    <div><span class="label">Solar Noon:</span> <span class="value" id="solarnoon"></span></div>
+    <div><span class="label">Current Sun Angle:</span> <span class="value" id="sunangle"></span></div>
+    <div><span class="label">UVA Window (UV ≥ 0):</span> <span class="value" id="uva"></span></div>
+    <div><span class="label">UVB Window (UV ≥ 3):</span> <span class="value" id="uvb"></span></div>
+</div>
+
+<div class="section">
+    <h2>Moon</h2>
+    <div><span class="label">Phase:</span> <span class="value" id="moonPhase"></span></div>
+    <div><span class="label">Illumination:</span> <span class="value" id="moonIllumination"></span></div>
+    <div><span class="label">Currently Visible:</span> <span class="value" id="moonVisible"></span></div>
+    <div><span class="label">Days Until Next Full Moon:</span> <span class="value" id="moonNextFull"></span></div>
+</div>
+
+
+<script>
+const lat = 39.1036;
+const lon = -84.5136;
+
+const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}
+&current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m,uv_index
+&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset
+&hourly=uv_index
+&temperature_unit=fahrenheit
+&wind_speed_unit=mph
+&timezone=auto`;
+
+fetch(url)
+.then(res => res.json())
+.then(data => {
+
+    /* ---------------- Weather ---------------- */
+
+    document.getElementById("temp").textContent =
+        Math.round(data.current.temperature_2m) + "°F";
+
+    document.getElementById("conditions").textContent =
+        weatherCodeToText(data.current.weather_code);
+
+    document.getElementById("highlow").textContent =
+        Math.round(data.daily.temperature_2m_max[0]) + "°F / " +
+        Math.round(data.daily.temperature_2m_min[0]) + "°F";
+
+    document.getElementById("wind").textContent =
+        Math.round(data.current.wind_speed_10m) + " mph";
+
+    document.getElementById("humidity").textContent =
+        data.current.relative_humidity_2m + "%";
+
+    /* ---------------- Solar ---------------- */
+
+    const sunrise = new Date(data.daily.sunrise[0]);
+    const sunset = new Date(data.daily.sunset[0]);
+
+    document.getElementById("sunrise").textContent = formatTime(sunrise);
+    document.getElementById("sunset").textContent = formatTime(sunset);
+
+    const solarNoon = new Date((sunrise.getTime() + sunset.getTime()) / 2);
+    document.getElementById("solarnoon").textContent = formatTime(solarNoon);
+
+    /* ---------------- UV ---------------- */
+
+    document.getElementById("uv").textContent =
+        data.current.uv_index;
+
+    const hourlyUV = data.hourly.uv_index;
+    const hourlyTimes = data.hourly.time.map(t => new Date(t));
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    function findUVWindowForToday(threshold, requirePositive=false) {
+        let start = null;
+        let end = null;
+
+        for (let i = 0; i < hourlyUV.length; i++) {
+            const time = hourlyTimes[i];
+
+            // Only use today's data
+            if (time >= today && time < tomorrow) {
+
+                const uv = hourlyUV[i];
+
+                // Optional guard to avoid counting UV = 0 at night
+                const meetsThreshold = requirePositive
+                    ? uv > threshold
+                    : uv >= threshold;
+
+                if (meetsThreshold) {
+                    if (!start) start = time;
+                    end = time;
+                }
+            }
+        }
+
+        if (!start) return "None";
+
+        return formatTime(start) + " – " + formatTime(end);
+    }
+
+    // UVA: any measurable UV (> 0)
+    const uvaWindow = findUVWindowForToday(0, true);
+
+    // UVB: UV ≥ 3
+    const uvbWindow = findUVWindowForToday(3);
+
+    document.getElementById("uva").textContent = uvaWindow;
+    document.getElementById("uvb").textContent = uvbWindow;
+
+
+    document.getElementById("uva").textContent = uvaWindow;
+    document.getElementById("uvb").textContent = uvbWindow;
+
+
+    /* ---------------- Accurate Solar Elevation ---------------- */
+
+    function getSolarElevation(date, latitude, longitude) {
+
+        const rad = Math.PI / 180;
+
+        const day = Math.floor(
+            (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) -
+             Date.UTC(date.getFullYear(), 0, 0)) / 86400000
+        );
+
+        const time = date.getHours() +
+                     date.getMinutes() / 60 +
+                     date.getSeconds() / 3600;
+
+        // Fractional year (radians)
+        const gamma = 2 * Math.PI / 365 *
+            (day - 1 + (time - 12) / 24);
+
+        // Equation of time (minutes)
+        const eqTime =
+            229.18 * (
+                0.000075 +
+                0.001868 * Math.cos(gamma) -
+                0.032077 * Math.sin(gamma) -
+                0.014615 * Math.cos(2 * gamma) -
+                0.040849 * Math.sin(2 * gamma)
+            );
+
+        // Solar declination (radians)
+        const decl =
+            0.006918 -
+            0.399912 * Math.cos(gamma) +
+            0.070257 * Math.sin(gamma) -
+            0.006758 * Math.cos(2 * gamma) +
+            0.000907 * Math.sin(2 * gamma) -
+            0.002697 * Math.cos(3 * gamma) +
+            0.00148 * Math.sin(3 * gamma);
+
+        // Time offset
+        const timezoneOffset = -date.getTimezoneOffset() / 60;
+        const timeOffset = eqTime + 4 * longitude - 60 * timezoneOffset;
+
+        const trueSolarTime = time * 60 + timeOffset;
+
+        // Hour angle (degrees)
+        const hourAngle = (trueSolarTime / 4) - 180;
+
+        const haRad = hourAngle * rad;
+        const latRad = latitude * rad;
+
+        const elevation =
+            Math.asin(
+                Math.sin(latRad) * Math.sin(decl) +
+                Math.cos(latRad) * Math.cos(decl) * Math.cos(haRad)
+            );
+
+        return elevation / rad; // convert back to degrees
+    }
+
+    const now = new Date();
+    const solarElevation = getSolarElevation(now, 39.1036, -84.5136);
+
+    document.getElementById("sunangle").textContent =
+        Math.round(solarElevation) + "°";
+
+
+    /* ===============================
+       ASTRONOMICAL MOON ENGINE
+    ================================ */
+
+    function getJulianDate(date) {
+        return (date / 86400000) + 2440587.5;
+    }
+
+    function getMoonPosition(date, lat, lon) {
+
+        const rad = Math.PI / 180;
+        const deg = 180 / Math.PI;
+
+        const JD = getJulianDate(date);
+        const T = (JD - 2451545.0) / 36525;
+
+        // Mean longitude
+        let L = 218.316 + 13.176396 * (JD - 2451545.0);
+        L %= 360;
+
+        // Mean anomaly
+        let M = 134.963 + 13.064993 * (JD - 2451545.0);
+        M %= 360;
+
+        // Ecliptic longitude
+        const lambda = L + 6.289 * Math.sin(M * rad);
+
+        // Obliquity
+        const epsilon = 23.439 - 0.0000004 * (JD - 2451545.0);
+
+        // Right ascension
+        const RA = Math.atan2(
+            Math.cos(epsilon * rad) * Math.sin(lambda * rad),
+            Math.cos(lambda * rad)
+        ) * deg;
+
+        // Declination
+        const Dec = Math.asin(
+            Math.sin(epsilon * rad) * Math.sin(lambda * rad)
+        ) * deg;
+
+        // Sidereal time
+        const GMST = 280.46061837 + 360.98564736629 * (JD - 2451545.0);
+        const LST = (GMST + lon) % 360;
+
+        const HA = (LST - RA) * rad;
+
+        const latRad = lat * rad;
+        const decRad = Dec * rad;
+
+        const altitude = Math.asin(
+            Math.sin(latRad) * Math.sin(decRad) +
+            Math.cos(latRad) * Math.cos(decRad) * Math.cos(HA)
+        ) * deg;
+
+        return altitude;
+    }
+
+
+    /* ===============================
+       FIND MOONRISE / MOONSET
+    ================================ */
+
+    function findMoonRiseSet(date, lat, lon) {
+
+        const start = new Date(date);
+        start.setHours(0,0,0,0);
+
+        let rise = null;
+        let set = null;
+
+        let prevAlt = getMoonPosition(start, lat, lon);
+
+        for (let h = 1; h <= 24; h++) {
+
+            const testTime = new Date(start);
+            testTime.setHours(h);
+
+            const alt = getMoonPosition(testTime, lat, lon);
+
+            if (prevAlt < 0 && alt >= 0 && !rise) {
+                rise = new Date(testTime);
+            }
+
+            if (prevAlt >= 0 && alt < 0 && !set) {
+                set = new Date(testTime);
+            }
+
+            prevAlt = alt;
+        }
+
+        return { rise, set };
+    }
+
+
+    /* ===============================
+       MOON PHASE & ILLUMINATION
+    ================================ */
+
+    function calculateMoonPhase(date) {
+
+        const synodicMonth = 29.53058867;
+        const knownNewMoon = new Date("2000-01-06T18:14:00Z");
+
+        const daysSince =
+            (date - knownNewMoon) / (1000 * 60 * 60 * 24);
+
+        const moonAge =
+            (daysSince % synodicMonth + synodicMonth) % synodicMonth;
+
+        const phaseFraction = moonAge / synodicMonth;
+
+        const illumination =
+            (1 - Math.cos(2 * Math.PI * phaseFraction)) / 2;
+
+        const illuminationPercent =
+            Math.round(illumination * 100);
+
+        let phaseName;
+
+        if (moonAge < 1) phaseName = "New Moon";
+        else if (moonAge < 7.4) phaseName = "Waxing Crescent";
+        else if (moonAge < 8.9) phaseName = "First Quarter";
+        else if (moonAge < 14.8) phaseName = "Waxing Gibbous";
+        else if (moonAge < 16.2) phaseName = "Full Moon";
+        else if (moonAge < 22.1) phaseName = "Waning Gibbous";
+        else if (moonAge < 23.6) phaseName = "Last Quarter";
+        else phaseName = "Waning Crescent";
+
+        const fullMoonAge = synodicMonth / 2;
+        let daysUntilFull = fullMoonAge - moonAge;
+        if (daysUntilFull < 0) daysUntilFull += synodicMonth;
+
+        return {
+            phaseName,
+            illuminationPercent,
+            daysUntilFull: Math.round(daysUntilFull)
+        };
+    }
+
+
+    /* ===============================
+       UPDATE MOON PANEL
+    ================================ */
+
+    const moonPhase = calculateMoonPhase(now);
+
+    const moonAltitude =
+        getMoonPosition(now, 39.1036, -84.5136);
+
+    const moonRiseSet =
+        findMoonRiseSet(now, 39.1036, -84.5136);
+
+    document.getElementById("moonPhase").textContent =
+        moonPhase.phaseName;
+
+    document.getElementById("moonIllumination").textContent =
+        moonPhase.illuminationPercent + "%";
+
+    document.getElementById("moonNextFull").textContent =
+        moonPhase.daysUntilFull + " days";
+
+    document.getElementById("moonVisible").textContent =
+        moonAltitude > 0 ? "Yes" : "No";
+
+
+    // Optional: Add new display lines
+    const moonSection = document.querySelector("#moonVisible").parentElement.parentElement;
+
+    const altitudeDiv = document.createElement("div");
+    altitudeDiv.innerHTML =
+        '<span class="label">Altitude:</span> <span class="value">' +
+        Math.round(moonAltitude) + '°</span>';
+
+    const riseSetDiv = document.createElement("div");
+    riseSetDiv.innerHTML =
+        '<span class="label">Moonrise / Moonset:</span> <span class="value">' +
+        (moonRiseSet.rise ? formatTime(moonRiseSet.rise) : "None") +
+        " / " +
+        (moonRiseSet.set ? formatTime(moonRiseSet.set) : "None") +
+        '</span>';
+
+    moonSection.appendChild(altitudeDiv);
+    moonSection.appendChild(riseSetDiv);
+
+
+
+
+});
+
+/* ---------------- Helper Functions ---------------- */
+
+function formatTime(date) {
+    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+}
+
+function findUVWindow(times, values, threshold) {
+    let start = null;
+    let end = null;
+
+    for (let i = 0; i < values.length; i++) {
+        if (values[i] >= threshold) {
+            if (!start) start = times[i];
+            end = times[i];
+        }
+    }
+
+    if (!start) return "None";
+
+    return formatTime(start) + " – " + formatTime(end);
+}
+
+function weatherCodeToText(code) {
+    const map = {
+        0: "Clear sky",
+        1: "Mainly clear",
+        2: "Partly cloudy",
+        3: "Overcast",
+        45: "Fog",
+        48: "Depositing rime fog",
+        51: "Light drizzle",
+        53: "Moderate drizzle",
+        55: "Dense drizzle",
+        61: "Light rain",
+        63: "Moderate rain",
+        65: "Heavy rain",
+        71: "Light snow",
+        73: "Moderate snow",
+        75: "Heavy snow",
+        80: "Rain showers",
+        95: "Thunderstorm"
+    };
+    return map[code] || "Unknown";
+}
+</script>
+
+</body>
+</html>
