@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Suncinnati</title>
 
 <!-- App Icons -->
@@ -60,18 +60,8 @@ a {
   background:#0f172a;
   /*margin-top: -500px;
   padding-top: 500px;*/
-}
 
-#topBarBG {
-  /*background:#0f172a;*/
-  position: relative;
-  background: green;
-  width: 100%;
-  top: -500px;
-  margin:0;
-  padding: 0;
-
-  border:1px solid green;
+  padding-top: calc(14px + env(safe-area-inset-top));
 }
 
 /* LOGO ROW */
@@ -583,7 +573,6 @@ h2{
 <!-- =========================
      TOP BAR
 ========================= -->
-<div id="topBarBG"></div>
 
 <div id="topBar">
   
