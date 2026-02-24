@@ -108,12 +108,17 @@ a {
 
 /* CENTER — Date/Time */
 #dateTimeBlock{
-  text-align:center;
+  text-align:right;
 }
 
 /* RIGHT — Refresh */
 #refreshBlock{
   text-align:right;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 #refreshButton{
@@ -588,17 +593,20 @@ h2{
     <!-- LEFT -->
     <div id="locationBlock">
       <div class="location-name">Cincinnati, Ohio</div>
-      <div class="location-coords">39.1036° N • 84.5136° W</div>
+      <div class="location-coords">39.1111° N • 84.4306° W</div>
     </div>
 
     <!-- CENTER -->
-    <div id="dateTimeBlock">
-      <div id="dateLine"></div>
-      <div id="timeLine"></div>
-    </div>
+    <div></div>
 
     <!-- RIGHT -->
     <div id="refreshBlock">
+
+      <div id="dateTimeBlock">
+        <div id="dateLine"></div>
+        <div id="timeLine"></div>
+      </div>
+
       <button id="refreshButton">↻</button>
     </div>
 
@@ -958,8 +966,8 @@ h2{
 
 <script>
 
-const lat = 39.1036;
-const lon = -84.5136;
+const lat = 39.1111;
+const lon = -84.4304;
 
 /* =========================
    DATE / TIME
