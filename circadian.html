@@ -894,7 +894,7 @@ fetch(url)
     const solarElevation = getSolarElevation(now, lat, lon);
 
     document.getElementById("centerSunAngle").textContent =
-        Math.round(solarElevation) + "°";
+        "∠ " + Math.round(solarElevation) + "°";
 
 
     plotSunPosition(sunrise, sunset, uvaWindow, uvbWindow);
