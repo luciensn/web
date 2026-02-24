@@ -63,11 +63,15 @@ a {
 }
 
 #topBarBG {
-  background:#0f172a;
+  /*background:#0f172a;*/
+  position: relative;
+  background: green;
   width: 100%;
   top: -500px;
   margin:0;
   padding: 0;
+
+  border:1px solid green;
 }
 
 /* LOGO ROW */
@@ -579,8 +583,10 @@ h2{
 <!-- =========================
      TOP BAR
 ========================= -->
+<div id="topBarBG"></div>
+
 <div id="topBar">
-  <div id="topBarBG"></div>
+  
 
   <!-- ROW 1: LOGO -->
   <div id="siteLogo">
