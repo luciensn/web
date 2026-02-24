@@ -550,6 +550,20 @@ h2{
             stroke-width="10"
             stroke-linecap="round" />
 
+      <!-- Breakfast Arc -->
+      <path id="breakfastSegment"
+            fill="none"
+            stroke="#22c55e"
+            stroke-width="10"
+            stroke-linecap="round" />
+
+      <!-- Dinner Arc -->
+      <path id="dinnerSegment"
+            fill="none"
+            stroke="#22c55e"
+            stroke-width="10"
+            stroke-linecap="round" />
+
       <!-- Sunrise / Sunset Dots -->
       <circle id="sunriseDot" r="4" fill="#64748b"/>
       <circle id="sunsetDot" r="4" fill="#64748b"/>
@@ -1185,9 +1199,9 @@ function plotSunPosition(sunrise,sunset,uvaWindow,uvbWindow){
      SLEEP ARC (11PM → Sunrise)
   ========================= */
 
-  // 11:00 PM
   const sleepStart = new Date(midnight);
-  sleepStart.setHours(23,0,0,0);
+  //sleepStart.setHours(23,0,0,0); // 11:00 PM
+  sleepStart.setHours(22,30,0,0); // 10:30 PM
 
   // If sunrise is before 11PM (normal case), it is next day wrap
   let sleepEnd = new Date(sunrise);
@@ -1266,6 +1280,61 @@ function plotSunPosition(sunrise,sunset,uvaWindow,uvbWindow){
     .setAttribute("d",
       `M ${ux1} ${uy1}
        A ${innerR} ${innerR} 0 0 1 ${ux2} ${uy2}`);
+
+
+  /* =========================
+     BREAKFAST ARC
+     Sunrise → +1 hour
+  ========================= */
+
+  const breakfastStart = new Date(sunrise);
+  const breakfastEnd = new Date(sunrise.getTime() + 60*60*1000);
+
+  const breakfastR = r - 20;   // inside main ring
+
+  const breakfastStartP = (breakfastStart - midnight) / totalDay;
+  const breakfastEndP   = (breakfastEnd - midnight) / totalDay;
+
+  const bA1 = breakfastStartP * 2*Math.PI + rotation;
+  const bA2 = breakfastEndP   * 2*Math.PI + rotation;
+
+  const bx1 = cx + breakfastR * Math.cos(bA1);
+  const by1 = cy + breakfastR * Math.sin(bA1);
+  const bx2 = cx + breakfastR * Math.cos(bA2);
+  const by2 = cy + breakfastR * Math.sin(bA2);
+
+  document.getElementById("breakfastSegment")
+    .setAttribute("d",
+      `M ${bx1} ${by1}
+       A ${breakfastR} ${breakfastR} 0 0 1 ${bx2} ${by2}`);
+
+
+
+  /* =========================
+     DINNER ARC
+     -1 hour → Sunset
+  ========================= */
+
+  const dinnerEnd = new Date(sunset);
+  const dinnerStart = new Date(sunset.getTime() - 60*60*1000);
+
+  const dinnerR = r - 20;
+
+  const dinnerStartP = (dinnerStart - midnight) / totalDay;
+  const dinnerEndP   = (dinnerEnd - midnight) / totalDay;
+
+  const dA1 = dinnerStartP * 2*Math.PI + rotation;
+  const dA2 = dinnerEndP   * 2*Math.PI + rotation;
+
+  const dx1 = cx + dinnerR * Math.cos(dA1);
+  const dy1 = cy + dinnerR * Math.sin(dA1);
+  const dx2 = cx + dinnerR * Math.cos(dA2);
+  const dy2 = cy + dinnerR * Math.sin(dA2);
+
+  document.getElementById("dinnerSegment")
+    .setAttribute("d",
+      `M ${dx1} ${dy1}
+       A ${dinnerR} ${dinnerR} 0 0 1 ${dx2} ${dy2}`);
 
 
   /* =========================
