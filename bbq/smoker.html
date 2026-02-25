@@ -1,0 +1,269 @@
+<!-- vibe-coded with ChatGPT 🤝 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Smoker Load Balancer</title>
+
+<link rel="icon" href="favicon.ico">
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="theme-color" content="#ffffff" />
+<!-- App title when added to home screen -->
+<meta name="apple-mobile-web-app-title" content="Smoker Load Balancer">
+
+<style>
+* { box-sizing: border-box; margin:0; padding:0; }
+
+body {
+  font-family: -apple-system, system-ui, sans-serif;
+  background: #f5f5f7;
+  padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+}
+
+header {
+  position: sticky;
+  top: 0;
+  background: rgba(255,255,255,.9);
+  backdrop-filter: blur(20px);
+  padding: 12px 0;
+  font-weight: 600;
+  font-size: 18px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  background: #007aff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+#summary {
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.visualizer {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.set {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rack-bar {
+  background: #e5e5ea;
+  border-radius: 8px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 0 6px;
+}
+
+.rack-bar.shrink {
+  justify-content: space-between;
+}
+
+.meat {
+  width: 14px;
+  height: 14px;
+  background: red;
+  border-radius: 50%;
+}
+
+/* ==== LABEL GENERATOR ==== */
+
+.label-widget {
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.label-dates {
+  /*display: flex;
+  justify-content: space-between;*/
+  margin-bottom: 8px;
+}
+
+.recalc-btn {
+  /*width: 100%;*/
+  padding: 8px;
+  font-size: 14px;
+  background: #34c759; /* iOS green */
+  color: white;
+  border: none;
+  border-radius: 8px;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<header>Smoker Load Balancer</header>
+
+
+<!-- LOAD VISUALIZER -->
+<div>How many cases of pork butts to load?</div>
+<br>
+<br>
+
+<input type="number" id="cases" placeholder="Enter number of cases" min="1">
+<button onclick="loadMeat()">Submit</button>
+
+<div id="summary"></div>
+<div class="visualizer" id="visualizer"></div>
+
+
+<br>
+<br>
+
+<!-- LABEL GENERATOR -->
+<div class="label-widget">
+  Label Generator
+  <br>
+  <br>
+  <div class="label-dates">
+    <div><strong>Today:</strong> <span id="todayDate"></span></div>
+    <div><strong>Use By:</strong> <span id="useByDate"></span></div>
+  </div>
+  <!--<button class="recalc-btn" onclick="generateDates()">↻</button>-->
+</div>
+
+<script>
+function loadMeat() {
+  const cases = parseInt(document.getElementById('cases').value);
+  if (!cases || cases < 1) return;
+  if (cases > 12) return;
+
+  const totalMeats = cases * 8;
+  const sets = 5;
+
+  let meatsPerSet = Math.floor(totalMeats / sets);
+  let remainder = totalMeats % sets;
+
+  const distribution = [];
+
+  for (let i = 0; i < sets; i++) {
+    let meats = meatsPerSet + (i < remainder ? 1 : 0);
+    distribution.push(distributeToRacks(meats));
+  }
+
+  renderSummary(cases, totalMeats, meatsPerSet, remainder);
+  renderVisualizer(distribution);
+}
+
+function distributeToRacks(meats) {
+  const racks = [0,0,0,0]; // 1(top),2,3,4(bottom)
+
+  // Determine max capacity per rack
+  const maxPerRack = meats > 8 ? 5 : 4;
+
+  // Decide which racks are active
+  let activeRacks = [1,2]; // rack 2 and 3 (0-based index: 1,2)
+
+  if (meats > 10) activeRacks.push(3); // add rack 4
+  if (meats > 15) activeRacks.push(0); // add rack 1
+
+  let remaining = meats;
+
+  // Even vertical distribution
+  while (remaining > 0) {
+    for (let r of activeRacks) {
+      if (remaining === 0) break;
+      if (racks[r] < maxPerRack) {
+        racks[r]++;
+        remaining--;
+      }
+    }
+  }
+
+  return racks;
+}
+
+function renderSummary(cases, totalMeats, meatsPerSet, remainder) {
+    document.getElementById('summary').innerHTML =
+    `<strong>${cases} cases</strong> = ${totalMeats} meats<br>
+     Evenly spread across 5 sets<br>
+     ${meatsPerSet}${remainder ? "–" + (meatsPerSet+1) : ""} meats per set`;
+}
+
+function renderVisualizer(distribution) {
+  const container = document.getElementById('visualizer');
+  container.innerHTML = "";
+
+  distribution.forEach(racks => {
+    const setDiv = document.createElement("div");
+    setDiv.className = "set";
+
+    racks.forEach(count => {
+      const rackBar = document.createElement("div");
+      rackBar.className = "rack-bar";
+      if (count > 4) rackBar.classList.add("shrink");
+
+      for (let i = 0; i < count; i++) {
+        const meat = document.createElement("div");
+        meat.className = "meat";
+        rackBar.appendChild(meat);
+      }
+
+      setDiv.appendChild(rackBar);
+    });
+
+    container.appendChild(setDiv);
+  });
+}
+
+
+/* =================
+  LABEL GENERATOR 
+  ================== */
+function formatDate(date) {
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  return `${month}-${day.toString().padStart(2, '0')}`;
+}
+
+function generateDates() {
+  const today = new Date();
+
+  const useBy = new Date();
+  useBy.setDate(today.getDate() + 6); // auto handles month/year rollover
+
+  document.getElementById("todayDate").textContent = formatDate(today);
+  document.getElementById("useByDate").textContent = formatDate(useBy);
+}
+
+// Auto-generate on page load
+generateDates();
+
+</script>
+
+</body>
+</html>
