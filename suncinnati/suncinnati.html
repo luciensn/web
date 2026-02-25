@@ -135,6 +135,21 @@ a {
   gap: 10px;
 }
 
+
+.topBarButton {
+  background:#1e293b;
+  border:1px solid #334155;
+  color:#f1f5f9;
+  border-radius:6px;
+  padding:4px 8px;
+  cursor:pointer;
+  font-size:14px;
+}
+.topBarButton:hover {
+  background:#334155;
+}
+
+/*
 #refreshButton{
   background:#1e293b;
   border:1px solid #334155;
@@ -148,6 +163,7 @@ a {
 #refreshButton:hover{
   background:#334155;
 }
+*/
 
 /* =========================
    PANELS
@@ -526,10 +542,11 @@ h2{
 ========================= -->
 
 <div id="topBar">
+  <button id="settingsButton" class="topBarButton">⚙</button>
   <div id="siteLogo">
     Suncinnati
   </div>
-  <button id="refreshButton">↻</button>
+  <button id="refreshButton" class="topBarButton">↻</button>
 </div>
 
 
