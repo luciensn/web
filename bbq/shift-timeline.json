@@ -1,14 +1,11 @@
-/* ==== SHIFT TIMELINE ==== */
 {
-  "shiftStart": "09:00", // 9:00 AM
-  "shiftEnd": "17:00", // 5:00 PM
+  "shiftStart": "09:00",
+  "shiftEnd": "17:00",
 
-  // COOK TIMES
-  "wings": "120", // 2 hours cook time
-  "ribs": "300", // 5 hours cook time
-  "hotdogs": "45", // 45 minutes cook time
+  "wings": "120",
+  "ribs": "300",
+  "hotdogs": "45",
 
-  // KEY MILESTONES
   "milestones": [
     {
       "id": "shift_start",
@@ -16,11 +13,13 @@
       "displayTime": "9:00 AM",
       "label": "Shift start",
       "checklist": [
-        "Temp cooked pork butts (verify 195F+ internal temp)",
-        "Take cooked pork butts off smoker and wrap on bus",
-        "Check meat lugs in the walk-in and rotate them as needed",
+        "Temp pork butts on smoker (verify 195°F+ internal temp)",
+        "Take pork butts off smoker and wrap on bus",
+        "Check current meat lugs in the walk-in and rotate them as needed",
         "Consult with mgr on duty for today's cooking needs",
-        "Cut ribs & load raw meats on smoker"
+        "Cut ribs & load raw meats on smoker",
+        "Add 3–4 logs of wood (leave firebox door open)",
+        "⚠️ Set smoker dial to 250°F"
       ]
     },
     {
@@ -29,11 +28,10 @@
       "displayTime": "11:15 AM",
       "label": "Begin cooking",
       "checklist": [
-        "⚠️ Set smoker dial to 250F",
-        "Add 3–4 logs of wood (leave firebox door open)",
+        "Close doors and start smoker (rack, fan, & burner switched on)",
         "⚠️ Clean smoker work area",
         "Hose off the concrete slab",
-        "Run trash/recycling to dumpsters"
+        "Run trash & paper recycling to dumpsters"
       ]
     },
     {
@@ -42,8 +40,9 @@
       "displayTime": "12:15 PM",
       "label": "Check smoker temperature",
       "checklist": [
-        "Verify smoker dial temp has reached 250F",
-        "⚠️ Close firebox door"
+        "Verify smoker dial temp has reached 250°F",
+        "⚠️ Close firebox door",
+        "Begin pulling pork on bus"
       ]
     },
     {
@@ -52,9 +51,10 @@
       "displayTime": "1:15 PM",
       "label": "Wings finished",
       "checklist": [
-        "Temp large drums (165F+ internal temp)",
-        "Temp small turkey breasts (every 30 mins)",
-        "Pull pork on bus"
+        "Temp large drums (165°F+ internal temp) and remove wings",
+        "Move bottom ribs up to the top rack (where the wings were)",
+        "Temp small turkey breasts (every ~30 mins)",
+        "Continue pulling pork on bus"
       ]
     },
     {
@@ -63,8 +63,8 @@
       "displayTime": "2:15 PM",
       "label": "Turkey finished?",
       "checklist": [
-        "Temp remaining turkey breasts (165F+ internal temp)",
-        "⚠️ Turn smoker dial down to 225F",
+        "Temp remaining turkey breasts (165°F+ internal temp)",
+        "⚠️ Turn smoker dial down to 225°F (after all turkey is done)",
         "Finish pulling pork on bus",
         "Move pulled pork pans to walk-in",
         "⚠️ Clean bus work area"
@@ -74,9 +74,9 @@
       "id": "hotdogs",
       "time": "15:30",
       "displayTime": "3:30 PM",
-      "label": "Load hotdogs on smoker",
+      "label": "Hotdogs",
       "checklist": [
-        
+        "Load hotdogs on smoker (cook for 45 minutes)"
       ]
     },
     {
@@ -85,12 +85,23 @@
       "displayTime": "4:15 PM",
       "label": "Hotdogs, ribs, & tips finished",
       "checklist": [
-        "Temp ribs (verify 195F+ internal temp)",
-        "Move all cooked meat to walk-in",
+        "Temp ribs (verify 195°F+ internal temp)",
+        "Move all smoked meat to walk-in for cooldown (uncovered)",
         "Load pork butts for the night",
-        "⚠️ Set smoker dial to 215F",
+        "⚠️ Set smoker dial to 215°F (overnight)",
+        "Add 3-4 logs of wood to the firebox & start smoker",
         "⚠️ Clean smoker work area",
-        "Run trash/recycling to dumpsters"
+        "Run trash & recycling to dumpsters",
+        "Lock smoker doors"
+      ]
+    },
+    {
+      "id": "shift_end",
+      "time": "17:00",
+      "displayTime": "5:00 PM",
+      "label": "Shift end",
+      "checklist": [
+        
       ]
     }
   ]
