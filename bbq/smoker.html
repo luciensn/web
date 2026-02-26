@@ -206,6 +206,13 @@ button {
   background: #bbb;
 }
 
+/* CHECKLIST */
+
+label.completed {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
 </style>
 </head>
 
@@ -436,7 +443,7 @@ function startLiveShiftSystem(containerId, shiftStartHour = 9, shiftEndHour = 17
     if (now < shiftStart) {
 
       const diff = shiftStart - now;
-      statusEl.textContent = formatDuration(diff) + " until shift";
+      statusEl.textContent = formatDuration(diff) + " until next shift";
 
     } else if (now >= shiftStart && now <= shiftEnd) {
 
@@ -445,7 +452,7 @@ function startLiveShiftSystem(containerId, shiftStartHour = 9, shiftEndHour = 17
 
     } else {
 
-      statusEl.textContent = "Shift complete for today.";
+      statusEl.textContent = "Shift complete for today";
 
     }
 
@@ -548,7 +555,15 @@ async function renderShiftMilestones(containerId, jsonPath) {
   const startHour = parseInt(data.shiftStart.split(":")[0]);
   const startMinutes = startHour * 60;
 
-  const todayKey = new Date().toISOString().split("T")[0];
+  // reset at midnight UTC
+  // const todayKey = new Date().toISOString().split("T")[0];
+
+  // reset at midight local time
+  const now = new Date();
+  const todayKey =
+    now.getFullYear() + "-" +
+    String(now.getMonth() + 1).padStart(2, "0") + "-" +
+    String(now.getDate()).padStart(2, "0");
   const storageKey = "shiftChecklist_" + todayKey;
 
   const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
@@ -617,6 +632,7 @@ async function renderShiftMilestones(containerId, jsonPath) {
       const nextOffset = nextMinutes * pixelsPerMinute;
 
       const block = document.createElement("div");
+      block.style.className = "checklist-item";
       block.style.position = "absolute";
       block.style.left = "120px";
       block.style.right = "0";
@@ -649,10 +665,19 @@ async function renderShiftMilestones(containerId, jsonPath) {
 
         checkbox.checked = saved[id] || false;
 
+        // strikethrough?
+        if (checkbox.checked) {
+          label.classList.add("completed");
+        }
+
         checkbox.addEventListener("change", () => {
           const updated = JSON.parse(localStorage.getItem(storageKey) || "{}");
           updated[id] = checkbox.checked;
           localStorage.setItem(storageKey, JSON.stringify(updated));
+
+          // toggle strikethrough
+          label.classList.toggle("completed", checkbox.checked);
+
         });
 
         label.appendChild(checkbox);
