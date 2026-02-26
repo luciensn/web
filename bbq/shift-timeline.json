@@ -1,0 +1,97 @@
+/* ==== SHIFT TIMELINE ==== */
+{
+  "shiftStart": "09:00", // 9:00 AM
+  "shiftEnd": "17:00", // 5:00 PM
+
+  // COOK TIMES
+  "wings": "120", // 2 hours cook time
+  "ribs": "300", // 5 hours cook time
+  "hotdogs": "45", // 45 minutes cook time
+
+  // KEY MILESTONES
+  "milestones": [
+    {
+      "id": "shift_start",
+      "time": "09:00",
+      "displayTime": "9:00 AM",
+      "label": "Shift start",
+      "checklist": [
+        "Temp cooked pork butts (verify 195F+ internal temp)",
+        "Take cooked pork butts off smoker and wrap on bus",
+        "Check meat lugs in the walk-in and rotate them as needed",
+        "Consult with mgr on duty for today's cooking needs",
+        "Cut ribs & load raw meats on smoker"
+      ]
+    },
+    {
+      "id": "begin_cooking",
+      "time": "11:15",
+      "displayTime": "11:15 AM",
+      "label": "Begin cooking",
+      "checklist": [
+        "⚠️ Set smoker dial to 250F",
+        "Add 3–4 logs of wood (leave firebox door open)",
+        "⚠️ Clean smoker work area",
+        "Hose off the concrete slab",
+        "Run trash/recycling to dumpsters"
+      ]
+    },
+    {
+      "id": "check_smoker_temp",
+      "time": "12:15",
+      "displayTime": "12:15 PM",
+      "label": "Check smoker temperature",
+      "checklist": [
+        "Verify smoker dial temp has reached 250F",
+        "⚠️ Close firebox door"
+      ]
+    },
+    {
+      "id": "wings",
+      "time": "13:15",
+      "displayTime": "1:15 PM",
+      "label": "Wings finished",
+      "checklist": [
+        "Temp large drums (165F+ internal temp)",
+        "Temp small turkey breasts (every 30 mins)",
+        "Pull pork on bus"
+      ]
+    },
+    {
+      "id": "turkey",
+      "time": "14:15",
+      "displayTime": "2:15 PM",
+      "label": "Turkey finished?",
+      "checklist": [
+        "Temp remaining turkey breasts (165F+ internal temp)",
+        "⚠️ Turn smoker dial down to 225F",
+        "Finish pulling pork on bus",
+        "Move pulled pork pans to walk-in",
+        "⚠️ Clean bus work area"
+      ]
+    },
+    {
+      "id": "hotdogs",
+      "time": "15:30",
+      "displayTime": "3:30 PM",
+      "label": "Load hotdogs on smoker",
+      "checklist": [
+        
+      ]
+    },
+    {
+      "id": "cook_finished",
+      "time": "16:15",
+      "displayTime": "4:15 PM",
+      "label": "Hotdogs, ribs, & tips finished",
+      "checklist": [
+        "Temp ribs (verify 195F+ internal temp)",
+        "Move all cooked meat to walk-in",
+        "Load pork butts for the night",
+        "⚠️ Set smoker dial to 215F",
+        "⚠️ Clean smoker work area",
+        "Run trash/recycling to dumpsters"
+      ]
+    }
+  ]
+}
