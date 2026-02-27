@@ -282,9 +282,29 @@ label.completed {
 <br>
 <br>
 
-<!-- PULLED PORK BUILD CALCULATOR -->
 
-<h2>Pulled Pork Widget</h2>
+<!-- PULLED PORK PAN CALCULATOR -->
+
+<h2>Pulled Pork Widgets</h2>
+
+<br>
+
+<div class="label-widget" id="panWidget">
+
+  <div style="margin-bottom:10px; font-weight:600;">
+    How many cases of pork were loaded?
+  </div>
+
+  <input type="number" id="casesLoaded" placeholder="Enter number of cases" min="0">
+
+  <button onclick="calculatePans()">Submit</button>
+
+  <div id="panResult" style="margin-top:14px; font-size:14px;"></div>
+
+</div>
+
+
+<!-- PULLED PORK BUILD CALCULATOR -->
 
 <br>
 
@@ -313,7 +333,7 @@ label.completed {
 <br>
 
 <!-- PORK BUTT LOADING VISUALIZER -->
-<h2>Smoker Balancer</h2>
+<h2>Pork Butt Balancer</h2>
 
 <br>
 <div><b>How many cases of pork butts to load?</b></div>
@@ -766,9 +786,35 @@ renderShiftMilestones("timeScale", "shift-timeline.json");
 startLiveShiftSystem("timeScale");
 
 
-/* ====================
+/* =====================
+  PULLED PORK PANS
+========================= */
+
+function calculatePans() {
+
+  const cases = parseInt(document.getElementById("casesLoaded").value);
+
+  if (isNaN(cases) || cases < 0) return;
+
+  const meatsPerCase = 8;
+  const meatsPerPan = 3;
+
+  const totalMeats = cases * meatsPerCase;
+
+  // Always round up final pan count
+  const pans = Math.ceil(totalMeats / meatsPerPan);
+
+  document.getElementById("panResult").innerHTML = `
+    <strong>${cases} case${cases !== 1 ? "s" : ""}</strong><br><br>
+    ${cases} × 8 meats = ${totalMeats} meats<br>
+    ${totalMeats} meats ÷ 3 meats per pan = <strong>${pans} pans</strong><br><br>
+    <strong>Final Output: ${pans} pans of pulled pork</strong>
+  `;
+}
+
+/* ========================
   PULLED PORK CALCULATOR
-======================= */
+=========================== */
 
 let buildTarget = 30; // default
 
