@@ -142,6 +142,7 @@ button {
   font-size: 18px;
   margin-top: 6px;
   color: #666;
+  /*font-style: italic;*/
 }
 
 /* ===== RED TIME MARKER ===== */
@@ -213,6 +214,26 @@ label.completed {
   opacity: 0.6;
 }
 
+/* PORK CALCULATOR */
+.build-btn {
+  flex: 1;
+  background: #e5e5ea;
+  color: #000;
+}
+
+.build-btn.active {
+  background: #007aff;
+  color: #fff;
+}
+
+
+#dialImg {
+  display: none;
+}
+#dialImg img {
+  width:100%;
+}
+
 </style>
 </head>
 
@@ -234,21 +255,6 @@ label.completed {
 </div>
 
 
-<br>
-
-<!-- LOAD VISUALIZER -->
-<div>How many cases of pork butts to load?</div>
-<br>
-<br>
-
-<input type="number" id="cases" placeholder="Enter number of cases" min="1">
-<button onclick="loadMeat()">Submit</button>
-
-<div id="summary"></div>
-<div class="visualizer" id="visualizer"></div>
-
-
-
 <!-- COOKING TIMELINE WIDGET -->
 <br>
 
@@ -260,14 +266,73 @@ label.completed {
 <br>
 <br>
 
-<b>Shift Timeline & Checklist</b>
-<br>
+<h2>Shift Timeline & Checklist</h2>
 <br>
 <hr>
+<br>
 <br>
 <div id="timeScale"></div>
 
 <br>
+<br>
+<br>
+
+<hr>
+
+<br>
+<br>
+
+<!-- PULLED PORK BUILD CALCULATOR -->
+
+<h2>Pulled Pork Widget</h2>
+
+<br>
+
+<div class="label-widget" id="buildWidget">
+
+  <div style="margin-bottom:10px; font-weight:600;">
+    How many pans of pulled pork do we currently have in the walk-in?
+  </div>
+
+  <input type="number" id="currentPans" placeholder="Enter number of pans" min="0">
+
+  <div style="margin:12px 0 6px 0; font-weight:600;">Build to?</div>
+
+  <div style="display:flex; gap:10px; margin-bottom:12px;">
+    <button class="build-btn active" data-target="30">30+ (Winter)</button>
+    <button class="build-btn" data-target="40">40+ (Summer)</button>
+  </div>
+
+  <button onclick="calculateBuild()">Submit</button>
+
+  <div id="buildResult" style="margin-top:14px; font-size:14px;"></div>
+
+</div>
+
+
+<br>
+
+<!-- PORK BUTT LOADING VISUALIZER -->
+<h2>Smoker Balancer</h2>
+
+<br>
+<div><b>How many cases of pork butts to load?</b></div>
+<br>
+<br>
+
+<input type="number" id="cases" placeholder="Enter number of cases" min="1">
+<button onclick="loadMeat()">Submit</button>
+
+<div id="summary"></div>
+<div class="visualizer" id="visualizer"></div>
+
+<br>
+<div id="dialImg">
+  ⚠️ Set smoker dial to 215°F
+  <img src="smoker-dial-215.jpg" />
+</div>
+
+
 <br>
 <br>
 <br>
@@ -348,6 +413,10 @@ function renderSummary(cases, totalMeats, meatsPerSet, remainder) {
      Evenly spread across 5 sets<br>
      ${meatsPerSet}${remainder ? "–" + (meatsPerSet+1) : ""} meats per set<br>
      ${warning}`;
+
+     // show the dial image
+     document.getElementById("dialImg").style.display = "block";
+
 }
 
 function renderVisualizer(distribution) {
@@ -695,6 +764,61 @@ async function renderShiftMilestones(containerId, jsonPath) {
 renderVerticalTimeScale("timeScale");
 renderShiftMilestones("timeScale", "shift-timeline.json");
 startLiveShiftSystem("timeScale");
+
+
+/* ====================
+  PULLED PORK CALCULATOR
+======================= */
+
+let buildTarget = 30; // default
+
+// Toggle buttons
+document.querySelectorAll(".build-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".build-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    buildTarget = parseInt(btn.dataset.target);
+  });
+});
+
+function calculateBuild() {
+
+  const current = parseInt(document.getElementById("currentPans").value);
+  if (isNaN(current) || current < 0) return;
+
+  const meatsPerCase = 8;
+  const meatsPerPan = 3;
+
+  const pansNeeded = Math.max(0, buildTarget - current);
+
+  if (pansNeeded === 0) {
+    document.getElementById("buildResult").innerHTML =
+      `<strong>You're already at ${current} pans.</strong><br>
+       No additional cases needed to reach ${buildTarget}+.`;
+    return;
+  }
+
+  // Convert pans needed to meats
+  const meatsNeeded = pansNeeded * meatsPerPan;
+
+  // Convert meats to cases (round up)
+  const casesNeeded = Math.ceil(meatsNeeded / meatsPerCase);
+
+  // Calculate actual pans produced from those cases
+  const actualPansProduced = Math.ceil((casesNeeded * meatsPerCase) / meatsPerPan);
+
+  const finalTotal = current + actualPansProduced;
+
+  document.getElementById("buildResult").innerHTML = `
+    <strong>Recommendation: Load ${casesNeeded} case${casesNeeded > 1 ? "s" : ""}</strong><br><br>
+    Build Target: ${buildTarget}+ pans<br>
+    Current: ${current} pans<br>
+    Needed: ${pansNeeded} pans<br><br>
+    ${casesNeeded} cases × 8 meats = ${casesNeeded * meatsPerCase} meats<br>
+    ${casesNeeded * meatsPerCase} meats ÷ 3 meats per pan = ${actualPansProduced} pans<br><br>
+    Final total: <strong>${finalTotal} pans</strong>
+  `;
+}
 
 </script>
 
