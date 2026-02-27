@@ -244,14 +244,10 @@ label.completed {
 
 <!-- LABEL GENERATOR -->
 <div class="label-widget">
-  Label Generator
-  <br>
-  <br>
   <div class="label-dates">
     <div><strong>Today:</strong> <span id="todayDate"></span></div>
     <div><strong>Use By:</strong> <span id="useByDate"></span></div>
   </div>
-  <!--<button class="recalc-btn" onclick="generateDates()">↻</button>-->
 </div>
 
 
@@ -493,6 +489,14 @@ generateDates();
   SHIFT TIMELINE
 =======================*/
 
+function formatMilestoneTime(date){
+  return date.toLocaleTimeString([],{
+    hour:'numeric',
+    minute:'2-digit',
+    hour12:true
+  }).replace(/\s?(AM|PM)/i, '');
+}
+
 function startLiveShiftSystem(containerId, shiftStartHour = 9, shiftEndHour = 17, pixelsPerMinute = 4) {
 
   const container = document.getElementById(containerId);
@@ -541,7 +545,8 @@ function startLiveShiftSystem(containerId, shiftStartHour = 9, shiftEndHour = 17
 
     } else {
 
-      statusEl.textContent = "Shift complete for today";
+      //statusEl.textContent = "Shift complete for today";
+      statusEl.textContent = "Today's shift has ended";
 
     }
 
@@ -676,6 +681,12 @@ async function renderShiftMilestones(containerId, jsonPath) {
     wrap.style.left = "90px";
     wrap.style.transform = "translateY(-50%)";
 
+    // format the display time
+    const [hour, minute] = ms.time.split(":").map(Number);
+    const milestoneDate = new Date();
+    milestoneDate.setHours(hour, minute, 0, 0);
+    let dispTime = formatMilestoneTime(milestoneDate);
+
     wrap.innerHTML = `
       <div style="
         position:absolute;
@@ -703,7 +714,7 @@ async function renderShiftMilestones(containerId, jsonPath) {
         background-color:#000;
         color:#fff;
         padding: 6px;">
-        ${ms.displayTime} • ${ms.label}
+        ${dispTime} • ${ms.label}
       </div>
     `;
 

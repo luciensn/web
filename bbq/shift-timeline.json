@@ -10,7 +10,6 @@
     {
       "id": "shift_start",
       "time": "09:00",
-      "displayTime": "9:00 AM",
       "label": "Shift start",
       "checklist": [
         "Temp pork butts on smoker (verify 195°F+ internal temp)",
@@ -25,7 +24,6 @@
     {
       "id": "begin_cooking",
       "time": "11:15",
-      "displayTime": "11:15 AM",
       "label": "Begin cooking",
       "checklist": [
         "Close doors and start smoker (rack, fan, & burner switched on)",
@@ -37,10 +35,9 @@
     {
       "id": "check_smoker_temp",
       "time": "12:15",
-      "displayTime": "12:15 PM",
-      "label": "Check smoker temperature",
+      "label": "Check smoker temp",
       "checklist": [
-        "Verify smoker dial temp has reached 250°F",
+        "Verify smoker temp gauge has reached 250°F",
         "⚠️ Close firebox door",
         "Begin pulling pork on bus"
       ]
@@ -48,7 +45,6 @@
     {
       "id": "wings",
       "time": "13:15",
-      "displayTime": "1:15 PM",
       "label": "Wings finished",
       "checklist": [
         "Temp large drums (165°F+ internal temp) and remove wings",
@@ -60,7 +56,6 @@
     {
       "id": "turkey",
       "time": "14:15",
-      "displayTime": "2:15 PM",
       "label": "Turkey finished?",
       "checklist": [
         "Temp remaining turkey breasts (165°F+ internal temp)",
@@ -73,7 +68,6 @@
     {
       "id": "hotdogs",
       "time": "15:30",
-      "displayTime": "3:30 PM",
       "label": "Hotdogs",
       "checklist": [
         "Load hotdogs on smoker (cook for 45 minutes)"
@@ -82,7 +76,6 @@
     {
       "id": "cook_finished",
       "time": "16:15",
-      "displayTime": "4:15 PM",
       "label": "Hotdogs, ribs, & tips finished",
       "checklist": [
         "Temp ribs (verify 195°F+ internal temp)",
@@ -98,7 +91,6 @@
     {
       "id": "shift_end",
       "time": "17:00",
-      "displayTime": "5:00 PM",
       "label": "Shift end",
       "checklist": [
         
