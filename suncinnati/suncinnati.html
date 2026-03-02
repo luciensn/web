@@ -106,18 +106,24 @@ a {
 }
 
 #dateLine{
-  font-size:14px;
-  color:#e2e8f0;
+  /*font-size:14px;
+  color:#e2e8f0;*/
+  color:#94a3b8;
 }
 
 #timeLine{
-  font-size:13px;
+  /*font-size:13px;*/
   color:#94a3b8;
 }
 
 /* LEFT — City */
 #locationBlock{
   text-align:left;
+
+  position: absolute;
+  top: -30px;   /* move above the visible bar */
+  width: 100%;
+  text-align: center;
 }
 
 /* CENTER — Date/Time */
@@ -221,6 +227,10 @@ h2{
 #highLow {
   font-size:14px;
   color:var(--muted);
+}
+
+#uvPanel {
+  display: none;
 }
 
 
@@ -560,31 +570,44 @@ h2{
      TOP BAR
 ========================= -->
 
+
+
 <div id="topBar">
+
+  <!--
+  <div id="locationBlock">
+    <div class="location-name">Alms Park Overlook</div>
+    <div class="location-coords">39.1111° N • 84.4306° W</div>
+  </div>
+  -->
+
   <button id="settingsButton" class="topBarButton">⚙</button>
   <div id="siteLogo">
     Suncinnati
   </div>
   <button id="refreshButton" class="topBarButton">↻</button>
+
+
 </div>
 
 
-<!-- ROW 2: DETAILS -->
+<!-- ROW 2: DETAILS --
 <div id="siteDetails">
 
-  <!-- LEFT -->
+  <!-- LEFT --
   <div id="locationBlock">
     <div class="location-name">Alms Park Overlook</div>
     <div class="location-coords">39.1111° N • 84.4306° W</div>
   </div>
 
-  <!-- RIGHT -->
+  <!-- RIGHT --
   <div id="dateTimeBlock">
     <div id="dateLine"></div>
     <div id="timeLine"></div>
   </div>
 
 </div>
+-->
 
 
 
@@ -675,7 +698,7 @@ h2{
 <!-- =========================
      PANEL 2 — UV INDEX
 ========================= -->
-<div class="panel">
+<div class="panel" id="uvPanel">
   <h2>UV Index</h2>
 
   <div id="uvValue">--</div>
@@ -850,6 +873,7 @@ h2{
     ========================= -->
     <div id="cycleStats">
       <div id="daylightLabel" class="cycleLabel"></div>
+      <!--<div id="bedtimeLabel" class="cycleLabel"></div>-->
       <div id="sleepCycleLabel" class="cycleLabel"></div>
     </div>
 
@@ -957,6 +981,13 @@ h2{
     ">
 
     Data from <a href="https://open-meteo.com">Open-Meteo<a/> • <span id="lastUpdated">Last updated: --:--:--</span>
+
+      <br>
+
+      
+        <span id="dateLine"></span>
+        <span id="timeLine"></span>
+      
 </div>
 
 
@@ -1811,8 +1842,13 @@ function plotSunPosition(sunrise,sunset,uvaWindow,uvbWindow){
 
     // Daylight & Sleep Labels
     updateCycleLabels(sunrise, sunset);
+
+    // UV TOGGLE
+    toggleUVPanel(sunrise, sunset);
   
 }
+
+
 
 
 /* ======================
@@ -2027,6 +2063,22 @@ function updateUVIndex(uv){
     }
 
     uvDescription.textContent = description;
+}
+
+// Only show UV panel during the day
+function toggleUVPanel(sunrise, sunset){
+
+  const now = new Date();
+  const uvPanel = document.getElementById("uvPanel");
+
+  if(!uvPanel) return;
+
+  if(now >= sunrise && now <= sunset){
+    uvPanel.style.display = "block";
+  } else {
+    uvPanel.style.display = "none";
+    console.log("UV Panel Hidden");
+  }
 }
 
 /* REFRESH */
