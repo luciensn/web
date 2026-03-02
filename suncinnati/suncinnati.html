@@ -75,14 +75,14 @@ a {
   justify-content: space-between;
 }
 
-/* LOGO ROW */
+/* ====== LOGO ROW ====== */
 #siteLogo{
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   text-align:center;
   font-family:'Pirata One';
-  font-size:32px;
+  font-size:30px;
 }
 
 /* DETAILS ROW */
@@ -239,7 +239,7 @@ h2{
   line-height:1.2;
 }
 
-#solarTimeRow{
+#solarTimeRow {
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -378,7 +378,7 @@ h2{
 }
 
 #uvScaleBar{
-  height:18px;
+  height:10px;
   border-radius:10px;
   background:linear-gradient(
     to right,
@@ -529,8 +529,22 @@ h2{
   transition:width 0.4s ease;
 }
 
+/* =========================
+   DAYLIGHT / SLEEP LABELS
+========================= */
 
+#cycleStats{
+  margin-top:18px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  text-align:center;
+}
 
+.cycleLabel{
+  font-size:13px;
+  color:#cbd5e1;
+}
 
 
 </style>
@@ -555,7 +569,7 @@ h2{
 
   <!-- LEFT -->
   <div id="locationBlock">
-    <div class="location-name">Cincinnati, Ohio</div>
+    <div class="location-name">📍Alms Park Overlook</div>
     <div class="location-coords">39.1111° N • 84.4306° W</div>
   </div>
 
@@ -793,14 +807,23 @@ h2{
             x="150"
             y="135"
             text-anchor="middle"
-            font-size="32"
+            font-size="40"
+            fill="#f1f5f9"
+            font-weight="600">
+      </text>
+
+      <text id="centerSunAngle2"
+            x="150"
+            y="155"
+            text-anchor="middle"
+            font-size="12"
             fill="#f1f5f9"
             font-weight="600">
       </text>
 
       <text id="centerUVA"
             x="150"
-            y="155"
+            y="172"
             text-anchor="middle"
             font-size="12"
             fill="#f87171">
@@ -808,13 +831,25 @@ h2{
 
       <text id="centerUVB"
             x="150"
-            y="172"
+            y="189"
             text-anchor="middle"
             font-size="12"
             fill="#3b82f6">
       </text>
     </svg>
     </div>
+
+    
+    <!-- =========================
+         DAYLIGHT & SLEEP LABELS
+    ========================= -->
+    <div id="cycleStats">
+      <div id="daylightLabel" class="cycleLabel"></div>
+      <div id="sleepCycleLabel" class="cycleLabel"></div>
+    </div>
+
+    <br>
+
 
     <!-- =========================
          YEAR PROGRESS BAR
@@ -915,6 +950,7 @@ h2{
     margin-top:20px;
     padding:10px 0;
     ">
+
     Data from <a href="https://open-meteo.com">Open-Meteo<a/> • <span id="lastUpdated">Last updated: --:--:--</span>
 </div>
 
@@ -1148,7 +1184,10 @@ fetch(url)
     const solarElevation = getSolarElevation(now, lat, lon);
 
     document.getElementById("centerSunAngle").textContent =
-        "∠ " + Math.round(solarElevation) + "°";
+        Math.round(solarElevation) + "°";
+
+    document.getElementById("centerSunAngle2").textContent =
+        "Altitude";
 
 
     plotSunPosition(sunrise, sunset, uvaWindow, uvbWindow);
@@ -1763,8 +1802,112 @@ function plotSunPosition(sunrise,sunset,uvaWindow,uvbWindow){
 
   document.getElementById("midnightMarker")
     .setAttribute("cy", my);
+
+
+    // Daylight & Sleep Labels
+    updateCycleLabels(sunrise, sunset);
   
 }
+
+
+/* ======================
+    DAYLIGHT & SLEEP
+========================*/
+function updateCycleLabels(sunrise, sunset){
+
+  const now = new Date();
+
+  const midnight = new Date();
+  midnight.setHours(0,0,0,0);
+
+  const nextMidnight = new Date(midnight);
+  nextMidnight.setDate(nextMidnight.getDate()+1);
+
+  const totalDay = nextMidnight - midnight;
+
+  /* =========================
+     ROUND TO 15 MINUTES
+  ========================= */
+  function roundTo15(minutes){
+    return Math.round(minutes / 15) * 15;
+  }
+
+  function formatHoursMinutes(totalMinutes){
+    const hrs = Math.floor(totalMinutes / 60);
+    const mins = totalMinutes % 60;
+    return `${hrs} hrs and ${mins}m`;
+  }
+
+  /* =========================
+     DAYLIGHT LOGIC
+  ========================= */
+
+  const daylightDuration = (sunset - sunrise) / 60000; // in minutes
+
+  let daylightText;
+
+  if(now < sunrise){
+    const rounded = roundTo15(daylightDuration);
+    daylightText =
+      "Daylight: " +
+      formatHoursMinutes(rounded) +
+      " available";
+  }
+  else if(now >= sunrise && now <= sunset){
+    const remaining = (sunset - now) / 60000;
+    const rounded = roundTo15(remaining);
+    daylightText =
+      "Daylight: " +
+      formatHoursMinutes(rounded) +
+      " remaining";
+  }
+  else{
+    daylightText = "Daylight complete • Bedtime: 10:30 PM";
+  }
+
+  document.getElementById("daylightLabel")
+    .textContent = daylightText;
+
+
+  /* =========================
+     SLEEP LOGIC
+     10:30 PM → Sunrise
+  ========================= */
+
+  const sleepStart = new Date(midnight);
+  sleepStart.setHours(22,30,0,0);
+
+  let sleepEnd = new Date(sunrise);
+  sleepEnd.setDate(sleepEnd.getDate()+1);
+
+  const sleepDuration = (sleepEnd - sleepStart) / 60000;
+
+  let sleepText;
+
+  if(now < sleepStart){
+    const rounded = roundTo15(sleepDuration);
+    sleepText =
+      "Sleep: " +
+      formatHoursMinutes(rounded) +
+      " available";
+  }
+  else if(now >= sleepStart && now < sleepEnd){
+    const remaining = (sleepEnd - now) / 60000;
+    const rounded = roundTo15(remaining);
+    sleepText =
+      "Sleep: " +
+      formatHoursMinutes(rounded) +
+      " remaining";
+  }
+  else{
+    sleepText = "Sleep window complete";
+  }
+
+  document.getElementById("sleepCycleLabel")
+    .textContent = sleepText;
+}
+
+
 
 /* =========================
    YEAR PROGRESS
@@ -1840,15 +1983,19 @@ function updateUVIndex(uv){
 
   /* Color-code number by risk */
 
-  let color = "#22c55e"; // default low
+  //let color = "#22c55e"; // default low
+  let color = "";
 
-  if(uv == 0) color =             "#f1f5f9";
-  if(uv >= 3 && uv < 6) color =   "#eab308";
+  //if(uv == 0) color =             "#f1f5f9";
+  //if(uv >= 3 && uv < 6) color =   "#eab308";
   if(uv >= 6 && uv < 8) color =   "#f97316";
   if(uv >= 8 && uv < 11) color =  "#ef4444";
   if(uv >= 11) color =            "#7c3aed";
 
-  uvValue.style.color = color;
+  //uvValue.style.color = color;
+  if (color.length > 0) {
+    uvValue.style.color = color
+  }
 
   /* Position arrow */
 
