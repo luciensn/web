@@ -539,6 +539,10 @@ h2{
 
 /* THERMOMETER */
 
+#thermometerContainer {
+  margin-top:20px;
+}
+
 #thermometerWrapper{
   margin-top:14px;
   width:100%;
@@ -559,6 +563,41 @@ h2{
   transition:width 0.4s ease;
 }
 
+#thermometerTrack {
+  position:relative;
+  height:14px;
+  border-radius:8px;
+  /*overflow:hidden;*/
+  background:#334155;
+}
+
+#tickMarks {
+  position:absolute;
+  width:100%;
+  height:100%;
+  top:0;
+}
+
+#tickLabels {
+  display:flex;
+  justify-content:space-between;
+  font-size:10px;
+  color:#888;
+  margin-bottom:6px;
+}
+
+#tempMarker {
+    position:absolute;
+    top:-6px;
+    width:3px;
+    height:26px;
+    background:red;
+    /*border-radius:2px;
+    box-shadow:0 0 6px rgba(255,255,255,0.6);
+    transition:left 0.6s ease;*/
+}
+
+
 /* =========================
    DAYLIGHT / SLEEP LABELS
 ========================= */
@@ -577,6 +616,14 @@ h2{
 }
 
 
+#dataFooter {
+  text-align:center;
+  font-size:12px;
+  color:#888;
+  margin-top:20px;
+  padding:10px 0;
+}
+
 </style>
 </head>
 <body>
@@ -586,45 +633,14 @@ h2{
 ========================= -->
 
 <div id="topBar">
-
-  <!--
-  <div id="locationBlock">
-    <div class="location-name">Alms Park Overlook</div>
-    <div class="location-coords">39.1111° N • 84.4306° W</div>
-  </div>
-  -->
-
   <button id="settingsButton" class="topBarButton" onclick="toggleSettingsPanel();">⚙</button>
-  <div id="siteLogo">
-    Suncinnati
-  </div>
+  <div id="siteLogo">Suncinnati</div>
   <button id="refreshButton" class="topBarButton">↻</button>
-
-
 </div>
-
-
-<!-- ROW 2: DETAILS --
-<div id="siteDetails">
-
-  <!-- LEFT --
-  <div id="locationBlock">
-    <div class="location-name">Alms Park Overlook</div>
-    <div class="location-coords">39.1111° N • 84.4306° W</div>
-  </div>
-
-  <!-- RIGHT --
-  <div id="dateTimeBlock">
-    <div id="dateLine"></div>
-    <div id="timeLine"></div>
-  </div>
-
-</div>
--->
 
 
 <!-- =========================
-     SETTINGS PANEL - HIDDEN
+     SETTINGS PANEL (HIDDEN)
 ================================ -->
 <div id="settingsPanel" class="panel hidden">
   <h2>Settings</h2>
@@ -665,16 +681,10 @@ h2{
   <!-- THERMOMETER VISUALIZATION -->
   <br >
 
-  <div id="thermometerContainer" style="margin-top:20px;">
+  <div id="thermometerContainer">
 
     <!-- Tick Labels -->
-    <div id="tickLabels" style="
-        display:flex;
-        justify-content:space-between;
-        font-size:10px;
-        color:#888;
-        margin-bottom:6px;
-    ">
+    <div id="tickLabels">
         <span>-20</span>
         <span>0</span>
         <span>20</span>
@@ -685,13 +695,7 @@ h2{
         <span>120</span>
     </div>
 
-    <div id="thermometerTrack" style="
-        position:relative;
-        height:14px;
-        border-radius:8px;
-        /*overflow:hidden;*/
-        background:#334155;
-    ">
+    <div id="thermometerTrack">
 
         <!-- Color Zones --
         <div style="position:absolute; left:0%; width:14.285%; height:100%; background:#e5e7eb;"></div>
@@ -702,19 +706,10 @@ h2{
         -->
 
         <!-- Tick Marks -->
-        <div id="tickMarks" style="position:absolute; width:100%; height:100%; top:0;"></div>
+        <div id="tickMarks"></div>
 
         <!-- Temperature Marker -->
-        <div id="tempMarker" style="
-            position:absolute;
-            top:-6px;
-            width:3px;
-            height:26px;
-            background:red;
-            /*border-radius:2px;
-            box-shadow:0 0 6px rgba(255,255,255,0.6);
-            transition:left 0.6s ease;*/
-        "></div>
+        <div id="tempMarker"></div>
 
     </div>
   </div>
@@ -999,22 +994,13 @@ h2{
 
 <!-- FOOTER -->
 
-<div id="dataFooter" style="
-    text-align:center;
-    font-size:12px;
-    color:#888;
-    margin-top:20px;
-    padding:10px 0;
-    ">
-
+<div id="dataFooter">
     Data from <a href="https://open-meteo.com">Open-Meteo<a/> • <span id="lastUpdated">Last updated: --:--:--</span>
 
-      <br>
+    <br>
 
-      
-        <span id="dateLine"></span>
-        <span id="timeLine"></span>
-      
+    <span id="dateLine"></span>
+    <span id="timeLine"></span>
 </div>
 
 
@@ -2122,7 +2108,7 @@ function updateUVIndex(uv){
     uvDescription.textContent = description;
 }
 
-// Only show UV panel during the day
+// Only show UV panel during daylight
 function toggleUVPanel(sunrise, sunset){
 
   const now = new Date();
@@ -2139,25 +2125,18 @@ function toggleUVPanel(sunrise, sunset){
 
 // Show/Hide Settings Panel
 function toggleSettingsPanel(){
-
   const settingsPanel = document.getElementById("settingsPanel");
   if(!settingsPanel) return;
-
-  // if (settingsPanel.style.display === "none" || settingsPanel.style.display === "") {
-  //   settingsPanel.style.display = "block";
-  // } else {
-  //   settingsPanel.style.display = "none";
-  // }
-
   settingsPanel.classList.toggle("hidden");
 }
 
-/* REFRESH */
+/* === RELOAD DATA ==== */
 document.getElementById("refreshButton")
   .addEventListener("click", () => {
       location.reload();
-  });
+});
 
+/*
 function updateTimestamp() {
     const now = new Date();
     const timeString = now.toLocaleTimeString([], {
@@ -2167,6 +2146,7 @@ function updateTimestamp() {
     });
     document.getElementById("lastUpdated").textContent = timeString;
 }
+*/
 
 
 </script>
