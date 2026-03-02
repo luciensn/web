@@ -52,7 +52,7 @@ body{
 }
 
 a {
-  color: #f1f5f9;
+  color: var(--text);
 }
 
 /* =========================
@@ -120,10 +120,12 @@ a {
 #locationBlock{
   text-align:left;
 
+  /*
   position: absolute;
-  top: -30px;   /* move above the visible bar */
+  top: -30px;   /* move above the visible bar *
   width: 100%;
   text-align: center;
+  */
 }
 
 /* CENTER — Date/Time */
@@ -202,6 +204,19 @@ h2{
   font-size:14px;
   color:var(--muted);
 }
+
+
+/* ==== SETTING PANEL ==== */
+
+#settingsPanel {
+  /*display: none;*/
+}
+
+.hidden {
+  display: none;
+}
+
+/* ==== WEATHER PANEL ==== */
 
 .weatherRow{
   position:relative;
@@ -570,8 +585,6 @@ h2{
      TOP BAR
 ========================= -->
 
-
-
 <div id="topBar">
 
   <!--
@@ -581,7 +594,7 @@ h2{
   </div>
   -->
 
-  <button id="settingsButton" class="topBarButton">⚙</button>
+  <button id="settingsButton" class="topBarButton" onclick="toggleSettingsPanel();">⚙</button>
   <div id="siteLogo">
     Suncinnati
   </div>
@@ -608,6 +621,20 @@ h2{
 
 </div>
 -->
+
+
+<!-- =========================
+     SETTINGS PANEL - HIDDEN
+================================ -->
+<div id="settingsPanel" class="panel hidden">
+  <h2>Settings</h2>
+
+  <div id="locationBlock">
+    <div class="location-name">Alms Park Overlook</div>
+    <div class="location-coords">39.1111° N • 84.4306° W</div>
+  </div>
+
+</div>
 
 
 
@@ -741,7 +768,7 @@ h2{
     
     <div style="position: relative;width:100%;max-width:360px;margin:auto;">
 
-    <svg viewBox="0 0 300 330"
+    <svg viewBox="0 0 300 300"
          style="width:100%;display:block">
 
       <!-- Night Ring -->
@@ -1159,9 +1186,9 @@ fetch(url)
     // UVB: UV ≥ 3
     const uvbWindow = findUVWindowForToday(3);
     
-    
-    let uvaWindowText = "UVA: None";
-    let uvbWindowText = "UVB: None";
+
+    let uvaWindowText = "No UVA today";
+    let uvbWindowText = "No UVB today";
 
     if (uvaWindow) {
       uvaWindowText = "UVA: " + formatTime(uvaWindow.start) + " – " + formatTime(uvaWindow.end);
@@ -2108,6 +2135,21 @@ function toggleUVPanel(sunrise, sunset){
   } else {
     uvPanel.style.display = "none";
   }
+}
+
+// Show/Hide Settings Panel
+function toggleSettingsPanel(){
+
+  const settingsPanel = document.getElementById("settingsPanel");
+  if(!settingsPanel) return;
+
+  // if (settingsPanel.style.display === "none" || settingsPanel.style.display === "") {
+  //   settingsPanel.style.display = "block";
+  // } else {
+  //   settingsPanel.style.display = "none";
+  // }
+
+  settingsPanel.classList.toggle("hidden");
 }
 
 /* REFRESH */
