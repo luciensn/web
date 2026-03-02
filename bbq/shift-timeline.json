@@ -10,11 +10,11 @@
     {
       "id": "shift_start",
       "time": "09:00",
-      "label": "Shift start",
+      "label": "Start",
       "checklist": [
         "Temp pork butts on smoker (verify 195°F+ internal temp)",
         "Take pork butts off smoker and wrap on bus",
-        "Check current meat lugs in the walk-in and rotate them as needed",
+        "Check meat lugs in the walk-in and rotate them as needed",
         "Consult with mgr on duty for today's cooking needs",
         "Cut ribs & load raw meats on smoker",
         "Add 3–4 logs of wood (leave firebox door open)",
@@ -29,7 +29,8 @@
         "Close doors and start smoker (rack, fan, & burner switched on)",
         "⚠️ Clean smoker work area",
         "Hose off the concrete slab",
-        "Run trash & paper recycling to dumpsters"
+        "Run trash & paper recycling to dumpsters",
+        "Lunch break"
       ]
     },
     {
@@ -39,6 +40,7 @@
       "checklist": [
         "Verify smoker temp gauge has reached 250°F",
         "⚠️ Close firebox door",
+        "Write out labels for meat lugs & pulled pork pans",
         "Begin pulling pork on bus"
       ]
     },
@@ -91,7 +93,7 @@
     {
       "id": "shift_end",
       "time": "17:00",
-      "label": "Shift end",
+      "label": "End",
       "checklist": [
         
       ]

@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Smoko</title>
+<title>Smoker</title>
 
 <link rel="icon" href="favicon.ico">
 <link rel="apple-touch-icon" sizes="152x152" href="smoker-icon.png">
@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="theme-color" content="#ffffff" />
 <!-- App title when added to home screen -->
-<meta name="apple-mobile-web-app-title" content="Smoko">
+<meta name="apple-mobile-web-app-title" content="Smoker">
 
 <style>
 * { box-sizing: border-box; margin:0; padding:0; }
@@ -149,10 +149,10 @@ button {
 
 .current-time-marker {
   position: absolute;
-  left: 50%;
+  left: 62px;
   transform: translateX(-50%);
   width: 36px;
-  height: 14px;
+  height: 6px;
   background: #e21;
   border-radius: 20px;
   z-index: 10;
@@ -171,7 +171,7 @@ button {
 /* Dotted vertical timeline */
 .timeline-line {
   position: absolute;
-  left: 70px;
+  left: 60px;
   top: 0;
   width: 2px;
   background: repeating-linear-gradient(
@@ -186,17 +186,17 @@ button {
 /* Hour labels */
 .time-label {
   position: absolute;
-  left: 0;
-  width: 60px;
+  left: 0px;
+  width: 50px;
   text-align: right;
-  font-size: 12px;
+  font-size: 10px;
   color: #222;
 }
 
 /* Ticks */
 .tick {
   position: absolute;
-  left: 68px;
+  left: 58px;
   height: 2px;
   background: #bbb;
   width: 12px;
@@ -239,7 +239,7 @@ label.completed {
 
 <body>
 
-<header>Smoko</header>
+<header>Smoker</header>
 
 
 <!-- LABEL GENERATOR -->
@@ -262,11 +262,13 @@ label.completed {
 <br>
 <br>
 
-<h2>Shift Timeline & Checklist</h2>
+<h2>Shift Timeline</h2>
+
 <br>
 <hr>
 <br>
 <br>
+
 <div id="timeScale"></div>
 
 <br>
@@ -316,6 +318,7 @@ label.completed {
 
   <div style="display:flex; gap:10px; margin-bottom:12px;">
     <button class="build-btn active" data-target="30">30+ (Winter)</button>
+    <button class="build-btn" data-target="35">35</button>
     <button class="build-btn" data-target="40">40+ (Summer)</button>
   </div>
 
@@ -678,7 +681,7 @@ async function renderShiftMilestones(containerId, jsonPath) {
     const wrap = document.createElement("div");
     wrap.style.position = "absolute";
     wrap.style.top = offset + "px";
-    wrap.style.left = "90px";
+    wrap.style.left = "80px";
     wrap.style.transform = "translateY(-50%)";
 
     // format the display time
@@ -703,12 +706,12 @@ async function renderShiftMilestones(containerId, jsonPath) {
         left:-10px;
         top:50%;
         transform:translateY(-50%);
-        width:40px;
+        width:30px;
         height:3px;
         background:#000;">
       </div>
       <div style="
-        margin-left:30px;
+        margin-left:20px;
         font-size:14px;
         font-weight:700;
         background-color:#000;
@@ -734,7 +737,7 @@ async function renderShiftMilestones(containerId, jsonPath) {
       const block = document.createElement("div");
       block.style.className = "checklist-item";
       block.style.position = "absolute";
-      block.style.left = "120px";
+      block.style.left = "100px";
       block.style.right = "0";
       block.style.top = (offset + 20) + "px";
       block.style.height = (nextOffset - offset - 40) + "px";
