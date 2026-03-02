@@ -1016,6 +1016,12 @@ updateDateTime();
 
 // Format Time
 function formatTime(date){
+  
+  // failsafe
+  if (!(date instanceof Date) || isNaN(date)) {
+    return "--";
+  }
+
   return date.toLocaleTimeString([],{
     hour:'numeric',
     minute:'2-digit',
@@ -1142,7 +1148,7 @@ fetch(url)
             }
         }
 
-        if (!start) return "None";
+        if (!start) return null;
 
         return { start, end };
     }
@@ -1152,9 +1158,22 @@ fetch(url)
 
     // UVB: UV ≥ 3
     const uvbWindow = findUVWindowForToday(3);
+    
+    
+    let uvaWindowText = "UVA: None";
+    let uvbWindowText = "UVB: None";
 
-    document.getElementById("centerUVA").textContent = "UVA: " + formatTime(uvaWindow.start) + " – " + formatTime(uvaWindow.end);
-    document.getElementById("centerUVB").textContent = "UVB: " + formatTime(uvbWindow.start) + " – " + formatTime(uvbWindow.end);
+    if (uvaWindow) {
+      uvaWindowText = "UVA: " + formatTime(uvaWindow.start) + " – " + formatTime(uvaWindow.end);
+    }
+
+    if (uvbWindow) {
+      uvbWindowText = "UVB: " + formatTime(uvbWindow.start) + " – " + formatTime(uvbWindow.end);
+    }
+
+    document.getElementById("centerUVA").textContent = uvaWindowText;
+    document.getElementById("centerUVB").textContent = uvbWindowText;
+    
 
     /* ---------------- Accurate Solar Elevation ---------------- */
 
@@ -1227,8 +1246,10 @@ fetch(url)
 
 
     plotSunPosition(sunrise, sunset, uvaWindow, uvbWindow);
+    
     updateYearProgress();
     positionSeasonTicks();
+
 
     /* ===============================
        ASTRONOMICAL MOON ENGINE
@@ -1482,6 +1503,7 @@ createTickMarks();
 
 /* ---------------- Helper Functions ---------------- */
 
+/*
 function findUVWindow(times, values, threshold) {
     let start = null;
     let end = null;
@@ -1497,6 +1519,7 @@ function findUVWindow(times, values, threshold) {
 
     return formatTime(start) + " – " + formatTime(end);
 }
+*/
 
 function weatherCodeToText(code) {
     const map = {
@@ -1620,48 +1643,55 @@ function plotSunPosition(sunrise,sunset,uvaWindow,uvbWindow){
      UVA ARC
   ========================= */
 
-  const uvaStartP = (uvaWindow.start - midnight) / totalDay;
-  const uvaEndP   = (uvaWindow.end - midnight) / totalDay;
+  if (uvaWindow) {
 
-  const uvaR = r;
-  //const uvaR = r - 12;   // between sun arc and UVB arc
+    const uvaStartP = (uvaWindow.start - midnight) / totalDay;
+    const uvaEndP   = (uvaWindow.end - midnight) / totalDay;
 
-  const uvaA1 = uvaStartP * 2*Math.PI + rotation;
-  const uvaA2 = uvaEndP   * 2*Math.PI + rotation;
+    const uvaR = r;
+    //const uvaR = r - 12;   // between sun arc and UVB arc
 
-  const uvaX1 = cx + uvaR * Math.cos(uvaA1);
-  const uvaY1 = cy + uvaR * Math.sin(uvaA1);
-  const uvaX2 = cx + uvaR * Math.cos(uvaA2);
-  const uvaY2 = cy + uvaR * Math.sin(uvaA2);
+    const uvaA1 = uvaStartP * 2*Math.PI + rotation;
+    const uvaA2 = uvaEndP   * 2*Math.PI + rotation;
 
-  document.getElementById("uvaSegment")
-    .setAttribute("d",
-      `M ${uvaX1} ${uvaY1}
-       A ${uvaR} ${uvaR} 0 0 1 ${uvaX2} ${uvaY2}`);
+    const uvaX1 = cx + uvaR * Math.cos(uvaA1);
+    const uvaY1 = cy + uvaR * Math.sin(uvaA1);
+    const uvaX2 = cx + uvaR * Math.cos(uvaA2);
+    const uvaY2 = cy + uvaR * Math.sin(uvaA2);
+
+    document.getElementById("uvaSegment")
+      .setAttribute("d",
+        `M ${uvaX1} ${uvaY1}
+         A ${uvaR} ${uvaR} 0 0 1 ${uvaX2} ${uvaY2}`);
+  }
 
 
  /* =========================
      UVB ARC
   ========================= */
 
-  const uvbStartP = (uvbWindow.start - midnight) / totalDay;
-  const uvbEndP   = (uvbWindow.end - midnight) / totalDay;
+  if (uvbWindow) {
 
-  const innerR = r;
-  //const innerR = r - 20;
+    const uvbStartP = (uvbWindow.start - midnight) / totalDay;
+    const uvbEndP   = (uvbWindow.end - midnight) / totalDay;
 
-  const ua1 = uvbStartP * 2*Math.PI + rotation;
-  const ua2 = uvbEndP   * 2*Math.PI + rotation;
+    const innerR = r;
+    //const innerR = r - 20;
 
-  const ux1 = cx + innerR * Math.cos(ua1);
-  const uy1 = cy + innerR * Math.sin(ua1);
-  const ux2 = cx + innerR * Math.cos(ua2);
-  const uy2 = cy + innerR * Math.sin(ua2);
+    const ua1 = uvbStartP * 2*Math.PI + rotation;
+    const ua2 = uvbEndP   * 2*Math.PI + rotation;
 
-  document.getElementById("uvbSegment")
-    .setAttribute("d",
-      `M ${ux1} ${uy1}
-       A ${innerR} ${innerR} 0 0 1 ${ux2} ${uy2}`);
+    const ux1 = cx + innerR * Math.cos(ua1);
+    const uy1 = cy + innerR * Math.sin(ua1);
+    const ux2 = cx + innerR * Math.cos(ua2);
+    const uy2 = cy + innerR * Math.sin(ua2);
+
+    document.getElementById("uvbSegment")
+      .setAttribute("d",
+        `M ${ux1} ${uy1}
+         A ${innerR} ${innerR} 0 0 1 ${ux2} ${uy2}`);
+
+  }
 
 
   /* =========================
@@ -1876,7 +1906,7 @@ function updateCycleLabels(sunrise, sunset){
   function formatHoursMinutes(totalMinutes){
     const hrs = Math.floor(totalMinutes / 60);
     const mins = totalMinutes % 60;
-    return `${hrs} hrs and ${mins}m`;
+    return `${hrs}h and ${mins}m`;
   }
 
   /* =========================
@@ -2024,7 +2054,7 @@ function updateUVIndex(uv){
 
   /* Color-code number by risk */
 
-  //let color = "#22c55e"; // default low
+  //let color = "#22c55e"; // default low (green)
   let color = "";
 
   //if(uv == 0) color =             "#f1f5f9";
@@ -2077,7 +2107,6 @@ function toggleUVPanel(sunrise, sunset){
     uvPanel.style.display = "block";
   } else {
     uvPanel.style.display = "none";
-    console.log("UV Panel Hidden");
   }
 }
 
