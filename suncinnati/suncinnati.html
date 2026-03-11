@@ -1103,6 +1103,16 @@ h2{
 
 </div>
 
+<!-- ===============
+  PLANETS PANEL 
+================= -->
+
+<div id="planetPanel" class="panel">
+  <h2>Planets</h2>
+  <svg id="planetViz" viewBox="0 0 220 220"></svg>
+</div>
+
+
 <!-- FOOTER -->
 
 <div id="dataFooter">
@@ -1620,6 +1630,10 @@ fetch(url)
 
 
     buildFullMoonCalendar();
+
+    // update planets panel
+    //console.log("Moon phase:", moonPhase);
+    drawPlanetViz(moonPhase.illuminationPercent);
 
     // timestamp
     startElapsedTimer();
@@ -2494,6 +2508,184 @@ function formatHour(hour) {
   let h = hour % 12;
   if (h === 0) h = 12;
   return `${h}:00${period}`;
+}
+
+/* ===============
+  PLANETS PANEL
+================== */
+
+function polarToCartesian(cx, cy, r, angle) {
+  return {
+    x: cx + r * Math.cos(angle),
+    y: cy + r * Math.sin(angle)
+  };
+}
+
+function drawPlanetViz(moonPhase){
+
+  function dayToAngle(day){
+    return Math.PI + (day / 365) * Math.PI * 2;
+  }
+
+  const svg = document.getElementById("planetViz");
+  svg.innerHTML = "";
+
+  const svgNS = "http://www.w3.org/2000/svg";
+
+  const cx = 110;
+  const cy = 110;
+
+  const earthOrbit = 70;
+  const moonOrbit = 18;
+
+  /* ---------- DAY OF YEAR ---------- */
+
+  const now = new Date();
+  const start = new Date(now.getFullYear(),0,0);
+  const diff = now - start;
+  const day = Math.floor(diff / 86400000);
+
+  const yearLength = 365;
+  const yearProgress = day / yearLength;
+
+  const startAngle = Math.PI; // 9 o'clock
+  const endAngle = startAngle + yearProgress * Math.PI * 2;
+
+  const earthAngle = (day/yearLength) * Math.PI * 2;
+
+  /* Rotate so Jan 1 = 9 o'clock */
+  const rotatedEarthAngle = earthAngle + Math.PI;
+
+  /* ---------- EARTH POSITION ---------- */
+
+  const earthX = cx + earthOrbit * Math.cos(rotatedEarthAngle);
+  const earthY = cy + earthOrbit * Math.sin(rotatedEarthAngle);
+
+  /* ---------- MOON POSITION ---------- */
+
+  const moonAngle = moonPhase * Math.PI * 2;
+
+  const moonX = earthX + moonOrbit * Math.cos(moonAngle);
+  const moonY = earthY + moonOrbit * Math.sin(moonAngle);
+
+  /* ---------- EARTH ORBIT ARC ---------- */
+
+  const orbit = document.createElementNS(svgNS,"circle");
+  orbit.setAttribute("cx",cx);
+  orbit.setAttribute("cy",cy);
+  orbit.setAttribute("r",earthOrbit);
+  orbit.setAttribute("fill","none");
+  orbit.setAttribute("stroke","#374151");
+  orbit.setAttribute("stroke-width","1");
+  svg.appendChild(orbit);
+
+
+  /* ---------- SEASONAL MARKERS (EQUINOX/SOLSTICE) ---------- */
+
+  const seasonDays = [79, 172, 266, 355];
+
+  seasonDays.forEach(day => {
+
+    const angle = dayToAngle(day);
+
+    const inner = polarToCartesian(cx, cy, earthOrbit - 4, angle);
+    const outer = polarToCartesian(cx, cy, earthOrbit + 4, angle);
+
+    const tick = document.createElementNS(svgNS,"line");
+
+    tick.setAttribute("x1", inner.x);
+    tick.setAttribute("y1", inner.y);
+    tick.setAttribute("x2", outer.x);
+    tick.setAttribute("y2", outer.y);
+    //tick.setAttribute("stroke","#9ca3af");
+    tick.setAttribute("stroke","#374151");
+    tick.setAttribute("stroke-width","1");
+
+    svg.appendChild(tick);
+
+  });
+
+  const seasons = [
+    {day:79,label:"♈︎"},
+    {day:172,label:"☀"},
+    {day:266,label:"♎︎"},
+    {day:355,label:"❄"}
+  ];
+
+  seasons.forEach(season => {
+
+    const angle = dayToAngle(season.day);
+
+    const pos = polarToCartesian(cx, cy, earthOrbit + 18, angle);
+
+    const label = document.createElementNS(svgNS,"text");
+
+    label.textContent = season.label;
+
+    label.setAttribute("x", pos.x);
+    label.setAttribute("y", pos.y);
+
+    label.setAttribute("text-anchor","middle");
+    label.setAttribute("dominant-baseline","middle");
+
+    label.setAttribute("font-size","10");
+    label.setAttribute("fill","#9ca3af");
+    label.setAttribute("fill-opacity","0.7");
+
+    svg.appendChild(label);
+
+  });
+
+  /* ---------- SUN ---------- */
+
+  const sun = document.createElementNS(svgNS,"circle");
+  sun.setAttribute("cx",cx);
+  sun.setAttribute("cy",cy);
+  sun.setAttribute("r",14);
+  sun.setAttribute("fill","#facc15");
+  svg.appendChild(sun);
+
+  /* ---------- YEAR PROGRESS ARC ---------- */
+
+  const ystart = polarToCartesian(cx, cy, earthOrbit, startAngle);
+  const yend = polarToCartesian(cx, cy, earthOrbit, endAngle);
+
+  const largeArc = yearProgress > 0.5 ? 1 : 0;
+
+  const arcPath = `
+  M ${ystart.x} ${ystart.y}
+  A ${earthOrbit} ${earthOrbit} 0 ${largeArc} 1 ${yend.x} ${yend.y}
+  `;
+
+  const yearArc = document.createElementNS(svgNS, "path");
+
+  yearArc.setAttribute("d", arcPath);
+  yearArc.setAttribute("fill", "none");
+  //yearArc.setAttribute("stroke", "#38bdf8");
+  yearArc.setAttribute("stroke", "#374151"); // same color as earth arc
+  yearArc.setAttribute("stroke-width", "3");
+  yearArc.setAttribute("stroke-linecap", "round");
+
+  svg.appendChild(yearArc);
+
+  /* ---------- EARTH ---------- */
+
+  const earth = document.createElementNS(svgNS,"circle");
+  earth.setAttribute("cx",earthX);
+  earth.setAttribute("cy",earthY);
+  earth.setAttribute("r",6);
+  earth.setAttribute("fill","#22c55e");
+  svg.appendChild(earth);
+
+  /* ---------- MOON ---------- */
+
+  const moon = document.createElementNS(svgNS,"circle");
+  moon.setAttribute("cx",moonX);
+  moon.setAttribute("cy",moonY);
+  moon.setAttribute("r",3);
+  moon.setAttribute("fill","#ffffff");
+  svg.appendChild(moon);
+
 }
 
 </script>
