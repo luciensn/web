@@ -515,6 +515,7 @@ h2{
   position:absolute;
   top:0;
   font-size:10px;
+  font-style: italic;
   color:#cbd5e1;
   height:100%;
   display:flex;
@@ -526,9 +527,33 @@ h2{
 .rightLabel{ right:12px; }
 
 
+/* =========================
+   FULL MOON CALENDAR
+========================= */
+
+#fullMoonCalendar{
+  display:flex;
+  justify-content:space-between;
+  padding: 12px;
+}
+
+.fullMoonDot{
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  background:#475569; /* grey (future) */
+}
+
+.fullMoonDot.complete{
+  background:#ffffff; /* completed full moon */
+}
+
+
 /* UV INDEX */
 #uvDescription {
-  margin-top:10px;font-size:14px;color:#94a3b8;
+  margin-top:10px;
+  font-size:14px;
+  color:#94a3b8;
 }
 
 
@@ -1007,6 +1032,10 @@ h2{
       <div class="moonBarLabel leftLabel">New</div>
       <div class="moonBarLabel rightLabel">Full</div>
     </div>
+
+    <!-- FULL MOON CALENDAR -->
+    <br>
+    <div id="fullMoonCalendar"></div>
   </div>
 
 </div>
@@ -1482,11 +1511,53 @@ fetch(url)
     }
 
 
+    buildFullMoonCalendar();
+
     // timestamp
     startElapsedTimer();
 
 });
 
+
+function buildFullMoonCalendar(){
+
+  const container = document.getElementById("fullMoonCalendar");
+  container.innerHTML = "";
+
+  const year = new Date().getFullYear();
+  const today = new Date();
+
+  const synodicMonth = 29.53058867;
+
+  // Known full moon reference
+  const knownFullMoon = new Date("2000-01-21T04:40:00Z");
+
+  let date = new Date(knownFullMoon);
+
+  // advance to current year
+  while(date.getFullYear() < year){
+    date = new Date(date.getTime() + synodicMonth*86400000);
+  }
+
+  // back up one just in case
+  date = new Date(date.getTime() - synodicMonth*86400000);
+
+  for(let i=0;i<14;i++){
+
+    date = new Date(date.getTime() + synodicMonth*86400000);
+
+    if(date.getFullYear() !== year) continue;
+
+    const dot = document.createElement("div");
+    dot.className = "fullMoonDot";
+
+    if(date < today){
+      dot.classList.add("complete");
+    }
+
+    container.appendChild(dot);
+  }
+}
 
 /* ================
   THERMOMETER 
