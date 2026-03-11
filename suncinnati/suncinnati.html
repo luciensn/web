@@ -688,6 +688,8 @@ h2{
     <label for="locationSelect">Location: </label>
     <select id="locationSelect">
       <option value="alms">Alms Park Overlook (Cincinnati)</option>
+      <option value="nyc">Central Park (NYC)</option>
+      <option value="macc">Mountain Air Country Club</option>
       <option value="sanibel">Sanibel Island, FL</option>
     </select>
   </div>
@@ -1060,9 +1062,6 @@ h2{
    LOCATIONS
 ========================= */
 
-// const lat = 39.1111;
-// const lon = -84.4304;
-
 const LOCATIONS = {
   alms: {
     name: "Alms Park Overlook",
@@ -1070,9 +1069,19 @@ const LOCATIONS = {
     lon: -84.4304
   },
   sanibel: {
-    name: "Sanibel Island",
+    name: "Sanibel Island, FL",
     lat: 26.4309,
     lon: -82.0515
+  },
+  macc: {
+    name: "Mountain Air Country Club",
+    lat: 35.8715,
+    lon: -82.3459
+  },
+  nyc: {
+    name: "Central Park (NYC)",
+    lat: 40.7719,
+    lon: -73.9746
   }
 };
 
