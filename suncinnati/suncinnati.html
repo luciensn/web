@@ -534,7 +534,8 @@ h2{
 #fullMoonCalendar{
   display:flex;
   justify-content:space-between;
-  padding: 10px 0px;
+  margin-top: 10px;
+  /*padding: 10px 0px;*/
 }
 
 .fullMoonDot{
@@ -897,7 +898,7 @@ h2{
             x="150"
             y="135"
             text-anchor="middle"
-            font-size="52"
+            font-size="14"
             fill="#f1f5f9"
             font-weight="600">
       </text>
@@ -1300,7 +1301,7 @@ fetch(url)
     const solarElevation = getSolarElevation(now, lat, lon);
 
     document.getElementById("centerSunAngle").textContent =
-        Math.round(solarElevation) + "°";
+        "Sun Altitude: " + Math.round(solarElevation) + "°";
 
     /*document.getElementById("centerSunAngle2").textContent =
         "Altitude";
