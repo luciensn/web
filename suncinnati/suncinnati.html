@@ -453,6 +453,10 @@ h2{
   border:none;
   color:#9ca3af;
   cursor:pointer;
+
+  border:1px solid #475569;
+  padding: 6px 12px;
+  border-radius: 8px;
 }
 
 #showUVGraphBtn:hover {
@@ -818,7 +822,7 @@ h2{
 <div class="panel" id="uvPanel">
   <h2>UV Index</h2>
 
-  <button id="showUVGraphBtn">Hourly</button>
+  <button id="showUVGraphBtn">Today</button>
 
   <div id="uvValue">--</div>
 
@@ -873,7 +877,7 @@ h2{
       <path id="sleepSegment"
             fill="none"
             stroke="#1f2937"
-            stroke-width="20"
+            stroke-width="12"
             stroke-linecap="round" />
 
       <!-- Daylight Segment -->
