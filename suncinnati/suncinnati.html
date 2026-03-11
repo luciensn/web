@@ -448,7 +448,7 @@ h2{
   right: 20px;
 
   font: inherit;
-  font-size:14px;
+  font-size:12px;
   background:none;
   border:none;
   color:#9ca3af;
@@ -1116,7 +1116,7 @@ h2{
       <span>Hourly UV Index</span>
       <button id="closeUVModal">✕</button>
     </div>
-    <svg id="uvGraph" viewBox="0 0 360 160"></svg>
+    <svg id="uvGraph" viewBox="0 0 360 200"></svg>
   </div>
 </div>
 
@@ -1281,6 +1281,13 @@ fetch(url)
     const hourlyUV = data.hourly.uv_index;
     const hourlyTimes = data.hourly.time.map(t => new Date(t));
     //const hourlyTimes = data.hourly.time;
+
+    // Hourly UV Graph
+    const uvToday = hourlyUV.slice(0,24);
+    const timeToday = data.hourly.time.slice(0,24);
+    //drawUVGraph(uvToday);
+    drawUVGraph(uvToday, timeToday);
+
 
     const today = new Date();
     today.setHours(0,0,0,0);
@@ -2364,10 +2371,161 @@ document.getElementById("closeUVModal").onclick = () => {
   uvModal.style.display = "none";
 };
 
+/*
+function drawUVGraph(uvData){
 
-function drawUVGraph(){
+  const svg = document.getElementById("uvGraph");
+  svg.innerHTML = "";
 
-  
+  const width = 360;
+  const height = 160;
+
+  const maxUV = 11;
+
+  let path = "";
+
+  uvData.forEach((uv,i)=>{
+
+    const x = (i/(uvData.length-1))*width;
+    const y = height - (uv/maxUV)*height;
+
+    if(i===0){
+      path += `M ${x} ${y}`;
+    } else {
+      path += ` L ${x} ${y}`;
+    }
+
+  });
+
+  const line = document.createElementNS("http://www.w3.org/2000/svg","path");
+
+  line.setAttribute("d",path);
+  line.setAttribute("fill","none");
+  line.setAttribute("stroke","#f59e0b");
+  line.setAttribute("stroke-width","3");
+
+  svg.appendChild(line);
+
+}
+*/
+
+function drawUVGraph(uvData, timeData){
+
+  const svg = document.getElementById("uvGraph");
+  svg.innerHTML = "";
+
+  const width = 360;
+  const height = 200;
+
+  const margin = {
+    left: 40,
+    right: 10,
+    top: 10,
+    bottom: 30
+  };
+
+  const graphWidth = width - margin.left - margin.right;
+  const graphHeight = height - margin.top - margin.bottom;
+
+  const maxUV = 11;
+
+  /* AXES */
+
+  const axisColor = "#6b7280";
+
+  const yAxis = document.createElementNS("http://www.w3.org/2000/svg","line");
+  yAxis.setAttribute("x1", margin.left);
+  yAxis.setAttribute("x2", margin.left);
+  yAxis.setAttribute("y1", margin.top);
+  yAxis.setAttribute("y2", height - margin.bottom);
+  yAxis.setAttribute("stroke", axisColor);
+  svg.appendChild(yAxis);
+
+  const xAxis = document.createElementNS("http://www.w3.org/2000/svg","line");
+  xAxis.setAttribute("x1", margin.left);
+  xAxis.setAttribute("x2", width - margin.right);
+  xAxis.setAttribute("y1", height - margin.bottom);
+  xAxis.setAttribute("y2", height - margin.bottom);
+  xAxis.setAttribute("stroke", axisColor);
+  svg.appendChild(xAxis);
+
+
+  /* Y GRID + LABELS */
+
+  for(let uv=0; uv<=11; uv+=2){
+
+    const y = margin.top + graphHeight - (uv/maxUV)*graphHeight;
+
+    const grid = document.createElementNS("http://www.w3.org/2000/svg","line");
+    grid.setAttribute("x1", margin.left);
+    grid.setAttribute("x2", width - margin.right);
+    grid.setAttribute("y1", y);
+    grid.setAttribute("y2", y);
+    grid.setAttribute("stroke", "#374151");
+    grid.setAttribute("stroke-width","1");
+    svg.appendChild(grid);
+
+    const label = document.createElementNS("http://www.w3.org/2000/svg","text");
+    label.textContent = uv;
+    label.setAttribute("x", margin.left - 8);
+    label.setAttribute("y", y + 4);
+    label.setAttribute("text-anchor","end");
+    label.setAttribute("font-size","10");
+    label.setAttribute("fill","#9ca3af");
+    svg.appendChild(label);
+
+  }
+
+
+  /* X LABELS (time) */
+
+  const hoursToShow = [6,9,12,15,18,21];
+
+  hoursToShow.forEach(hour => {
+
+    const index = timeData.findIndex(t => new Date(t).getHours() === hour);
+
+    if(index === -1) return;
+
+    const x = margin.left + (index/(uvData.length-1))*graphWidth;
+
+    const label = document.createElementNS("http://www.w3.org/2000/svg","text");
+    label.textContent = hour;
+    label.setAttribute("x", x);
+    label.setAttribute("y", height - 8);
+    label.setAttribute("text-anchor","middle");
+    label.setAttribute("font-size","10");
+    label.setAttribute("fill","#9ca3af");
+    svg.appendChild(label);
+
+  });
+
+
+  /* UV LINE */
+
+  let path = "";
+
+  uvData.forEach((uv,i)=>{
+
+    const x = margin.left + (i/(uvData.length-1))*graphWidth;
+    const y = margin.top + graphHeight - (uv/maxUV)*graphHeight;
+
+    if(i===0){
+      path += `M ${x} ${y}`;
+    } else {
+      path += ` L ${x} ${y}`;
+    }
+
+  });
+
+  const line = document.createElementNS("http://www.w3.org/2000/svg","path");
+
+  line.setAttribute("d",path);
+  line.setAttribute("fill","none");
+  line.setAttribute("stroke","#f59e0b");
+  line.setAttribute("stroke-width","3");
+
+  svg.appendChild(line);
 
 }
 
