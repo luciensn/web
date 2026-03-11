@@ -679,18 +679,20 @@ h2{
 
 
 <!-- =========================
-     SETTINGS PANEL (HIDDEN)
+     SETTINGS PANEL
 ================================ -->
 <div id="settingsPanel" class="panel hidden">
   <h2>Settings</h2>
 
-  <div id="locationBlock">
-    <div class="location-name">Alms Park Overlook</div>
-    <div class="location-coords">39.1111° N • 84.4306° W</div>
+  <div class="settingsRow">
+    <label for="locationSelect">Location: </label>
+    <select id="locationSelect">
+      <option value="alms">Alms Park Overlook (Cincinnati)</option>
+      <option value="sanibel">Sanibel Island, FL</option>
+    </select>
   </div>
 
 </div>
-
 
 
 <!-- =========================
@@ -705,7 +707,6 @@ h2{
     <div>
       <div class="temp" id="temp">--°</div>
       <div id="conditions">Loading...</div>
-      <!--<div id="highlow"></div>-->
     </div>
 
     <!-- RIGHT SIDE -->
@@ -1055,8 +1056,31 @@ h2{
 
 <script>
 
-const lat = 39.1111;
-const lon = -84.4304;
+/* =========================
+   LOCATIONS
+========================= */
+
+// const lat = 39.1111;
+// const lon = -84.4304;
+
+const LOCATIONS = {
+  alms: {
+    name: "Alms Park Overlook",
+    lat: 39.1111,
+    lon: -84.4304
+  },
+  sanibel: {
+    name: "Sanibel Island",
+    lat: 26.4309,
+    lon: -82.0515
+  }
+};
+
+let selectedLocationKey =
+  localStorage.getItem("suncinnatiLocation") || "alms";
+
+let lat = LOCATIONS[selectedLocationKey].lat;
+let lon = LOCATIONS[selectedLocationKey].lon;
 
 /* =========================
    DATE / TIME
@@ -2035,7 +2059,7 @@ function updateCycleLabels(sunrise, sunset){
 
   /* =========================
      SLEEP LOGIC
-     10:30 PM → Sunrise
+     Bedtime → Sunrise
   ========================= */
 
   const sleepStart = new Date(midnight);
@@ -2152,7 +2176,7 @@ function updateUVIndex(uv){
 
   //if(uv == 0) color =             "#f1f5f9";
   //if(uv >= 3 && uv < 6) color =   "#eab308";
-  if(uv >= 6 && uv < 8) color =   "#f97316";
+  //if(uv >= 6 && uv < 8) color =   "#f97316";
   if(uv >= 8 && uv < 11) color =  "#ef4444";
   if(uv >= 11) color =            "#7c3aed";
 
@@ -2227,6 +2251,27 @@ function updateTimestamp() {
     document.getElementById("lastUpdated").textContent = timeString;
 }
 */
+
+
+/* =========================
+   LOCATION DROPDOWN
+========================= */
+
+const locationSelect = document.getElementById("locationSelect");
+
+// initialize dropdown
+locationSelect.value = selectedLocationKey;
+
+locationSelect.addEventListener("change", () => {
+
+  const key = locationSelect.value;
+
+  localStorage.setItem("suncinnatiLocation", key);
+
+  // reload page so all data recalculates
+  location.reload();
+
+});
 
 
 </script>
