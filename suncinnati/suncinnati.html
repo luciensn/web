@@ -742,8 +742,7 @@ h2{
     <label for="locationSelect">Location: </label>
     <select id="locationSelect">
       <option value="alms">Alms Park Overlook (Cincinnati)</option>
-      <option value="nyc">Central Park (NYC)</option>
-      <option value="macc">Mountain Air Country Club</option>
+      <option value="nyc">Central Park, NYC</option>
       <option value="sanibel">Sanibel Island, FL</option>
     </select>
   </div>
@@ -819,7 +818,7 @@ h2{
 <div class="panel" id="uvPanel">
   <h2>UV Index</h2>
 
-  <button id="showUVGraphBtn">Show Hourly UV</button>
+  <button id="showUVGraphBtn">Hourly</button>
 
   <div id="uvValue">--</div>
 
@@ -1113,7 +1112,7 @@ h2{
 <div id="uvModal">
   <div id="uvModalContent">
     <div id="uvModalHeader">
-      <span>Hourly UV Index</span>
+      <span>UV Index Today</span>
       <button id="closeUVModal">✕</button>
     </div>
     <svg id="uvGraph" viewBox="0 0 360 300"></svg>
@@ -1138,13 +1137,8 @@ const LOCATIONS = {
     lat: 26.4309,
     lon: -82.0515
   },
-  macc: {
-    name: "Mountain Air Country Club",
-    lat: 35.8715,
-    lon: -82.3459
-  },
   nyc: {
-    name: "Central Park (NYC)",
+    name: "Central Park, NYC",
     lat: 40.7719,
     lon: -73.9746
   }
