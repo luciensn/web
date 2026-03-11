@@ -234,9 +234,7 @@ h2{
   color:var(--muted);
 }
 
-#uvPanel {
-  /*display: none;*/
-}
+
 
 
 
@@ -387,6 +385,11 @@ h2{
    UV PANEL
 ========================= */
 
+#uvPanel {
+  /*display: none;*/
+  position:relative;
+}
+
 #uvValue{
   font-size:52px;
   font-weight:700;
@@ -433,6 +436,57 @@ h2{
   font-size:10px;
   margin-top:6px;
   color:#94a3b8;
+}
+
+/* ================
+  HOURLY UV POPUP
+=================== */
+
+#showUVGraphBtn{
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
+  font: inherit;
+  font-size:14px;
+  background:none;
+  border:none;
+  color:#9ca3af;
+  cursor:pointer;
+}
+
+#showUVGraphBtn:hover {
+  color: #ffffff;
+}
+
+#uvModal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
+}
+
+#uvModalContent{
+  width:90%;
+  max-width:420px;
+  background:#111827;
+  border-radius:12px;
+  padding:16px;
+}
+
+#uvModalHeader{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:12px;
+  font-weight:600;
+}
+
+#uvGraph{
+  width:100%;
+  height:160px;
 }
 
 /* =========================
@@ -765,6 +819,8 @@ h2{
 <div class="panel" id="uvPanel">
   <h2>UV Index</h2>
 
+  <button id="showUVGraphBtn">Show Hourly UV</button>
+
   <div id="uvValue">--</div>
 
   <div id="uvScaleSection">
@@ -1048,11 +1104,20 @@ h2{
 
 <div id="dataFooter">
     Data from <a href="https://open-meteo.com">Open-Meteo<a/> • <span id="lastUpdated">Last updated: --:--:--</span>
-
     <br>
-
     <span id="dateLine"></span>
     <span id="timeLine"></span>
+</div>
+
+<!-- UV POPUP WINDOW -->
+<div id="uvModal">
+  <div id="uvModalContent">
+    <div id="uvModalHeader">
+      <span>Hourly UV Index</span>
+      <button id="closeUVModal">✕</button>
+    </div>
+    <svg id="uvGraph" viewBox="0 0 360 160"></svg>
+  </div>
 </div>
 
 
@@ -1156,7 +1221,6 @@ function startElapsedTimer() {
 
 // -----------------------------------------------------------
 
-
 const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}
 &current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m,uv_index
 &daily=temperature_2m_max,temperature_2m_min,sunrise,sunset
@@ -1164,6 +1228,10 @@ const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${
 &temperature_unit=fahrenheit
 &wind_speed_unit=mph
 &timezone=auto`;
+
+/* Save hourly UV data */
+// let hourlyUV = [];
+// let hourlyTimes = [];
 
 fetch(url)
 .then(res => res.json())
@@ -1212,6 +1280,7 @@ fetch(url)
 
     const hourlyUV = data.hourly.uv_index;
     const hourlyTimes = data.hourly.time.map(t => new Date(t));
+    //const hourlyTimes = data.hourly.time;
 
     const today = new Date();
     today.setHours(0,0,0,0);
@@ -2282,6 +2351,25 @@ locationSelect.addEventListener("change", () => {
 
 });
 
+
+/* === HOURLY UV POPUP ==== */
+
+const uvModal = document.getElementById("uvModal");
+
+document.getElementById("showUVGraphBtn").onclick = () => {
+  uvModal.style.display = "flex";
+};
+
+document.getElementById("closeUVModal").onclick = () => {
+  uvModal.style.display = "none";
+};
+
+
+function drawUVGraph(){
+
+  
+
+}
 
 </script>
 
