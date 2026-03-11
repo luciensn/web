@@ -486,7 +486,7 @@ h2{
 
 #uvGraph{
   width:100%;
-  height:160px;
+  height:300px;
 }
 
 /* =========================
@@ -1116,7 +1116,7 @@ h2{
       <span>Hourly UV Index</span>
       <button id="closeUVModal">✕</button>
     </div>
-    <svg id="uvGraph" viewBox="0 0 360 200"></svg>
+    <svg id="uvGraph" viewBox="0 0 360 300"></svg>
   </div>
 </div>
 
@@ -2371,51 +2371,13 @@ document.getElementById("closeUVModal").onclick = () => {
   uvModal.style.display = "none";
 };
 
-/*
-function drawUVGraph(uvData){
-
-  const svg = document.getElementById("uvGraph");
-  svg.innerHTML = "";
-
-  const width = 360;
-  const height = 160;
-
-  const maxUV = 11;
-
-  let path = "";
-
-  uvData.forEach((uv,i)=>{
-
-    const x = (i/(uvData.length-1))*width;
-    const y = height - (uv/maxUV)*height;
-
-    if(i===0){
-      path += `M ${x} ${y}`;
-    } else {
-      path += ` L ${x} ${y}`;
-    }
-
-  });
-
-  const line = document.createElementNS("http://www.w3.org/2000/svg","path");
-
-  line.setAttribute("d",path);
-  line.setAttribute("fill","none");
-  line.setAttribute("stroke","#f59e0b");
-  line.setAttribute("stroke-width","3");
-
-  svg.appendChild(line);
-
-}
-*/
-
 function drawUVGraph(uvData, timeData){
 
   const svg = document.getElementById("uvGraph");
   svg.innerHTML = "";
 
   const width = 360;
-  const height = 200;
+  const height = 300;
 
   const margin = {
     left: 40,
