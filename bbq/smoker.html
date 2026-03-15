@@ -18,10 +18,14 @@
 <meta name="apple-mobile-web-app-title" content="Smoker">
 
 <style>
+
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&family=Press+Start+2P&family=VT323&display=swap');
+
 * { box-sizing: border-box; margin:0; padding:0; }
 
 body {
   font-family: -apple-system, system-ui, sans-serif;
+  /*font-family: "VT323", monospace;*/
   background: #f5f5f7;
   padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
 }
@@ -50,11 +54,16 @@ button {
   width: 100%;
   padding: 10px;
   font-size: 16px;
-  background: #007aff;
+  /*background: #007aff;*/
+  background: #C11007;
   color: white;
   border: none;
   border-radius: 8px;
   margin-bottom: 16px;
+}
+
+.build-btn {
+  background: #C11007; // maroon
 }
 
 #summary {
@@ -130,89 +139,22 @@ button {
 #shiftClock {
   text-align: center;
   margin-bottom: 30px;
+  font-family: "VT323", monospace;
 }
 
 #currentTimeDisplay {
-  font-size: 48px;
-  font-weight: 700;
+  font-size: 52px;
+  /*font-weight: 700;*/
   letter-spacing: 1px;
 }
 
 #shiftStatus {
-  font-size: 18px;
+  font-size: 20px;
   margin-top: 6px;
   color: #666;
-  /*font-style: italic;*/
 }
 
-/* ===== RED TIME MARKER ===== */
 
-.current-time-marker {
-  position: absolute;
-  left: 62px;
-  transform: translateX(-50%);
-  width: 36px;
-  height: 6px;
-  background: #e21;
-  border-radius: 20px;
-  z-index: 10;
-}
-
-/* ===== TIMESCALE ===== */
-
-#timeScale {
-  position: relative;
-  max-width: 800px;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  
-  /*border:1px solid blue;*/
-}
-
-/* Dotted vertical timeline */
-.timeline-line {
-  position: absolute;
-  left: 60px;
-  top: 0;
-  width: 2px;
-  background: repeating-linear-gradient(
-    to bottom,
-    #bbb 0px,
-    #bbb 2px,
-    transparent 2px,
-    transparent 6px
-  );
-}
-
-/* Hour labels */
-.time-label {
-  position: absolute;
-  left: 0px;
-  width: 50px;
-  text-align: right;
-  font-size: 10px;
-  color: #222;
-}
-
-/* Ticks */
-.tick {
-  position: absolute;
-  left: 58px;
-  height: 2px;
-  background: #bbb;
-  width: 12px;
-}
-
-.tick.hour {
-  width: 24px;
-  background: #bbb;
-}
-
-/* CHECKLIST */
-
-label.completed {
-  text-decoration: line-through;
-  opacity: 0.6;
-}
 
 /* PORK CALCULATOR */
 .build-btn {
@@ -222,7 +164,8 @@ label.completed {
 }
 
 .build-btn.active {
-  background: #007aff;
+  /*background: #007aff;*/
+  background: #C11007;
   color: #fff;
 }
 
@@ -234,6 +177,12 @@ label.completed {
   width:100%;
 }
 
+ul {
+  list-style-position: inside;
+  margin-left: 20px; /* Or a suitable value */
+  padding-left: 0; /* Optional: adjust as needed */
+}
+
 </style>
 </head>
 
@@ -242,7 +191,84 @@ label.completed {
 <header>Smoker</header>
 
 
+<!-- SHIFT CLOCK -->
+<br>
+
+<div id="shiftClock">
+  <div id="currentTimeDisplay"></div>
+  <div id="shiftStatus"></div>
+</div>
+
+
+<br>
+
+<div id="cookingGuide">
+  <h2>Cooking Guide</h2>
+  <br>
+
+  <div>
+    <span style="font-weight: bold;">🍗 Wings</span>
+    <ul>
+      <li>Cook ~2 hrs @ 250°F (11:00AM - 1:00PM)</li>
+      <li>Minimum 165°F internal temp</li>
+      <li>Use <b>1/2 bag</b> of dry rub per case</li>
+      <li>Use top racks to cook fastest</li>
+
+    </ul>
+  </div>
+  <br>
+    
+  <div>
+    <span style="font-weight: bold;">🦃 Turkey</span>
+    <ul>
+      <li>Cook ~3 hrs @ 250°F (11:00AM - 2:00PM)</li>
+      <li>Minimum 165°F internal temp</li>
+      <li>Use top racks to cook fastest</li>
+    </ul>
+  </div>
+  <br>
+
+  <div>
+    <span style="font-weight: bold;">🥓 Ribs & Tips</span>
+    <ul>
+      <li>Cook ~5 hrs @ 225°F (11:00AM - 4:00PM)</li>
+      <li>Minimum 195°F internal temp</li>
+      <li>Can start cooking at 250°F (with wings & turkey)</li>
+      <li>⚠️ Turn dial down to 225°F after all wings & turkey done</li>
+      <li>When space becomes available, move <b>ribs</b> up to top racks</li>
+    </ul>
+  </div>
+  <br>
+  
+  <div>
+    <span style="font-weight: bold;">🌭 Hotdogs</span>
+    <ul>
+      <li>Cook 45min @ 225°F (3:15PM - 4:00PM)</li>
+      <li>Do not overcook</li>
+    </ul>
+  </div>
+  <br>
+
+  <div>
+    <span style="font-weight: bold;">🥩 Pork Shoulder Butts</span>
+    <ul>
+      <li>Cook overnight @ 215°F (5:00PM - 9:00AM)</li>
+      <li>⚠️ Do not use top rack</li>
+    </ul>
+  </div>
+  <br>
+
+
+</div>
+
+
+
+<br>
+<br>
+
 <!-- LABEL GENERATOR -->
+<h2>Label Generator</h2>
+<br>
 <div class="label-widget">
   <div class="label-dates">
     <div><strong>Today:</strong> <span id="todayDate"></span></div>
@@ -251,39 +277,11 @@ label.completed {
 </div>
 
 
-<!-- COOKING TIMELINE WIDGET -->
 <br>
-
-<div id="shiftClock">
-  <div id="currentTimeDisplay"></div>
-  <div id="shiftStatus"></div>
-</div>
-
-<br>
-<br>
-
-<h2>Shift Timeline</h2>
-
-<br>
-<hr>
-<br>
-<br>
-
-<div id="timeScale"></div>
-
-<br>
-<br>
-<br>
-
-<hr>
-
-<br>
-<br>
-
 
 <!-- PULLED PORK PAN CALCULATOR -->
 
-<h2>Pulled Pork Widgets</h2>
+<h2>Pulled Pork Pan Calculator</h2>
 
 <br>
 
@@ -301,8 +299,12 @@ label.completed {
 
 </div>
 
+<br>
+
 
 <!-- PULLED PORK BUILD CALCULATOR -->
+
+<h2>Pork Loading Helper</h2>
 
 <br>
 
@@ -318,7 +320,7 @@ label.completed {
 
   <div style="display:flex; gap:10px; margin-bottom:12px;">
     <button class="build-btn active" data-target="30">30+ (Winter)</button>
-    <button class="build-btn" data-target="35">35</button>
+    <button class="build-btn" data-target="35">35+</button>
     <button class="build-btn" data-target="40">40+ (Summer)</button>
   </div>
 
@@ -358,6 +360,9 @@ label.completed {
 
 <script>
 
+const SHIFT_START = 9; // 9:00 AM
+const SHIFT_END = 17; // 5:00 PM
+
 // Format Time
 function formatTime(date){
   return date.toLocaleTimeString([],{
@@ -367,9 +372,115 @@ function formatTime(date){
   });
 }
 
-/* ============================
-  PORK BUTT LOADING VISUALIZER
-================================*/
+
+/* ====================
+  SHIFT CLOCK
+=======================*/
+
+function formatMilestoneTime(date){
+  return date.toLocaleTimeString([],{
+    hour:'numeric',
+    minute:'2-digit',
+    hour12:true
+  }).replace(/\s?(AM|PM)/i, '');
+}
+
+function startLiveShiftSystem() {
+
+  function update() {
+
+    const now = new Date();
+
+    /* =========================
+       1️⃣ BIG TIME DISPLAY
+    ========================== */
+
+    const timeString = now.toLocaleTimeString([], {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true
+    });
+
+    document.getElementById("currentTimeDisplay").textContent = timeString;
+
+    /* =========================
+       2️⃣ SHIFT STATUS LOGIC
+    ========================== */
+
+    const shiftStart = new Date();
+    shiftStart.setHours(SHIFT_START, 0, 0, 0);
+
+    const shiftEnd = new Date();
+    shiftEnd.setHours(SHIFT_END, 0, 0, 0);
+
+    const statusEl = document.getElementById("shiftStatus");
+
+    if (now < shiftStart) {
+
+      const diff = shiftStart - now;
+      statusEl.textContent = formatDuration(diff) + " until next shift";
+
+    } else if (now >= shiftStart && now <= shiftEnd) {
+
+      const diff = shiftEnd - now;
+      statusEl.textContent = formatDuration(diff) + " remaining";
+
+    } else {
+
+      statusEl.textContent = "Today's shift has ended";
+
+    }
+  }
+
+  function formatDuration(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    return (
+      String(hours).padStart(2, "0") + ":" +
+      String(minutes).padStart(2, "0") + ":" +
+      String(seconds).padStart(2, "0")
+    );
+  }
+
+  update();
+  setInterval(update, 1000); // every 1 second
+}
+
+startLiveShiftSystem();
+
+
+
+/* =================
+  LABEL GENERATOR 
+  ================== */
+function formatDate(date) {
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  return `${month}-${day.toString().padStart(2, '0')}`;
+}
+
+function generateDates() {
+  const today = new Date();
+
+  const useBy = new Date();
+  useBy.setDate(today.getDate() + 6); // auto handles month/year rollover
+
+  document.getElementById("todayDate").textContent = formatDate(today);
+  document.getElementById("useByDate").textContent = formatDate(useBy);
+}
+
+// Auto-generate on page load
+generateDates();
+
+
+
+/* ======================================
+  PORK BUTT LOADING VISUALIZER/BALANCER
+========================================= */
 function loadMeat() {
   const cases = parseInt(document.getElementById('cases').value);
   if (!cases || cases < 1) return;
@@ -465,344 +576,10 @@ function renderVisualizer(distribution) {
 }
 
 
-/* =================
-  LABEL GENERATOR 
-  ================== */
-function formatDate(date) {
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  return `${month}-${day.toString().padStart(2, '0')}`;
-}
 
-function generateDates() {
-  const today = new Date();
-
-  const useBy = new Date();
-  useBy.setDate(today.getDate() + 6); // auto handles month/year rollover
-
-  document.getElementById("todayDate").textContent = formatDate(today);
-  document.getElementById("useByDate").textContent = formatDate(useBy);
-}
-
-// Auto-generate on page load
-generateDates();
-
-
-/* ====================
-  SHIFT TIMELINE
-=======================*/
-
-function formatMilestoneTime(date){
-  return date.toLocaleTimeString([],{
-    hour:'numeric',
-    minute:'2-digit',
-    hour12:true
-  }).replace(/\s?(AM|PM)/i, '');
-}
-
-function startLiveShiftSystem(containerId, shiftStartHour = 9, shiftEndHour = 17, pixelsPerMinute = 4) {
-
-  const container = document.getElementById(containerId);
-
-  const marker = document.createElement("div");
-  marker.className = "current-time-marker";
-  container.appendChild(marker);
-
-  function update() {
-
-    const now = new Date();
-
-    /* =========================
-       1️⃣ BIG TIME DISPLAY
-    ========================== */
-
-    const timeString = now.toLocaleTimeString([], {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true
-    });
-
-    document.getElementById("currentTimeDisplay").textContent = timeString;
-
-    /* =========================
-       2️⃣ SHIFT STATUS LOGIC
-    ========================== */
-
-    const shiftStart = new Date();
-    shiftStart.setHours(shiftStartHour, 0, 0, 0);
-
-    const shiftEnd = new Date();
-    shiftEnd.setHours(shiftEndHour, 0, 0, 0);
-
-    const statusEl = document.getElementById("shiftStatus");
-
-    if (now < shiftStart) {
-
-      const diff = shiftStart - now;
-      statusEl.textContent = formatDuration(diff) + " until next shift";
-
-    } else if (now >= shiftStart && now <= shiftEnd) {
-
-      const diff = shiftEnd - now;
-      statusEl.textContent = formatDuration(diff) + " remaining";
-
-    } else {
-
-      //statusEl.textContent = "Shift complete for today";
-      statusEl.textContent = "Today's shift has ended";
-
-    }
-
-    /* =========================
-       MARKER VISIBILITY + POSITION
-    ========================== */
-
-    if (now >= shiftStart && now <= shiftEnd) {
-
-      marker.style.display = "block";
-
-      const minutesFromStart =
-        (now.getHours() - shiftStartHour) * 60 + now.getMinutes();
-
-      const offset = minutesFromStart * pixelsPerMinute;
-
-      marker.style.top = offset + "px";
-
-    } else {
-
-      marker.style.display = "none";
-
-    }
-  }
-
-  function formatDuration(ms) {
-    const totalSeconds = Math.floor(ms / 1000);
-
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-
-    return (
-      String(hours).padStart(2, "0") + ":" +
-      String(minutes).padStart(2, "0") + ":" +
-      String(seconds).padStart(2, "0")
-    );
-  }
-
-  update();
-  setInterval(update, 1000);
-}
-
-
-function renderVerticalTimeScale(containerId, startHour = 9, endHour = 17, pixelsPerMinute = 2) {
-
-  pixelsPerMinute = 4;
-
-  const container = document.getElementById(containerId);
-  container.innerHTML = "";
-
-  const totalMinutes = (endHour - startHour) * 60;
-  const totalHeight = totalMinutes * pixelsPerMinute;
-
-  container.style.height = totalHeight + "px";
-
-  /* Vertical dotted line */
-  const line = document.createElement("div");
-  line.className = "timeline-line";
-  line.style.height = totalHeight + "px";
-  container.appendChild(line);
-
-  /* Create ticks + labels */
-  for (let minutes = 0; minutes <= totalMinutes; minutes += 15) {
-
-    const offset = minutes * pixelsPerMinute;
-
-    const tick = document.createElement("div");
-    tick.className = "tick";
-    tick.style.top = offset + "px";
-
-    if (minutes % 60 === 0) {
-      tick.classList.add("hour");
-
-      const hour = startHour + minutes / 60;
-      const suffix = hour >= 12 ? "PM" : "AM";
-      const displayHour = hour > 12 ? hour - 12 : hour;
-
-      const label = document.createElement("div");
-      label.className = "time-label";
-      label.style.top = (offset - 6) + "px";
-      label.textContent = `${displayHour}:00 ${suffix}`;
-
-      container.appendChild(label);
-    }
-
-    container.appendChild(tick);
-  }
-}
-
-async function renderShiftMilestones(containerId, jsonPath) {
-
-  const container = document.getElementById(containerId);
-
-  const response = await fetch(jsonPath);
-  const data = await response.json();
-
-  const pixelsPerMinute = 4;
-
-  const startHour = parseInt(data.shiftStart.split(":")[0]);
-  const startMinutes = startHour * 60;
-
-  // reset at midnight UTC
-  // const todayKey = new Date().toISOString().split("T")[0];
-
-  // reset at midight local time
-  const now = new Date();
-  const todayKey =
-    now.getFullYear() + "-" +
-    String(now.getMonth() + 1).padStart(2, "0") + "-" +
-    String(now.getDate()).padStart(2, "0");
-  const storageKey = "shiftChecklist_" + todayKey;
-
-  const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
-
-  const milestones = data.milestones;
-
-  for (let i = 0; i < milestones.length; i++) {
-
-    const ms = milestones[i];
-    const [h, m] = ms.time.split(":").map(Number);
-    const totalMinutes = (h * 60 + m) - startMinutes;
-    const offset = totalMinutes * pixelsPerMinute;
-
-    /* =======================
-       MILESTONE MARKER
-    ======================== */
-
-    const wrap = document.createElement("div");
-    wrap.style.position = "absolute";
-    wrap.style.top = offset + "px";
-    wrap.style.left = "80px";
-    wrap.style.transform = "translateY(-50%)";
-
-    // format the display time
-    const [hour, minute] = ms.time.split(":").map(Number);
-    const milestoneDate = new Date();
-    milestoneDate.setHours(hour, minute, 0, 0);
-    let dispTime = formatMilestoneTime(milestoneDate);
-
-    wrap.innerHTML = `
-      <div style="
-        position:absolute;
-        left:-20px;
-        top:50%;
-        transform:translateY(-50%);
-        width:10px;
-        height:10px;
-        background:#000;
-        border-radius:50%;">
-      </div>
-      <div style="
-        position:absolute;
-        left:-10px;
-        top:50%;
-        transform:translateY(-50%);
-        width:30px;
-        height:3px;
-        background:#000;">
-      </div>
-      <div style="
-        margin-left:20px;
-        font-size:14px;
-        font-weight:700;
-        background-color:#000;
-        color:#fff;
-        padding: 6px;">
-        ${dispTime} • ${ms.label}
-      </div>
-    `;
-
-    container.appendChild(wrap);
-
-    /* =======================
-       CONTENT BLOCK
-    ======================== */
-
-    if (i < milestones.length - 1) {
-
-      const next = milestones[i + 1];
-      const [nh, nm] = next.time.split(":").map(Number);
-      const nextMinutes = (nh * 60 + nm) - startMinutes;
-      const nextOffset = nextMinutes * pixelsPerMinute;
-
-      const block = document.createElement("div");
-      block.style.className = "checklist-item";
-      block.style.position = "absolute";
-      block.style.left = "100px";
-      block.style.right = "0";
-      block.style.top = (offset + 20) + "px";
-      block.style.height = (nextOffset - offset - 40) + "px";
-      /*block.style.background = "#eee";*/
-      /*block.style.padding = "20px";*/
-      block.style.display = "flex";
-      block.style.flexDirection = "column";
-      block.style.gap = "6px"; // vertical spacing
-      block.style.overflow = "scroll";
-
-      ms.checklist.forEach((item, index) => {
-
-        const id = ms.id + "_" + index;
-
-        const label = document.createElement("label");
-        label.style.display = "flex";
-        label.style.alignItems = "center";
-        label.style.gap = "8px";
-        label.style.fontSize = "12px";
-        
-        /*label.style.border = "1px solid red";*/
-
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.style.width = "18px";
-        checkbox.style.height = "18px";
-
-
-        checkbox.checked = saved[id] || false;
-
-        // strikethrough?
-        if (checkbox.checked) {
-          label.classList.add("completed");
-        }
-
-        checkbox.addEventListener("change", () => {
-          const updated = JSON.parse(localStorage.getItem(storageKey) || "{}");
-          updated[id] = checkbox.checked;
-          localStorage.setItem(storageKey, JSON.stringify(updated));
-
-          // toggle strikethrough
-          label.classList.toggle("completed", checkbox.checked);
-
-        });
-
-        label.appendChild(checkbox);
-        label.append(item);
-
-        block.appendChild(label);
-      });
-
-      container.appendChild(block);
-    }
-  }
-}
-
-/* Render */
-renderVerticalTimeScale("timeScale");
-renderShiftMilestones("timeScale", "shift-timeline.json");
-startLiveShiftSystem("timeScale");
-
-
-/* =====================
-  PULLED PORK PANS
-========================= */
+/* ============================
+  PULLED PORK PAN CALCULATOR
+=============================== */
 
 function calculatePans() {
 
@@ -826,9 +603,9 @@ function calculatePans() {
   `;
 }
 
-/* ========================
-  PULLED PORK CALCULATOR
-=========================== */
+/* =============================
+  PULLED PORK LOADING HELPER
+================================ */
 
 let buildTarget = 30; // default
 
