@@ -746,6 +746,8 @@ h2{
     <label for="locationSelect">Location: </label>
     <select id="locationSelect">
       <option value="alms">Alms Park Overlook (Cincinnati)</option>
+      <option value="rdp">Rheinstrom Dog Park (Cincinnati)</option>
+      <option value="msq">Mariemont Square (Cincinnati)</option>
       <option value="nyc">Central Park, NYC</option>
       <option value="sanibel">Sanibel Island, FL</option>
     </select>
@@ -834,10 +836,11 @@ h2{
 
     <div id="uvScaleLabels">
       <span>0</span>
-      <span>3</span>
+      <span>2</span>
+      <span>4</span>
       <span>6</span>
       <span>8</span>
-      <span>11+</span>
+      <span>10+</span>
     </div>
 
   </div>
@@ -1145,6 +1148,16 @@ const LOCATIONS = {
     name: "Alms Park Overlook",
     lat: 39.1111,
     lon: -84.4304
+  },
+  rdp: {
+    name: "Rheinstrom Dog Park",
+    lat: 39.1702,
+    lon: -84.3511
+  },
+  msq: {
+    name: "Mariemont Square",
+    lat: 39.1453,
+    lon: -84.3744
   },
   sanibel: {
     name: "Sanibel Island, FL",
@@ -1810,7 +1823,7 @@ function plotSunPosition(sunrise,sunset,uvaWindow,uvbWindow){
     .setAttribute("cy",cy+r*Math.sin(angle));
 
 
-  /* DAY ARC */
+  /* DAY ARC 
   const sunriseP=(sunrise-midnight)/totalDay;
   const sunsetP=(sunset-midnight)/totalDay;
 
@@ -1826,6 +1839,31 @@ function plotSunPosition(sunrise,sunset,uvaWindow,uvbWindow){
     .setAttribute("d",
       `M ${x1} ${y1}
        A ${r} ${r} 0 0 1 ${x2} ${y2}`);
+  */
+
+  /* DAY ARC */
+  const sunriseP = (sunrise - midnight) / totalDay;
+  const sunsetP  = (sunset - midnight) / totalDay;
+
+  const a1 = sunriseP * 2 * Math.PI + rotation;
+  const a2 = sunsetP  * 2 * Math.PI + rotation;
+
+  const x1 = cx + r * Math.cos(a1);
+  const y1 = cy + r * Math.sin(a1);
+  const x2 = cx + r * Math.cos(a2);
+  const y2 = cy + r * Math.sin(a2);
+
+  // daylight can be > 12h, so don't hardcode the small arc
+  let daylightSpan = sunsetP - sunriseP;
+  if (daylightSpan < 0) daylightSpan += 1;
+
+  const dayLargeArcFlag = daylightSpan > 0.5 ? 1 : 0;
+
+  document.getElementById("daySegment").setAttribute(
+    "d",
+    `M ${x1} ${y1}
+     A ${r} ${r} 0 ${dayLargeArcFlag} 1 ${x2} ${y2}`
+  );
 
   /* =========================
      SLEEP ARC (11PM → Sunrise)
@@ -2258,7 +2296,7 @@ function positionSeasonTicks(){
 
 function updateUVIndex(uv){
 
-  //const uv = 4; // pretend value
+  //uv = 10.1; // pretend value
 
   const uvValue = document.getElementById("uvValue");
   const uvArrow = document.getElementById("uvArrow");
@@ -2272,10 +2310,10 @@ function updateUVIndex(uv){
   let color = "";
 
   //if(uv == 0) color =             "#f1f5f9";
-  //if(uv >= 3 && uv < 6) color =   "#eab308";
-  //if(uv >= 6 && uv < 8) color =   "#f97316";
-  if(uv >= 8 && uv < 11) color =  "#ef4444";
-  if(uv >= 11) color =            "#7c3aed";
+  //if(uv >= 3 && uv < 6) color =   "#eab308"; // yellow
+  if(uv >= 6 && uv < 8) color =   "#f97316"; // orange
+  if(uv >= 8 && uv < 10) color =  "#ef4444"; // red
+  if(uv >= 10) color =            "#7c3aed"; // purple
 
   //uvValue.style.color = color;
   if (color.length > 0) {
@@ -2284,7 +2322,7 @@ function updateUVIndex(uv){
 
   /* Position arrow */
 
-  const maxUV = 11;
+  const maxUV = 10; // 11
   const percent = Math.min(uv / maxUV, 1);
 
   const width = uvBar.offsetWidth;
@@ -2302,8 +2340,11 @@ function updateUVIndex(uv){
     else if(uv >= 3 && uv < 6){
       description = "UV is moderate. Safe for Vitamin D.";
     }
-    else if (uv >= 6) {
+    else if (uv >= 6 && uv < 10) {
       description = "UV is high. Fair skin types should avoid direct sun (seek shade).";
+    }
+    else if (uv >= 10) {
+      description = "⚠️ UV is extreme. Avoid direct sun (cover up, seek shade).";
     }
 
     uvDescription.textContent = description;
@@ -2367,11 +2408,12 @@ locationSelect.addEventListener("change", () => {
 
   // reload page so all data recalculates
   location.reload();
-
 });
 
 
-/* === HOURLY UV POPUP ==== */
+/* ===============
+  HOURLY UV POPUP 
+================= */
 
 const uvModal = document.getElementById("uvModal");
 
