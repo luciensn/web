@@ -1355,15 +1355,15 @@ fetch(url)
     let uvaWindowText = "No UVA today";
     let uvbWindowText = "No UVB today";
 
-    if (uvaWindow) {
-      uvaWindowText = "UVA: " + formatTime(uvaWindow.start) + " – " + formatTime(uvaWindow.end);
-    }
+    // if (uvaWindow) {
+    //   uvaWindowText = "UVA: " + formatTime(uvaWindow.start) + " – " + formatTime(uvaWindow.end);
+    // }
 
     if (uvbWindow) {
       uvbWindowText = "UVB: " + formatTime(uvbWindow.start) + " – " + formatTime(uvbWindow.end);
     }
 
-    document.getElementById("centerUVA").textContent = uvaWindowText;
+    //document.getElementById("centerUVA").textContent = uvaWindowText;
     document.getElementById("centerUVB").textContent = uvbWindowText;
     
 
@@ -1906,7 +1906,7 @@ function plotSunPosition(sunrise,sunset,uvaWindow,uvbWindow){
 
   /* =========================
      UVA ARC
-  ========================= */
+  ========================= 
 
   if (uvaWindow) {
 
@@ -1929,6 +1929,44 @@ function plotSunPosition(sunrise,sunset,uvaWindow,uvbWindow){
         `M ${uvaX1} ${uvaY1}
          A ${uvaR} ${uvaR} 0 0 1 ${uvaX2} ${uvaY2}`);
   }
+
+  */
+
+
+  /* =========================
+   UVA ARC
+   Sunrise + 30 min → Sunset - 30 min
+  ========================= */
+
+  const uvaStart = new Date(sunrise.getTime() + 30 * 60 * 1000);
+  const uvaEnd   = new Date(sunset.getTime()  - 30 * 60 * 1000);
+
+  const uvaStartP = (uvaStart - midnight) / totalDay;
+  const uvaEndP   = (uvaEnd - midnight) / totalDay;
+
+  const uvaR = r;
+
+  const uvaA1 = uvaStartP * 2 * Math.PI + rotation;
+  const uvaA2 = uvaEndP   * 2 * Math.PI + rotation;
+
+  const uvaX1 = cx + uvaR * Math.cos(uvaA1);
+  const uvaY1 = cy + uvaR * Math.sin(uvaA1);
+  const uvaX2 = cx + uvaR * Math.cos(uvaA2);
+  const uvaY2 = cy + uvaR * Math.sin(uvaA2);
+
+  let uvaSpan = uvaEndP - uvaStartP;
+  if (uvaSpan < 0) uvaSpan += 1;
+
+  const uvaLargeArcFlag = uvaSpan > 0.5 ? 1 : 0;
+
+  document.getElementById("uvaSegment").setAttribute(
+    "d",
+    `M ${uvaX1} ${uvaY1}
+     A ${uvaR} ${uvaR} 0 ${uvaLargeArcFlag} 1 ${uvaX2} ${uvaY2}`
+  );
+
+  uvaWindowText = "UVA: " + formatTime(uvaStart) + " – " + formatTime(uvaEnd);
+  document.getElementById("centerUVA").textContent = uvaWindowText;
 
 
  /* =========================
@@ -2122,11 +2160,12 @@ function plotSunPosition(sunrise,sunset,uvaWindow,uvbWindow){
     .setAttribute("cy", my);
 
 
-    // Daylight & Sleep Labels
-    updateCycleLabels(sunrise, sunset);
 
-    // UV TOGGLE
-    //toggleUVPanel(sunrise, sunset);
+  // DAYLIGHT & SLEEP
+  updateCycleLabels(sunrise, sunset);
+
+  // UV TOGGLE
+  //toggleUVPanel(sunrise, sunset);
   
 }
 
