@@ -63,7 +63,7 @@ button {
 }
 
 .build-btn {
-  background: #C11007; // maroon
+  background: #C11007; /* maroon */
 }
 
 #summary {
@@ -183,12 +183,415 @@ ul {
   padding-left: 0; /* Optional: adjust as needed */
 }
 
+
+/* ==== LIVE COOK TIMELINE ==== */
+.cook-widget {
+  background: #fff;
+  border: 1px solid #d9d9de;
+  border-radius: 16px;
+  padding: 14px;
+  margin: 10px 0 24px;
+  box-shadow: 0 4px 18px rgba(0,0,0,.04);
+}
+
+.cook-widget h3 {
+  font-size: 17px;
+  margin-bottom: 4px;
+}
+
+.cook-subtitle,
+.cook-helper,
+.timeline-window,
+.timeline-now-status {
+  color: #666;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.cook-setup-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+  margin: 14px 0;
+}
+
+.cook-setup-row label {
+  display: block;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.cook-setup-row input[type="time"] {
+  margin: 6px 0 0;
+}
+
+.cook-widget button {
+  margin-bottom: 0;
+  font-weight: 650;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.cook-secondary-btn {
+  width: auto;
+  min-width: 104px;
+  background: #e5e5ea;
+  color: #111;
+}
+
+.cook-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0 14px;
+}
+
+.cook-check {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px;
+  border: 1px solid #dedee3;
+  border-radius: 12px;
+  background: #fafafa;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.cook-check input {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: #C11007;
+  flex: 0 0 auto;
+}
+
+.cook-error {
+  display: none;
+  color: #9d0903;
+  background: #fff0ef;
+  border: 1px solid #f2b7b3;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 10px 0;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.cook-error.visible { display: block; }
+
+.cook-action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.cook-running-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.cook-running-header .cook-secondary-btn {
+  min-width: 86px;
+  min-height: 38px;
+  padding: 7px 10px;
+  font-size: 14px;
+}
+
+.cook-phase-alert {
+  display: none;
+  background: #fff1cf;
+  border: 2px solid #e6a400;
+  border-radius: 12px;
+  padding: 12px;
+  margin: 0 0 12px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.cook-phase-alert.visible { display: block; }
+.cook-phase-alert.complete-alert {
+  background: #eaf8ed;
+  border-color: #34a853;
+}
+
+.cook-timer-list {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.meat-timer-card {
+  border: 1px solid #dedee3;
+  border-radius: 13px;
+  padding: 12px;
+  background: #fafafa;
+  overflow: hidden;
+  position: relative;
+}
+
+.meat-timer-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: #999;
+}
+
+.meat-timer-card.wings::before { background: #e39800; }
+.meat-timer-card.turkey::before { background: #8a5f3d; }
+.meat-timer-card.ribs::before { background: #C11007; }
+.meat-timer-card.hotdogs::before { background: #d94f4f; }
+.meat-timer-card.complete {
+  background: #eef8f0;
+  border-color: #9fcaaa;
+}
+.meat-timer-card.action-needed {
+  background: #fff6dc;
+  border-color: #e6a400;
+}
+
+.timer-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.timer-title {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.timer-temp-badge {
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: #ececef;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.timer-temp-badge.hot { background: #ffe0a7; }
+.timer-temp-badge.low { background: #dceafa; }
+.timer-temp-badge.done { background: #d8efdd; }
+
+.timer-instruction {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.4;
+  margin-top: 7px;
+}
+
+.timer-countdown {
+  font-family: "VT323", ui-monospace, monospace;
+  font-size: 46px;
+  letter-spacing: 1px;
+  line-height: 1;
+  margin: 10px 0 4px;
+}
+
+.timer-status {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.timer-complete-message {
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.35;
+  margin-top: 9px;
+}
+
+.cook-chart-card {
+  border: 1px solid #dedee3;
+  border-radius: 13px;
+  padding: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.timeline-window { margin: 3px 0 12px; }
+
+.cook-chart-layout {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.cook-chart-labels,
+.cook-chart-plot {
+  display: grid;
+  grid-auto-rows: 42px;
+  align-items: center;
+}
+
+.cook-chart-labels {
+  font-size: 11px;
+  font-weight: 750;
+  color: #444;
+}
+
+.cook-chart-labels .axis-spacer { height: 30px; }
+
+.cook-chart-plot {
+  position: relative;
+  min-width: 0;
+}
+
+.cook-track {
+  height: 28px;
+  position: relative;
+  border-radius: 7px;
+  background-color: #f0f0f2;
+  background-image: linear-gradient(to right, rgba(0,0,0,.10) 1px, transparent 1px);
+  background-size: 20% 100%;
+  overflow: hidden;
+}
+
+.cook-bar {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  border-radius: 5px;
+  min-width: 2px;
+}
+
+.cook-bar.wings { background: #e9a82c; }
+.cook-bar.turkey { background: #9b7353; }
+.cook-bar.ribs250 { background: #d25a51; }
+.cook-bar.ribs225 { background: #8aaed6; border-radius: 0 5px 5px 0; }
+.cook-bar.hotdogs { background: #db7373; }
+
+.bar-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 850;
+  color: #222;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.current-time-line {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 32px;
+  width: 3px;
+  background: #e02020;
+  z-index: 6;
+  transform: translateX(-1px);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.65);
+  pointer-events: none;
+}
+
+.current-time-line.visible { display: block; }
+.current-time-line::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid #e02020;
+}
+
+.cook-axis {
+  position: relative;
+  height: 32px;
+  border-top: 1px solid #aaa;
+  margin-top: 4px;
+}
+
+.cook-axis-tick {
+  position: absolute;
+  top: -4px;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: #555;
+  white-space: nowrap;
+  padding-top: 9px;
+}
+.cook-axis-tick::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 6px;
+  border-left: 1px solid #777;
+}
+.cook-axis-tick.first { transform: none; }
+.cook-axis-tick.first::before { left: 0; }
+.cook-axis-tick.last { transform: translateX(-100%); }
+.cook-axis-tick.last::before { left: 100%; }
+
+.timeline-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 8px;
+  color: #666;
+  font-size: 10px;
+}
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  display: inline-block;
+  margin-right: 4px;
+}
+.legend-250 { background: #d25a51; }
+.legend-225 { background: #8aaed6; }
+.legend-now { background: #e02020; width: 3px; }
+
+.cancel-confirm {
+  display: none;
+  border: 1px solid #efaaa6;
+  background: #fff3f2;
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 12px;
+}
+.cancel-confirm.visible { display: block; }
+.cancel-confirm p {
+  font-weight: 750;
+  margin-bottom: 10px;
+}
+.cancel-confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.cancel-confirm .no-btn { background: #e5e5ea; color: #111; }
+.cancel-confirm .yes-btn { background: #8f0903; }
+
+@media (max-width: 390px) {
+  .cook-selection-grid { grid-template-columns: 1fr; }
+  .timer-countdown { font-size: 41px; }
+  .cook-chart-layout { grid-template-columns: 68px minmax(0, 1fr); gap: 6px; }
+  .cook-chart-labels { font-size: 10px; }
+  .cook-axis-tick { font-size: 8px; }
+}
+
+
 </style>
 </head>
 
 <body>
 
-<header>Smoker</header>
+<header>Smoker Guy!</header>
 
 
 <!-- SHIFT CLOCK -->
@@ -202,67 +605,88 @@ ul {
 
 <br>
 
-<div id="cookingGuide">
-  <h2>Cooking Guide</h2>
-  <br>
-
-  <details>
-    <summary style="font-weight: bold;">🍗 Wings</summary>
-    <ul>
-      <li>Cook ~2 hrs @ 250°F (11:00AM - 1:00PM)</li>
-      <li>165+°F internal temp</li>
-      <li>Use 1/2 bag of dry rub per case</li>
-      <li>Use top racks to cook fastest</li>
-
-    </ul>
-  </details>
-  <br>
-    
-  <details>
-    <summary style="font-weight: bold;">🦃 Turkey</summary>
-    <ul>
-      <li>Cook ~3 hrs @ 250°F (11:00AM - 2:00PM)</li>
-      <li>165+°F internal temp</li>
-      <li>Use top racks to cook fastest</li>
-    </ul>
-  </details>
-  <br>
-
-  <details>
-    <summary style="font-weight: bold;">🥓 Ribs & Tips</summary>
-    <ul>
-      <li>Cook ~5 hrs @ 225°F (11:00AM - 4:00PM)</li>
-      <li>195+°F internal temp</li>
-      <li>Can start at 250°F with wings & turkey</li>
-      <li>⚠️ Turn dial down to 225°F after all wings & turkey done</li>
-      <li>When space becomes available, move ribs up to top racks</li>
-    </ul>
-  </details>
-  <br>
-  
-  <details>
-    <summary style="font-weight: bold;">🌭 Hotdogs</summary>
-    <ul>
-      <li>Cook 45min @ 225°F (3:15PM - 4:00PM)</li>
-    </ul>
-  </details>
-  <br>
-
-  <details>
-    <summary style="font-weight: bold;">🥩 Pork Shoulder Butts</summary>
-    <ul>
-      <li>Cook overnight @ 215°F (5:00PM - 9:00AM)</li>
-      <li>⚠️ Do not use top racks</li>
-    </ul>
-  </details>
-  <br>
 
 
-</div>
 
 
+<!-- LIVE COOK TIMELINE -->
+<section id="liveCookSection">
+  <h2>Live Cook Timeline</h2>
+  <div class="cook-widget" id="liveCookWidget">
+    <div id="cookSetupView">
+      <h3>Build Today’s Cook</h3>
+      <p class="cook-subtitle">Select the meats, choose when cooking began, then start the live schedule.</p>
+
+      <div class="cook-setup-row">
+        <label for="cookStartTime">Cook Start Time:
+          <input type="time" id="cookStartTime" step="60" />
+        </label>
+        <button type="button" class="cook-secondary-btn" id="cookStartNowBtn">Start Now</button>
+      </div>
+
+      <div class="cook-selection-grid" aria-label="Meats being cooked">
+        <label class="cook-check"><input type="checkbox" id="cookWings" checked /> 🍗 Wings</label>
+        <label class="cook-check"><input type="checkbox" id="cookTurkey" checked /> 🦃 Turkey Breast</label>
+        <label class="cook-check"><input type="checkbox" id="cookRibs" checked /> 🥓 Ribs &amp; Tips</label>
+        <label class="cook-check"><input type="checkbox" id="cookHotdogs" checked /> 🌭 Hotdogs</label>
+      </div>
+
+      <p class="cook-helper" style="display:none;">Hotdogs use the final one-hour window of the ribs &amp; tips and finish at the same time.</p>
+      <div class="cook-error" id="cookSetupError" role="alert"></div>
+      <button type="button" id="startCookBtn">Start Cooking</button>
+    </div>
+
+    <div id="cookRunningView" hidden>
+
+      <div class="cook-running-header">
+        <div>
+          <h3>Today’s Live Cook</h3>
+          <div class="cook-subtitle" id="cookScheduleSummary"></div>
+        </div>
+        <button type="button" class="cook-secondary-btn" id="cancelCookBtn">Cancel</button>
+      </div>
+
+      <div class="cancel-confirm" id="cancelCookConfirm">
+        <p>Are you sure you want to stop and clear today’s cook?</p>
+        <div class="cancel-confirm-actions">
+          <button type="button" class="no-btn" id="keepCookBtn">No, keep running</button>
+          <button type="button" class="yes-btn" id="confirmCancelCookBtn">Yes, cancel cook</button>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="cook-chart-card">
+        <h3>5-Hour Cook Window</h3>
+        <div class="timeline-window" id="timelineWindow"></div>
+        <div class="cook-chart-layout">
+          <div class="cook-chart-labels" id="cookChartLabels"></div>
+          <div class="cook-chart-plot" id="cookChartPlot">
+            <div class="current-time-line" id="currentCookTimeLine" aria-hidden="true"></div>
+          </div>
+        </div>
+        <div class="timeline-now-status" id="timelineNowStatus"></div>
+        <div class="timeline-legend">
+          <span><i class="legend-dot legend-250"></i>250°F</span>
+          <span><i class="legend-dot legend-225"></i>225°F</span>
+          <span><i class="legend-dot legend-now"></i>Current Time</span>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="cook-phase-alert" id="cookPhaseAlert" role="alert" aria-live="assertive"></div>
+      <div class="cook-timer-list" id="cookTimerList" aria-live="polite"></div>
+
+      
+
+      
+    </div>
+  </div>
+</section>
 
 <br>
+
 <br>
 
 <!-- LABEL GENERATOR -->
@@ -350,6 +774,67 @@ ul {
 <div id="dialImg">
   ⚠️ Set smoker dial to 215°F
   <img src="smoker-dial-215.jpg" />
+</div>
+
+<br>
+<br>
+
+<div id="cookingGuide">
+  <h2>Cooking Guide</h2>
+  <br>
+
+  <details>
+    <summary style="font-weight: bold;">🍗 Wings</summary>
+    <ul>
+      <li>Cook ~2 hrs @ 250°F (11:00AM - 1:00PM)</li>
+      <li>165+°F internal temp</li>
+      <li>Use 1/2 bag of dry rub per case</li>
+      <li>Use top racks to cook fastest</li>
+
+    </ul>
+  </details>
+  <br>
+    
+  <details>
+    <summary style="font-weight: bold;">🦃 Turkey</summary>
+    <ul>
+      <li>Cook ~3 hrs @ 250°F (11:00AM - 2:00PM)</li>
+      <li>165+°F internal temp</li>
+      <li>Use top racks to cook fastest</li>
+    </ul>
+  </details>
+  <br>
+
+  <details>
+    <summary style="font-weight: bold;">🥓 Ribs & Tips</summary>
+    <ul>
+      <li>Cook ~5 hrs total: start @ 250°F, finish @ 225°F</li>
+      <li>195+°F internal temp</li>
+      <li>Can start at 250°F with wings & turkey</li>
+      <li>⚠️ Turn dial down to 225°F after all wings & turkey done</li>
+      <li>When space becomes available, move ribs up to top racks</li>
+    </ul>
+  </details>
+  <br>
+  
+  <details>
+    <summary style="font-weight: bold;">🌭 Hotdogs</summary>
+    <ul>
+      <li>Cook 1 hr @ 225°F during the final hour of ribs &amp; tips</li>
+    </ul>
+  </details>
+  <br>
+
+  <details>
+    <summary style="font-weight: bold;">🥩 Pork Shoulder Butts</summary>
+    <ul>
+      <li>Cook overnight @ 215°F (5:00PM - 9:00AM)</li>
+      <li>⚠️ Do not use top racks</li>
+    </ul>
+  </details>
+  <br>
+
+
 </div>
 
 
@@ -655,6 +1140,511 @@ function calculateBuild() {
     Final total: <strong>${finalTotal} pans</strong>
   `;
 }
+
+
+/* =====================================
+   LIVE COOK TIMELINE / PERSISTENT TIMERS
+======================================== */
+const COOK_STORAGE_KEY = "smokerLiveCookStateV1";
+const COOK_HOUR = 60 * 60 * 1000;
+const COOK_LENGTH_MS = 5 * COOK_HOUR;
+const MEAT_CONFIG = {
+  wings: {
+    label: "🍗 Wings",
+    className: "wings",
+    durationHours: 2,
+    finishTemp: "165°F+",
+    instruction: "Cook for 2 hours at 250°F."
+  },
+  turkey: {
+    label: "🦃 Turkey Breast",
+    className: "turkey",
+    durationHours: 3,
+    finishTemp: "165°F+",
+    instruction: "Cook for 3 hours at 250°F."
+  },
+  ribs: {
+    label: "🥓 Ribs & Tips",
+    className: "ribs",
+    durationHours: 5,
+    finishTemp: "Ribs 195°F+",
+    instruction: "Cook for 5 hours. Start at 250°F, then finish at 225°F."
+  },
+  hotdogs: {
+    label: "🌭 Hotdogs",
+    className: "hotdogs",
+    durationHours: 1,
+    instruction: "Cook during the final hour of the ribs & tips at 225°F."
+  }
+};
+
+let activeCookState = null;
+let cookTicker = null;
+
+function localDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatCookClock(ms) {
+  return new Date(ms).toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true
+  }).replace(/\s/g, "");
+}
+
+function formatCookCountdown(ms) {
+  const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+function timeInputValue(date = new Date()) {
+  return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+}
+
+function setDefaultCookTime() {
+  const input = document.getElementById("cookStartTime");
+  if (input && !input.value) input.value = timeInputValue();
+}
+
+function getSelectedMeats() {
+  return {
+    wings: document.getElementById("cookWings").checked,
+    turkey: document.getElementById("cookTurkey").checked,
+    ribs: document.getElementById("cookRibs").checked,
+    hotdogs: document.getElementById("cookHotdogs").checked
+  };
+}
+
+function selectedStartMsFromInput() {
+  const value = document.getElementById("cookStartTime").value;
+  if (!value) return null;
+  const [hours, minutes] = value.split(":").map(Number);
+  if (!Number.isInteger(hours) || !Number.isInteger(minutes)) return null;
+  const start = new Date();
+  start.setHours(hours, minutes, 0, 0);
+  return start.getTime();
+}
+
+function showCookSetupError(message) {
+  const error = document.getElementById("cookSetupError");
+  error.textContent = message;
+  error.classList.toggle("visible", Boolean(message));
+}
+
+function calculateRibTurnDownOffsetHours(selected) {
+  let hours = 2;
+  if (selected.wings) hours = Math.max(hours, 2);
+  if (selected.turkey) hours = Math.max(hours, 3);
+  return hours;
+}
+
+function buildCookState(startMs, selected) {
+  return {
+    version: 1,
+    dateKey: localDateKey(new Date(startMs)),
+    startMs,
+    selected,
+    ribTurnDownOffsetHours: calculateRibTurnDownOffsetHours(selected),
+    alerted: {}
+  };
+}
+
+function saveCookState() {
+  if (!activeCookState) return;
+  localStorage.setItem(COOK_STORAGE_KEY, JSON.stringify(activeCookState));
+}
+
+function clearCookState() {
+  activeCookState = null;
+  localStorage.removeItem(COOK_STORAGE_KEY);
+  if (cookTicker) {
+    clearInterval(cookTicker);
+    cookTicker = null;
+  }
+}
+
+function loadCookState() {
+  try {
+    const raw = localStorage.getItem(COOK_STORAGE_KEY);
+    if (!raw) return null;
+    const state = JSON.parse(raw);
+    if (!state || state.dateKey !== localDateKey()) {
+      localStorage.removeItem(COOK_STORAGE_KEY);
+      return null;
+    }
+    return state;
+  } catch (error) {
+    localStorage.removeItem(COOK_STORAGE_KEY);
+    return null;
+  }
+}
+
+function startCookFromForm(useNow = false) {
+  showCookSetupError("");
+  const selected = getSelectedMeats();
+  if (!Object.values(selected).some(Boolean)) {
+    showCookSetupError("Select at least one type of meat before starting the cook.");
+    return;
+  }
+  if (selected.hotdogs && !selected.ribs) {
+    showCookSetupError("Hotdogs require Ribs & Tips because they cook during the ribs’ final hour.");
+    return;
+  }
+
+  let startMs;
+  if (useNow) {
+    const now = new Date();
+    now.setMilliseconds(0);
+    startMs = now.getTime();
+    document.getElementById("cookStartTime").value = timeInputValue(now);
+  } else {
+    startMs = selectedStartMsFromInput();
+  }
+
+  if (startMs === null) {
+    showCookSetupError("Enter a valid cook start time.");
+    return;
+  }
+
+  activeCookState = buildCookState(startMs, selected);
+  saveCookState();
+  showRunningCook();
+}
+
+function showRunningCook() {
+  document.getElementById("cookSetupView").hidden = true;
+  document.getElementById("cookRunningView").hidden = false;
+  document.getElementById("cancelCookConfirm").classList.remove("visible");
+  renderCookChart();
+  updateLiveCook();
+  if (cookTicker) clearInterval(cookTicker);
+  cookTicker = setInterval(updateLiveCook, 1000);
+}
+
+function showCookSetup() {
+  document.getElementById("cookSetupView").hidden = false;
+  document.getElementById("cookRunningView").hidden = true;
+  document.getElementById("cancelCookConfirm").classList.remove("visible");
+  showCookSetupError("");
+  setDefaultCookTime();
+}
+
+function getMeatTiming(key) {
+  const startMs = activeCookState.startMs;
+  if (key === "hotdogs") {
+    const ribsFinish = startMs + (5 * COOK_HOUR);
+    return { startMs: ribsFinish - COOK_HOUR, finishMs: ribsFinish };
+  }
+  return {
+    startMs,
+    finishMs: startMs + (MEAT_CONFIG[key].durationHours * COOK_HOUR)
+  };
+}
+
+function getTimerPhase(key, nowMs, timing) {
+  if (nowMs < timing.startMs) return "scheduled";
+  if (nowMs >= timing.finishMs) return "complete";
+  if (key === "ribs") {
+    const turnDownMs = activeCookState.startMs + (activeCookState.ribTurnDownOffsetHours * COOK_HOUR);
+    return nowMs < turnDownMs ? "ribs250" : "ribs225";
+  }
+  return "cooking";
+}
+
+function completeMessageFor(key) {
+  if (key === "wings") return "Wings are complete! Verify internal temperature of 165°F+.";
+  if (key === "turkey") return "Turkey breast is complete! Verify internal temperature of 165°F+.";
+  if (key === "ribs") return "Ribs & tips are complete! Verify ribs are 195°F+ internal temp. Tips do not need to be temped.";
+  return "Hotdogs are complete! Remove them with the ribs & tips.";
+}
+
+function buildTimerCard(key, nowMs) {
+  const config = MEAT_CONFIG[key];
+  const timing = getMeatTiming(key);
+  const phase = getTimerPhase(key, nowMs, timing);
+  const card = document.createElement("article");
+  card.className = `meat-timer-card ${config.className}`;
+
+  let badgeText = "250°F";
+  let badgeClass = "hot";
+  let instruction = config.instruction;
+  let countdown = "";
+  let status = "";
+  let completeMessage = "";
+
+  if (phase === "scheduled") {
+    countdown = formatCookCountdown(timing.startMs - nowMs);
+    status = key === "hotdogs"
+      ? `Until hotdogs go on at ${formatCookClock(timing.startMs)}`
+      : `Until cooking begins at ${formatCookClock(timing.startMs)}`;
+    if (key === "hotdogs") {
+      badgeText = "WAIT";
+      badgeClass = "";
+      instruction = `Cook hotdogs during the final hour of the ribs. Put them on at ${formatCookClock(timing.startMs)} and remove at ${formatCookClock(timing.finishMs)}.`;
+    } else {
+      instruction += ` Take them off at ${formatCookClock(timing.finishMs)}.`;
+    }
+  } else if (phase === "complete") {
+    card.classList.add("complete");
+    badgeText = "COMPLETE";
+    badgeClass = "done";
+    countdown = "00:00:00";
+    status = `Finished at ${formatCookClock(timing.finishMs)}`;
+    completeMessage = completeMessageFor(key);
+  } else {
+    countdown = formatCookCountdown(timing.finishMs - nowMs);
+    status = `Remaining · Take off at ${formatCookClock(timing.finishMs)}`;
+
+    if (key === "wings") {
+      instruction = `Cook for 2 hours at 250°F. Take them off at ${formatCookClock(timing.finishMs)}.`;
+    } else if (key === "turkey") {
+      instruction = `Cook for 3 hours at 250°F. Take them off at ${formatCookClock(timing.finishMs)}.`;
+    } else if (key === "hotdogs") {
+      badgeText = "225°F";
+      badgeClass = "low";
+      instruction = `Hotdogs are cooking at 225°F. Remove them with the ribs at ${formatCookClock(timing.finishMs)}.`;
+    } else if (phase === "ribs250") {
+      const turnDownMs = activeCookState.startMs + (activeCookState.ribTurnDownOffsetHours * COOK_HOUR);
+      instruction = `Keep smoker at 250°F until ${formatCookClock(turnDownMs)}, then turn it down to 225°F. Ribs finish at ${formatCookClock(timing.finishMs)}.`;
+    } else {
+      card.classList.add("action-needed");
+      badgeText = "225°F";
+      badgeClass = "low";
+      instruction = `Turn the smoker down to 225°F now. Finish ribs & tips at ${formatCookClock(timing.finishMs)}.`;
+    }
+  }
+
+  card.innerHTML = `
+    <div class="timer-topline">
+      <div class="timer-title">${config.label}</div>
+      <div class="timer-temp-badge ${badgeClass}">${badgeText}</div>
+    </div>
+    <div class="timer-instruction">${instruction}</div>
+    <div class="timer-countdown">${countdown}</div>
+    <div class="timer-status">${status}</div>
+    ${completeMessage ? `<div class="timer-complete-message">${completeMessage}</div>` : ""}
+  `;
+  return card;
+}
+
+function renderTimerCards(nowMs) {
+  const list = document.getElementById("cookTimerList");
+  list.innerHTML = "";
+  ["wings", "turkey", "ribs", "hotdogs"].forEach(key => {
+    if (activeCookState.selected[key]) list.appendChild(buildTimerCard(key, nowMs));
+  });
+}
+
+function currentCookAlert(nowMs) {
+  const alertEl = document.getElementById("cookPhaseAlert");
+  alertEl.className = "cook-phase-alert";
+  alertEl.textContent = "";
+
+  const startMs = activeCookState.startMs;
+  const selected = activeCookState.selected;
+  const finishMs = startMs + COOK_LENGTH_MS;
+  const turnDownMs = startMs + (activeCookState.ribTurnDownOffsetHours * COOK_HOUR);
+
+  if (nowMs < startMs) {
+    alertEl.textContent = `Cook is scheduled to begin at ${formatCookClock(startMs)}.`;
+    alertEl.classList.add("visible");
+    return;
+  }
+
+  if (selected.ribs && nowMs >= turnDownMs && nowMs < finishMs) {
+    alertEl.textContent = `⚠️ Turn the smoker down to 225°F now. Ribs & tips finish at ${formatCookClock(finishMs)}.`;
+    alertEl.classList.add("visible");
+    return;
+  }
+
+  const selectedFinishTimes = Object.keys(selected)
+    .filter(key => selected[key])
+    .map(key => getMeatTiming(key).finishMs);
+  const allComplete = selectedFinishTimes.length && selectedFinishTimes.every(ms => nowMs >= ms);
+  if (allComplete) {
+    alertEl.textContent = "✅ Today’s selected cook is complete. Verify required internal temperatures.";
+    alertEl.classList.add("visible", "complete-alert");
+  }
+}
+
+function maybeSoundCookAlerts(nowMs) {
+  const milestones = [];
+  const selected = activeCookState.selected;
+  if (selected.ribs) {
+    milestones.push({
+      id: "turnDown",
+      time: activeCookState.startMs + (activeCookState.ribTurnDownOffsetHours * COOK_HOUR)
+    });
+  }
+  ["wings", "turkey", "ribs", "hotdogs"].forEach(key => {
+    if (selected[key]) milestones.push({ id: `${key}Complete`, time: getMeatTiming(key).finishMs });
+  });
+  if (selected.hotdogs) milestones.push({ id: "hotdogsStart", time: getMeatTiming("hotdogs").startMs });
+
+  let changed = false;
+  milestones.forEach(milestone => {
+    if (!activeCookState.alerted[milestone.id] && nowMs >= milestone.time) {
+      activeCookState.alerted[milestone.id] = true;
+      changed = true;
+      // Sound only when the milestone has just occurred. Reopening an older
+      // cook should restore the correct visual state without replaying every alert.
+      if (nowMs - milestone.time <= 5000) playCookBeep();
+    }
+  });
+  if (changed) saveCookState();
+}
+
+function playCookBeep() {
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    const context = new AudioContextClass();
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = "sine";
+    oscillator.frequency.value = 880;
+    gain.gain.setValueAtTime(0.0001, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.16, context.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.35);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.36);
+    oscillator.addEventListener("ended", () => context.close());
+  } catch (error) {
+    // Visual alerts still work if the browser blocks audio.
+  }
+}
+
+function renderCookChart() {
+  const selected = activeCookState.selected;
+  const labels = document.getElementById("cookChartLabels");
+  const plot = document.getElementById("cookChartPlot");
+  labels.innerHTML = "";
+  plot.querySelectorAll(".cook-track, .cook-axis").forEach(el => el.remove());
+
+  const addRow = (label, segments) => {
+    const labelEl = document.createElement("div");
+    labelEl.textContent = label;
+    labels.appendChild(labelEl);
+
+    const track = document.createElement("div");
+    track.className = "cook-track";
+    segments.forEach(segment => {
+      const bar = document.createElement("div");
+      bar.className = `cook-bar ${segment.className}`;
+      bar.style.left = `${(segment.startHour / 5) * 100}%`;
+      bar.style.width = `${((segment.endHour - segment.startHour) / 5) * 100}%`;
+      if (segment.text) bar.innerHTML = `<span class="bar-text">${segment.text}</span>`;
+      track.appendChild(bar);
+    });
+    plot.appendChild(track);
+  };
+
+  if (selected.wings) addRow("Wings", [{ startHour: 0, endHour: 2, className: "wings", text: "250°F" }]);
+  if (selected.turkey) addRow("Turkey", [{ startHour: 0, endHour: 3, className: "turkey", text: "250°F" }]);
+  if (selected.ribs) {
+    const changeHour = activeCookState.ribTurnDownOffsetHours;
+    addRow("Ribs & Tips", [
+      { startHour: 0, endHour: changeHour, className: "ribs250", text: "250°F" },
+      { startHour: changeHour, endHour: 5, className: "ribs225", text: "225°F" }
+    ]);
+  }
+  if (selected.hotdogs) addRow("Hotdogs", [{ startHour: 4, endHour: 5, className: "hotdogs", text: "225°F" }]);
+
+  const axisSpacer = document.createElement("div");
+  axisSpacer.className = "axis-spacer";
+  labels.appendChild(axisSpacer);
+
+  const axis = document.createElement("div");
+  axis.className = "cook-axis";
+  for (let hour = 0; hour <= 5; hour++) {
+    const tick = document.createElement("span");
+    tick.className = "cook-axis-tick";
+    if (hour === 0) tick.classList.add("first");
+    if (hour === 5) tick.classList.add("last");
+    tick.style.left = `${(hour / 5) * 100}%`;
+    tick.textContent = formatCookClock(activeCookState.startMs + (hour * COOK_HOUR));
+    axis.appendChild(tick);
+  }
+  plot.appendChild(axis);
+
+  const endMs = activeCookState.startMs + COOK_LENGTH_MS;
+  document.getElementById("timelineWindow").textContent = `${formatCookClock(activeCookState.startMs)} to ${formatCookClock(endMs)} · 5 hours`;
+}
+
+function updateCurrentTimeLine(nowMs) {
+  const line = document.getElementById("currentCookTimeLine");
+  const status = document.getElementById("timelineNowStatus");
+  const startMs = activeCookState.startMs;
+  const endMs = startMs + COOK_LENGTH_MS;
+
+  if (nowMs >= startMs && nowMs <= endMs) {
+    const percent = ((nowMs - startMs) / COOK_LENGTH_MS) * 100;
+    line.style.left = `${percent}%`;
+    line.classList.add("visible");
+    status.textContent = `Red line: current time ${formatCookClock(nowMs)} · ${formatCookCountdown(endMs - nowMs)} left in the five-hour window.`;
+  } else {
+    line.classList.remove("visible");
+    if (nowMs < startMs) {
+      status.textContent = `Current time is before the cook window. It begins in ${formatCookCountdown(startMs - nowMs)}.`;
+    } else {
+      status.textContent = `The five-hour cook window ended at ${formatCookClock(endMs)}.`;
+    }
+  }
+}
+
+function updateLiveCook() {
+  if (!activeCookState) return;
+  if (activeCookState.dateKey !== localDateKey()) {
+    clearCookState();
+    showCookSetup();
+    return;
+  }
+
+  const nowMs = Date.now();
+  const selected = activeCookState.selected;
+  const endTimes = Object.keys(selected)
+    .filter(key => selected[key])
+    .map(key => getMeatTiming(key).finishMs);
+  const scheduleFinishMs = Math.max(...endTimes);
+  document.getElementById("cookScheduleSummary").textContent = `Started ${formatCookClock(activeCookState.startMs)} · Finish ${formatCookClock(scheduleFinishMs)}`;
+  renderTimerCards(nowMs);
+  currentCookAlert(nowMs);
+  updateCurrentTimeLine(nowMs);
+  maybeSoundCookAlerts(nowMs);
+}
+
+function initializeLiveCookTimeline() {
+  setDefaultCookTime();
+
+  document.getElementById("startCookBtn").addEventListener("click", () => startCookFromForm(false));
+  document.getElementById("cookStartNowBtn").addEventListener("click", () => startCookFromForm(true));
+  document.getElementById("cancelCookBtn").addEventListener("click", () => {
+    document.getElementById("cancelCookConfirm").classList.add("visible");
+  });
+  document.getElementById("keepCookBtn").addEventListener("click", () => {
+    document.getElementById("cancelCookConfirm").classList.remove("visible");
+  });
+  document.getElementById("confirmCancelCookBtn").addEventListener("click", () => {
+    clearCookState();
+    showCookSetup();
+  });
+
+  activeCookState = loadCookState();
+  if (activeCookState) showRunningCook();
+  else showCookSetup();
+}
+
+initializeLiveCookTimeline();
+
 
 </script>
 
