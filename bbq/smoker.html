@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Smoker</title>
+<title>Smoker Guy!</title>
 
 <link rel="icon" href="favicon.ico">
 <link rel="apple-touch-icon" sizes="152x152" href="smoker-icon.png">
@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="theme-color" content="#ffffff" />
 <!-- App title when added to home screen -->
-<meta name="apple-mobile-web-app-title" content="Smoker">
+<meta name="apple-mobile-web-app-title" content="Smoker Guy!">
 
 <style>
 
@@ -305,10 +305,11 @@ ul {
 
 .cook-phase-alert {
   display: none;
-  background: #fff1cf;
-  border: 2px solid #e6a400;
+  position: relative;
+  background: #fff8e8;
+  border: 2px solid #e39800;
   border-radius: 12px;
-  padding: 12px;
+  padding: 12px 44px 12px 12px;
   margin: 0 0 12px;
   font-weight: 750;
   line-height: 1.35;
@@ -320,6 +321,23 @@ ul {
   border-color: #34a853;
 }
 
+.cook-alert-dismiss {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 30px !important;
+  min-width: 30px;
+  min-height: 30px !important;
+  height: 30px;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 999px;
+  background: rgba(0,0,0,.08) !important;
+  color: #333 !important;
+  font-size: 20px !important;
+  line-height: 1;
+}
+
 .cook-timer-list {
   display: grid;
   gap: 10px;
@@ -327,12 +345,13 @@ ul {
 }
 
 .meat-timer-card {
-  border: 1px solid #dedee3;
+  border: 1px solid #b8b8be;
   border-radius: 13px;
   padding: 12px;
-  background: #fafafa;
+  background: #f7f7f8;
   overflow: hidden;
   position: relative;
+  transition: background-color .2s ease, border-color .2s ease;
 }
 
 .meat-timer-card::before {
@@ -340,21 +359,32 @@ ul {
   position: absolute;
   inset: 0 auto 0 0;
   width: 5px;
-  background: #999;
+  background: #8e8e93;
 }
 
-.meat-timer-card.wings::before { background: #e39800; }
-.meat-timer-card.turkey::before { background: #8a5f3d; }
-.meat-timer-card.ribs::before { background: #C11007; }
-.meat-timer-card.hotdogs::before { background: #d94f4f; }
+.meat-timer-card.state-waiting {
+  background: #f7f7f8;
+  border-color: #b8b8be;
+}
+.meat-timer-card.state-waiting::before { background: #8e8e93; }
+
+.meat-timer-card.state-250 {
+  background: #fff5f4;
+  border-color: #C11007;
+}
+.meat-timer-card.state-250::before { background: #C11007; }
+
+.meat-timer-card.state-225 {
+  background: #fff8e8;
+  border-color: #e39800;
+}
+.meat-timer-card.state-225::before { background: #e39800; }
+
 .meat-timer-card.complete {
   background: #eef8f0;
-  border-color: #9fcaaa;
+  border-color: #34a853;
 }
-.meat-timer-card.action-needed {
-  background: #fff6dc;
-  border-color: #e6a400;
-}
+.meat-timer-card.complete::before { background: #34a853; }
 
 .timer-topline {
   display: flex;
@@ -370,16 +400,18 @@ ul {
 
 .timer-temp-badge {
   border-radius: 999px;
-  padding: 4px 8px;
-  background: #ececef;
+  padding: 4px 9px;
   font-size: 12px;
   font-weight: 800;
   white-space: nowrap;
+  color: #fff;
+  background: #8e8e93;
 }
 
-.timer-temp-badge.hot { background: #ffe0a7; }
-.timer-temp-badge.low { background: #dceafa; }
-.timer-temp-badge.done { background: #d8efdd; }
+.timer-temp-badge.waiting { background: #8e8e93; }
+.timer-temp-badge.temp-250 { background: #C11007; }
+.timer-temp-badge.temp-225 { background: #e39800; }
+.timer-temp-badge.done { background: #34a853; }
 
 .timer-instruction {
   font-size: 13px;
@@ -388,12 +420,27 @@ ul {
   margin-top: 7px;
 }
 
+.timer-countdown-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 10px 0 4px;
+  flex-wrap: wrap;
+}
+
 .timer-countdown {
   font-family: "VT323", ui-monospace, monospace;
   font-size: 46px;
   letter-spacing: 1px;
   line-height: 1;
-  margin: 10px 0 4px;
+  margin: 0;
+}
+
+.timer-remaining-label {
+  font-family: "VT323", ui-monospace, monospace;
+  font-size: 25px;
+  line-height: 1;
+  color: #555;
 }
 
 .timer-status {
@@ -454,19 +501,35 @@ ul {
   overflow: hidden;
 }
 
+.cook-track.hotdogs-track {
+  background: transparent;
+  overflow: hidden;
+}
+
+.cook-track.hotdogs-track::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 40%;
+  border-radius: 7px;
+  background-color: #f0f0f2;
+  background-image: linear-gradient(to right, rgba(0,0,0,.10) 1px, transparent 1px);
+  background-size: 33.3333% 100%;
+}
+
 .cook-bar {
   position: absolute;
   top: 4px;
   bottom: 4px;
   border-radius: 5px;
   min-width: 2px;
+  z-index: 1;
 }
 
-.cook-bar.wings { background: #e9a82c; }
-.cook-bar.turkey { background: #9b7353; }
-.cook-bar.ribs250 { background: #d25a51; }
-.cook-bar.ribs225 { background: #8aaed6; border-radius: 0 5px 5px 0; }
-.cook-bar.hotdogs { background: #db7373; }
+.cook-bar.temp250 { background: #C11007; }
+.cook-bar.temp225 { background: #e39800; }
 
 .bar-text {
   position: absolute;
@@ -552,8 +615,8 @@ ul {
   display: inline-block;
   margin-right: 4px;
 }
-.legend-250 { background: #d25a51; }
-.legend-225 { background: #8aaed6; }
+.legend-250 { background: #C11007; }
+.legend-225 { background: #e39800; }
 .legend-now { background: #e02020; width: 3px; }
 
 .cancel-confirm {
@@ -580,6 +643,7 @@ ul {
 @media (max-width: 390px) {
   .cook-selection-grid { grid-template-columns: 1fr; }
   .timer-countdown { font-size: 41px; }
+  .timer-remaining-label { font-size: 23px; }
   .cook-chart-layout { grid-template-columns: 68px minmax(0, 1fr); gap: 6px; }
   .cook-chart-labels { font-size: 10px; }
   .cook-axis-tick { font-size: 8px; }
@@ -611,10 +675,10 @@ ul {
 
 <!-- LIVE COOK TIMELINE -->
 <section id="liveCookSection">
-  <h2>Live Cook Timeline</h2>
+  <!--<h2>Today's Cook</h2>-->
   <div class="cook-widget" id="liveCookWidget">
     <div id="cookSetupView">
-      <h3>Build Today’s Cook</h3>
+      <h3>Today's Cook</h3>
       <p class="cook-subtitle">Select the meats, choose when cooking began, then start the live schedule.</p>
 
       <div class="cook-setup-row">
@@ -640,7 +704,7 @@ ul {
 
       <div class="cook-running-header">
         <div>
-          <h3>Today’s Live Cook</h3>
+          <h3>Today’s Cook</h3>
           <div class="cook-subtitle" id="cookScheduleSummary"></div>
         </div>
         <button type="button" class="cook-secondary-btn" id="cancelCookBtn">Cancel</button>
@@ -655,6 +719,8 @@ ul {
       </div>
 
       <br>
+
+      <div class="cook-phase-alert" id="cookPhaseAlert" role="alert" aria-live="assertive"></div>
 
       <div class="cook-chart-card">
         <h3>5-Hour Cook Window</h3>
@@ -675,7 +741,6 @@ ul {
 
       <br>
 
-      <div class="cook-phase-alert" id="cookPhaseAlert" role="alert" aria-live="assertive"></div>
       <div class="cook-timer-list" id="cookTimerList" aria-live="polite"></div>
 
       
@@ -1252,7 +1317,8 @@ function buildCookState(startMs, selected) {
     startMs,
     selected,
     ribTurnDownOffsetHours: calculateRibTurnDownOffsetHours(selected),
-    alerted: {}
+    alerted: {},
+    dismissed: {}
   };
 }
 
@@ -1279,6 +1345,8 @@ function loadCookState() {
       localStorage.removeItem(COOK_STORAGE_KEY);
       return null;
     }
+    state.alerted = state.alerted || {};
+    state.dismissed = state.dismissed || {};
     return state;
   } catch (error) {
     localStorage.removeItem(COOK_STORAGE_KEY);
@@ -1359,10 +1427,10 @@ function getTimerPhase(key, nowMs, timing) {
 }
 
 function completeMessageFor(key) {
-  if (key === "wings") return "Wings are complete! Verify internal temperature of 165°F+.";
-  if (key === "turkey") return "Turkey breast is complete! Verify internal temperature of 165°F+.";
-  if (key === "ribs") return "Ribs & tips are complete! Verify ribs are 195°F+ internal temp. Tips do not need to be temped.";
-  return "Hotdogs are complete! Remove them with the ribs & tips.";
+  if (key === "wings") return "Wings are ready! Verify internal temperature of 165°F.";
+  if (key === "turkey") return "Turkey breast is ready! Verify internal temperature of 165°F.";
+  if (key === "ribs") return "Ribs & tips are ready! Verify ribs are 195°F+ internal temp. (Tips do not need to be temped.)";
+  return "Hotdogs are ready! Remove them with the ribs & tips.";
 }
 
 function buildTimerCard(key, nowMs) {
@@ -1373,53 +1441,64 @@ function buildTimerCard(key, nowMs) {
   card.className = `meat-timer-card ${config.className}`;
 
   let badgeText = "250°F";
-  let badgeClass = "hot";
+  let badgeClass = "temp-250";
+  let cardStateClass = "state-250";
   let instruction = config.instruction;
   let countdown = "";
   let status = "";
   let completeMessage = "";
+  let showRemaining = false;
 
   if (phase === "scheduled") {
+    cardStateClass = "state-waiting";
+    badgeText = "WAIT";
+    badgeClass = "waiting";
     countdown = formatCookCountdown(timing.startMs - nowMs);
     status = key === "hotdogs"
       ? `Until hotdogs go on at ${formatCookClock(timing.startMs)}`
       : `Until cooking begins at ${formatCookClock(timing.startMs)}`;
+
     if (key === "hotdogs") {
-      badgeText = "WAIT";
-      badgeClass = "";
-      instruction = `Cook hotdogs during the final hour of the ribs. Put them on at ${formatCookClock(timing.startMs)} and remove at ${formatCookClock(timing.finishMs)}.`;
+      instruction = `Smoke hotdogs during the final hour of the ribs. Put them on at ${formatCookClock(timing.startMs)} and remove at ${formatCookClock(timing.finishMs)}.`;
     } else {
       instruction += ` Take them off at ${formatCookClock(timing.finishMs)}.`;
     }
   } else if (phase === "complete") {
     card.classList.add("complete");
-    badgeText = "COMPLETE";
+    badgeText = "READY";
     badgeClass = "done";
-    countdown = "00:00:00";
     status = `Finished at ${formatCookClock(timing.finishMs)}`;
     completeMessage = completeMessageFor(key);
   } else {
     countdown = formatCookCountdown(timing.finishMs - nowMs);
-    status = `Remaining · Take off at ${formatCookClock(timing.finishMs)}`;
+    showRemaining = true;
+    status = `Ready at ${formatCookClock(timing.finishMs)}`;
 
     if (key === "wings") {
-      instruction = `Cook for 2 hours at 250°F. Take them off at ${formatCookClock(timing.finishMs)}.`;
+      instruction = `Cook for 2 hours at 250°F. Ready to temp at ${formatCookClock(timing.finishMs)}.`;
     } else if (key === "turkey") {
-      instruction = `Cook for 3 hours at 250°F. Take them off at ${formatCookClock(timing.finishMs)}.`;
+      instruction = `Cook for 3 hours at 250°F. Ready to temp at ${formatCookClock(timing.finishMs)}.`;
     } else if (key === "hotdogs") {
+      cardStateClass = "state-225";
       badgeText = "225°F";
-      badgeClass = "low";
+      badgeClass = "temp-225";
       instruction = `Hotdogs are cooking at 225°F. Remove them with the ribs at ${formatCookClock(timing.finishMs)}.`;
     } else if (phase === "ribs250") {
       const turnDownMs = activeCookState.startMs + (activeCookState.ribTurnDownOffsetHours * COOK_HOUR);
       instruction = `Keep smoker at 250°F until ${formatCookClock(turnDownMs)}, then turn it down to 225°F. Ribs finish at ${formatCookClock(timing.finishMs)}.`;
     } else {
-      card.classList.add("action-needed");
+      cardStateClass = "state-225";
       badgeText = "225°F";
-      badgeClass = "low";
-      instruction = `Turn the smoker down to 225°F now. Finish ribs & tips at ${formatCookClock(timing.finishMs)}.`;
+      badgeClass = "temp-225";
+      instruction = `Smoker should now be at 225°F. Finish ribs & tips at ${formatCookClock(timing.finishMs)}.`;
     }
   }
+
+  if (phase !== "complete") card.classList.add(cardStateClass);
+
+  const countdownMarkup = phase === "complete"
+    ? ""
+    : `<div class="timer-countdown-row"><div class="timer-countdown">${countdown}</div>${showRemaining ? '<div class="timer-remaining-label">remaining</div>' : ""}</div>`;
 
   card.innerHTML = `
     <div class="timer-topline">
@@ -1427,7 +1506,7 @@ function buildTimerCard(key, nowMs) {
       <div class="timer-temp-badge ${badgeClass}">${badgeText}</div>
     </div>
     <div class="timer-instruction">${instruction}</div>
-    <div class="timer-countdown">${countdown}</div>
+    ${countdownMarkup}
     <div class="timer-status">${status}</div>
     ${completeMessage ? `<div class="timer-complete-message">${completeMessage}</div>` : ""}
   `;
@@ -1445,7 +1524,7 @@ function renderTimerCards(nowMs) {
 function currentCookAlert(nowMs) {
   const alertEl = document.getElementById("cookPhaseAlert");
   alertEl.className = "cook-phase-alert";
-  alertEl.textContent = "";
+  alertEl.innerHTML = "";
 
   const startMs = activeCookState.startMs;
   const selected = activeCookState.selected;
@@ -1458,8 +1537,11 @@ function currentCookAlert(nowMs) {
     return;
   }
 
-  if (selected.ribs && nowMs >= turnDownMs && nowMs < finishMs) {
-    alertEl.textContent = `⚠️ Turn the smoker down to 225°F now. Ribs & tips finish at ${formatCookClock(finishMs)}.`;
+  if (selected.ribs && nowMs >= turnDownMs && nowMs < finishMs && !activeCookState.dismissed.turnDown) {
+    alertEl.innerHTML = `
+      <span>⚠️ Turn the smoker down to 225°F now. Ribs & tips finish at ${formatCookClock(finishMs)}.</span>
+      <button type="button" class="cook-alert-dismiss" data-dismiss-cook-alert="turnDown" aria-label="Dismiss temperature alert">×</button>
+    `;
     alertEl.classList.add("visible");
     return;
   }
@@ -1530,13 +1612,13 @@ function renderCookChart() {
   labels.innerHTML = "";
   plot.querySelectorAll(".cook-track, .cook-axis").forEach(el => el.remove());
 
-  const addRow = (label, segments) => {
+  const addRow = (label, segments, trackClass = "") => {
     const labelEl = document.createElement("div");
     labelEl.textContent = label;
     labels.appendChild(labelEl);
 
     const track = document.createElement("div");
-    track.className = "cook-track";
+    track.className = `cook-track ${trackClass}`.trim();
     segments.forEach(segment => {
       const bar = document.createElement("div");
       bar.className = `cook-bar ${segment.className}`;
@@ -1548,16 +1630,18 @@ function renderCookChart() {
     plot.appendChild(track);
   };
 
-  if (selected.wings) addRow("Wings", [{ startHour: 0, endHour: 2, className: "wings", text: "250°F" }]);
-  if (selected.turkey) addRow("Turkey", [{ startHour: 0, endHour: 3, className: "turkey", text: "250°F" }]);
+  if (selected.wings) addRow("Wings", [{ startHour: 0, endHour: 2, className: "temp250", text: "250°F" }]);
+  if (selected.turkey) addRow("Turkey", [{ startHour: 0, endHour: 3, className: "temp250", text: "250°F" }]);
   if (selected.ribs) {
     const changeHour = activeCookState.ribTurnDownOffsetHours;
     addRow("Ribs & Tips", [
-      { startHour: 0, endHour: changeHour, className: "ribs250", text: "250°F" },
-      { startHour: changeHour, endHour: 5, className: "ribs225", text: "225°F" }
+      { startHour: 0, endHour: changeHour, className: "temp250", text: "250°F" },
+      { startHour: changeHour, endHour: 5, className: "temp225", text: "225°F" }
     ]);
   }
-  if (selected.hotdogs) addRow("Hotdogs", [{ startHour: 4, endHour: 5, className: "hotdogs", text: "225°F" }]);
+  if (selected.hotdogs) {
+    addRow("Hotdogs", [{ startHour: 4, endHour: 5, className: "temp225", text: "225°F" }], "hotdogs-track");
+  }
 
   const axisSpacer = document.createElement("div");
   axisSpacer.className = "axis-spacer";
@@ -1636,6 +1720,15 @@ function initializeLiveCookTimeline() {
   document.getElementById("confirmCancelCookBtn").addEventListener("click", () => {
     clearCookState();
     showCookSetup();
+  });
+  document.getElementById("cookPhaseAlert").addEventListener("click", event => {
+    const dismissButton = event.target.closest("[data-dismiss-cook-alert]");
+    if (!dismissButton || !activeCookState) return;
+    const alertId = dismissButton.dataset.dismissCookAlert;
+    activeCookState.dismissed = activeCookState.dismissed || {};
+    activeCookState.dismissed[alertId] = true;
+    saveCookState();
+    currentCookAlert(Date.now());
   });
 
   activeCookState = loadCookState();
