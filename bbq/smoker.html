@@ -307,7 +307,7 @@ ul {
   display: none;
   position: relative;
   background: #fff8e8;
-  border: 2px solid #e39800;
+  border: 2px solid #E9A82C;
   border-radius: 12px;
   padding: 12px 44px 12px 12px;
   margin: 0 0 12px;
@@ -370,15 +370,15 @@ ul {
 
 .meat-timer-card.state-250 {
   background: #fff5f4;
-  border-color: #C11007;
+  border-color: #D25A51;
 }
-.meat-timer-card.state-250::before { background: #C11007; }
+.meat-timer-card.state-250::before { background: #D25A51; }
 
 .meat-timer-card.state-225 {
   background: #fff8e8;
-  border-color: #e39800;
+  border-color: #E9A82C;
 }
-.meat-timer-card.state-225::before { background: #e39800; }
+.meat-timer-card.state-225::before { background: #E9A82C; }
 
 .meat-timer-card.complete {
   background: #eef8f0;
@@ -409,8 +409,8 @@ ul {
 }
 
 .timer-temp-badge.waiting { background: #8e8e93; }
-.timer-temp-badge.temp-250 { background: #C11007; }
-.timer-temp-badge.temp-225 { background: #e39800; }
+.timer-temp-badge.temp-250 { background: #D25A51; }
+.timer-temp-badge.temp-225 { background: #E9A82C; }
 .timer-temp-badge.done { background: #34a853; }
 
 .timer-instruction {
@@ -528,8 +528,8 @@ ul {
   z-index: 1;
 }
 
-.cook-bar.temp250 { background: #C11007; }
-.cook-bar.temp225 { background: #e39800; }
+.cook-bar.temp250 { background: #D25A51; }
+.cook-bar.temp225 { background: #E9A82C; }
 
 .bar-text {
   position: absolute;
@@ -615,8 +615,8 @@ ul {
   display: inline-block;
   margin-right: 4px;
 }
-.legend-250 { background: #C11007; }
-.legend-225 { background: #e39800; }
+.legend-250 { background: #D25A51; }
+.legend-225 { background: #E9A82C; }
 .legend-now { background: #e02020; width: 3px; }
 
 .cancel-confirm {
@@ -1427,8 +1427,8 @@ function getTimerPhase(key, nowMs, timing) {
 }
 
 function completeMessageFor(key) {
-  if (key === "wings") return "Wings are ready! Verify internal temperature of 165°F.";
-  if (key === "turkey") return "Turkey breast is ready! Verify internal temperature of 165°F.";
+  if (key === "wings") return "Wings are ready! Verify internal temperature of 165°F+.";
+  if (key === "turkey") return "Turkey breast is ready! Verify internal temperature of 165°F+.";
   if (key === "ribs") return "Ribs & tips are ready! Verify ribs are 195°F+ internal temp. (Tips do not need to be temped.)";
   return "Hotdogs are ready! Remove them with the ribs & tips.";
 }
@@ -1674,7 +1674,7 @@ function updateCurrentTimeLine(nowMs) {
     const percent = ((nowMs - startMs) / COOK_LENGTH_MS) * 100;
     line.style.left = `${percent}%`;
     line.classList.add("visible");
-    status.textContent = `Red line: current time ${formatCookClock(nowMs)} · ${formatCookCountdown(endMs - nowMs)} left in the five-hour window.`;
+    status.textContent = `Current time: ${formatCookClock(nowMs)} · ${formatCookCountdown(endMs - nowMs)} left in the five-hour window.`;
   } else {
     line.classList.remove("visible");
     if (nowMs < startMs) {
