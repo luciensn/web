@@ -1634,7 +1634,7 @@ function renderCookChart() {
   if (selected.turkey) addRow("Turkey", [{ startHour: 0, endHour: 3, className: "temp250", text: "250°F" }]);
   if (selected.ribs) {
     const changeHour = activeCookState.ribTurnDownOffsetHours;
-    addRow("Ribs & Tips", [
+    addRow("Ribs", [
       { startHour: 0, endHour: changeHour, className: "temp250", text: "250°F" },
       { startHour: changeHour, endHour: 5, className: "temp225", text: "225°F" }
     ]);
