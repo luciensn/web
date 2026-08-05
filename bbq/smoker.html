@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Smoker Guy!</title>
+<title>Smoker Guy</title>
 
 <link rel="icon" href="favicon.ico">
 <link rel="apple-touch-icon" sizes="152x152" href="smoker-icon.png">
@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="theme-color" content="#ffffff" />
 <!-- App title when added to home screen -->
-<meta name="apple-mobile-web-app-title" content="Smoker Guy!">
+<meta name="apple-mobile-web-app-title" content="Smoker Guy">
 
 <style>
 
@@ -148,10 +148,20 @@ button {
   letter-spacing: 1px;
 }
 
-#shiftStatus {
-  font-size: 20px;
-  margin-top: 6px;
-  color: #666;
+#shiftDates {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: 4px;
+  font-size: 22px;
+  line-height: 1.1;
+  color: #555;
+}
+
+#shiftDates > span {
+  display: block;
+  white-space: nowrap;
 }
 
 
@@ -210,7 +220,7 @@ ul {
 
 .cook-setup-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
   align-items: end;
   margin: 14px 0;
@@ -303,19 +313,33 @@ ul {
   font-size: 14px;
 }
 
+.cook-phase-alerts {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+
 .cook-phase-alert {
-  display: none;
   position: relative;
-  background: #fff8e8;
-  border: 2px solid #E9A82C;
+  background: #f7f7f8;
+  border: 2px solid #8e8e93;
   border-radius: 12px;
   padding: 12px 44px 12px 12px;
-  margin: 0 0 12px;
   font-weight: 750;
   line-height: 1.35;
 }
 
-.cook-phase-alert.visible { display: block; }
+.cook-phase-alert.temp-250-alert {
+  background: #fff5f4;
+  border-color: #D25A51;
+}
+
+.cook-phase-alert.temp-225-alert,
+.cook-phase-alert.firebox-alert {
+  background: #fff8e8;
+  border-color: #E9A82C;
+}
+
 .cook-phase-alert.complete-alert {
   background: #eaf8ed;
   border-color: #34a853;
@@ -440,7 +464,7 @@ ul {
   font-family: "VT323", ui-monospace, monospace;
   font-size: 25px;
   line-height: 1;
-  color: #555;
+  color: currentColor;
 }
 
 .timer-status {
@@ -641,6 +665,7 @@ ul {
 .cancel-confirm .yes-btn { background: #8f0903; }
 
 @media (max-width: 390px) {
+  #shiftDates { font-size: 20px; gap: 2px; }
   .cook-selection-grid { grid-template-columns: 1fr; }
   .timer-countdown { font-size: 41px; }
   .timer-remaining-label { font-size: 23px; }
@@ -655,7 +680,7 @@ ul {
 
 <body>
 
-<header>Smoker Guy!</header>
+<header>Smoker Guy</header>
 
 
 <!-- SHIFT CLOCK -->
@@ -663,7 +688,10 @@ ul {
 
 <div id="shiftClock">
   <div id="currentTimeDisplay"></div>
-  <div id="shiftStatus"></div>
+  <div id="shiftDates">
+    <span><strong>Today:</strong> <span id="todayDate"></span></span>
+    <span><strong>Use By:</strong> <span id="useByDate"></span></span>
+  </div>
 </div>
 
 
@@ -685,7 +713,6 @@ ul {
         <label for="cookStartTime">Cook Start Time:
           <input type="time" id="cookStartTime" step="60" />
         </label>
-        <button type="button" class="cook-secondary-btn" id="cookStartNowBtn">Start Now</button>
       </div>
 
       <div class="cook-selection-grid" aria-label="Meats being cooked">
@@ -720,7 +747,7 @@ ul {
 
       <br>
 
-      <div class="cook-phase-alert" id="cookPhaseAlert" role="alert" aria-live="assertive"></div>
+      <div class="cook-phase-alerts" id="cookPhaseAlert" role="alert" aria-live="assertive"></div>
 
       <div class="cook-chart-card">
         <h3>5-Hour Cook Window</h3>
@@ -731,7 +758,6 @@ ul {
             <div class="current-time-line" id="currentCookTimeLine" aria-hidden="true"></div>
           </div>
         </div>
-        <div class="timeline-now-status" id="timelineNowStatus"></div>
         <div class="timeline-legend">
           <span><i class="legend-dot legend-250"></i>250°F</span>
           <span><i class="legend-dot legend-225"></i>225°F</span>
@@ -751,19 +777,6 @@ ul {
 </section>
 
 <br>
-
-<br>
-
-<!-- LABEL GENERATOR -->
-<h2>Label Generator</h2>
-<br>
-<div class="label-widget">
-  <div class="label-dates">
-    <div><strong>Today:</strong> <span id="todayDate"></span></div>
-    <div><strong>Use By:</strong> <span id="useByDate"></span></div>
-  </div>
-</div>
-
 
 <br>
 
@@ -935,68 +948,18 @@ function formatMilestoneTime(date){
 }
 
 function startLiveShiftSystem() {
-
   function update() {
-
     const now = new Date();
-
-    /* =========================
-       1️⃣ BIG TIME DISPLAY
-    ========================== */
-
     const timeString = now.toLocaleTimeString([], {
       hour: "numeric",
       minute: "2-digit",
       hour12: true
     });
-
     document.getElementById("currentTimeDisplay").textContent = timeString;
-
-    /* =========================
-       2️⃣ SHIFT STATUS LOGIC
-    ========================== */
-
-    const shiftStart = new Date();
-    shiftStart.setHours(SHIFT_START, 0, 0, 0);
-
-    const shiftEnd = new Date();
-    shiftEnd.setHours(SHIFT_END, 0, 0, 0);
-
-    const statusEl = document.getElementById("shiftStatus");
-
-    if (now < shiftStart) {
-
-      const diff = shiftStart - now;
-      statusEl.textContent = formatDuration(diff) + " until next shift";
-
-    } else if (now >= shiftStart && now <= shiftEnd) {
-
-      const diff = shiftEnd - now;
-      statusEl.textContent = formatDuration(diff) + " remaining";
-
-    } else {
-
-      statusEl.textContent = "Today's shift has ended";
-
-    }
-  }
-
-  function formatDuration(ms) {
-    const totalSeconds = Math.floor(ms / 1000);
-
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-
-    return (
-      String(hours).padStart(2, "0") + ":" +
-      String(minutes).padStart(2, "0") + ":" +
-      String(seconds).padStart(2, "0")
-    );
   }
 
   update();
-  setInterval(update, 1000); // every 1 second
+  setInterval(update, 1000);
 }
 
 startLiveShiftSystem();
@@ -1354,7 +1317,7 @@ function loadCookState() {
   }
 }
 
-function startCookFromForm(useNow = false) {
+function startCookFromForm() {
   showCookSetupError("");
   const selected = getSelectedMeats();
   if (!Object.values(selected).some(Boolean)) {
@@ -1366,15 +1329,7 @@ function startCookFromForm(useNow = false) {
     return;
   }
 
-  let startMs;
-  if (useNow) {
-    const now = new Date();
-    now.setMilliseconds(0);
-    startMs = now.getTime();
-    document.getElementById("cookStartTime").value = timeInputValue(now);
-  } else {
-    startMs = selectedStartMsFromInput();
-  }
+  const startMs = selectedStartMsFromInput();
 
   if (startMs === null) {
     showCookSetupError("Enter a valid cook start time.");
@@ -1467,7 +1422,17 @@ function buildTimerCard(key, nowMs) {
     card.classList.add("complete");
     badgeText = "READY";
     badgeClass = "done";
-    status = `Finished at ${formatCookClock(timing.finishMs)}`;
+
+    if (key === "wings") {
+      instruction = `Cook for 2 hours at 250°F. Finished at ${formatCookClock(timing.finishMs)}.`;
+    } else if (key === "turkey") {
+      instruction = `Cook for 3 hours at 250°F. Finished at ${formatCookClock(timing.finishMs)}.`;
+    } else if (key === "ribs") {
+      instruction = `Cook for 5 hours. Start at 250°F, then finish at 225°F. Finished at ${formatCookClock(timing.finishMs)}.`;
+    } else {
+      instruction = `Cook during the final hour of the ribs & tips at 225°F. Finished at ${formatCookClock(timing.finishMs)}.`;
+    }
+
     completeMessage = completeMessageFor(key);
   } else {
     countdown = formatCookCountdown(timing.finishMs - nowMs);
@@ -1507,7 +1472,7 @@ function buildTimerCard(key, nowMs) {
     </div>
     <div class="timer-instruction">${instruction}</div>
     ${countdownMarkup}
-    <div class="timer-status">${status}</div>
+    ${status ? `<div class="timer-status">${status}</div>` : ""}
     ${completeMessage ? `<div class="timer-complete-message">${completeMessage}</div>` : ""}
   `;
   return card;
@@ -1521,39 +1486,95 @@ function renderTimerCards(nowMs) {
   });
 }
 
-function currentCookAlert(nowMs) {
-  const alertEl = document.getElementById("cookPhaseAlert");
-  alertEl.className = "cook-phase-alert";
-  alertEl.innerHTML = "";
+function requiredSmokerTempAt(nowMs) {
+  const selected = activeCookState.selected;
+  if (selected.wings && nowMs < getMeatTiming("wings").finishMs) return 250;
+  if (selected.turkey && nowMs < getMeatTiming("turkey").finishMs) return 250;
 
+  if (selected.ribs) {
+    const turnDownMs = activeCookState.startMs + (activeCookState.ribTurnDownOffsetHours * COOK_HOUR);
+    if (nowMs < turnDownMs) return 250;
+  }
+
+  return 225;
+}
+
+function cookAlertMarkup(id, message, temp = null, dismissible = true, extraClass = "") {
+  const tempClass = temp === 250 ? "temp-250-alert" : temp === 225 ? "temp-225-alert" : "";
+  return `
+    <div class="cook-phase-alert ${tempClass} ${extraClass}">
+      <span>${message}</span>
+      ${dismissible ? `<button type="button" class="cook-alert-dismiss" data-dismiss-cook-alert="${id}" aria-label="Dismiss alert">×</button>` : ""}
+    </div>
+  `;
+}
+
+function currentCookAlert(nowMs) {
+  const alertsEl = document.getElementById("cookPhaseAlert");
   const startMs = activeCookState.startMs;
   const selected = activeCookState.selected;
   const finishMs = startMs + COOK_LENGTH_MS;
+  const oneHourMs = startMs + COOK_HOUR;
   const turnDownMs = startMs + (activeCookState.ribTurnDownOffsetHours * COOK_HOUR);
+  const alerts = [];
 
   if (nowMs < startMs) {
-    alertEl.textContent = `Cook is scheduled to begin at ${formatCookClock(startMs)}.`;
-    alertEl.classList.add("visible");
+    alerts.push(cookAlertMarkup(
+      "scheduled",
+      `Cook is scheduled to begin at ${formatCookClock(startMs)}.`,
+      null,
+      false
+    ));
+    alertsEl.innerHTML = alerts.join("");
     return;
   }
 
+  const startTemp = requiredSmokerTempAt(startMs);
+  if (!activeCookState.dismissed.startFire) {
+    alerts.push(cookAlertMarkup(
+      "startFire",
+      `🔥 Add 3-4 logs to the firebox. Keep firebox door slightly open until smoker reaches ${startTemp}°F.`,
+      null,
+      true,
+      "firebox-alert"
+    ));
+  }
+
+  if (nowMs >= oneHourMs && !activeCookState.dismissed.closeFirebox) {
+    const oneHourTemp = requiredSmokerTempAt(oneHourMs);
+    alerts.push(cookAlertMarkup(
+      "closeFirebox",
+      `🌡️ Smoker should now be up to cooking temperature (${oneHourTemp}°F). Close the firebox door.`,
+      null,
+      true,
+      "firebox-alert"
+    ));
+  }
+
   if (selected.ribs && nowMs >= turnDownMs && nowMs < finishMs && !activeCookState.dismissed.turnDown) {
-    alertEl.innerHTML = `
-      <span>⚠️ Turn the smoker down to 225°F now. Ribs & tips finish at ${formatCookClock(finishMs)}.</span>
-      <button type="button" class="cook-alert-dismiss" data-dismiss-cook-alert="turnDown" aria-label="Dismiss temperature alert">×</button>
-    `;
-    alertEl.classList.add("visible");
-    return;
+    alerts.push(cookAlertMarkup(
+      "turnDown",
+      `⚠️ Turn the smoker down to 225°F now. Ribs & tips finish at ${formatCookClock(finishMs)}.`,
+      225
+    ));
   }
 
   const selectedFinishTimes = Object.keys(selected)
     .filter(key => selected[key])
     .map(key => getMeatTiming(key).finishMs);
   const allComplete = selectedFinishTimes.length && selectedFinishTimes.every(ms => nowMs >= ms);
+
   if (allComplete) {
-    alertEl.textContent = "✅ Today’s selected cook is complete. Verify required internal temperatures.";
-    alertEl.classList.add("visible", "complete-alert");
+    alerts.push(cookAlertMarkup(
+      "complete",
+      "✅ Today’s selected cook is complete. Verify required internal temperatures.",
+      null,
+      false,
+      "complete-alert"
+    ));
   }
+
+  alertsEl.innerHTML = alerts.join("");
 }
 
 function maybeSoundCookAlerts(nowMs) {
@@ -1660,13 +1681,11 @@ function renderCookChart() {
   }
   plot.appendChild(axis);
 
-  const endMs = activeCookState.startMs + COOK_LENGTH_MS;
-  document.getElementById("timelineWindow").textContent = `${formatCookClock(activeCookState.startMs)} to ${formatCookClock(endMs)} · 5 hours`;
 }
 
 function updateCurrentTimeLine(nowMs) {
   const line = document.getElementById("currentCookTimeLine");
-  const status = document.getElementById("timelineNowStatus");
+  const status = document.getElementById("timelineWindow");
   const startMs = activeCookState.startMs;
   const endMs = startMs + COOK_LENGTH_MS;
 
@@ -1674,13 +1693,13 @@ function updateCurrentTimeLine(nowMs) {
     const percent = ((nowMs - startMs) / COOK_LENGTH_MS) * 100;
     line.style.left = `${percent}%`;
     line.classList.add("visible");
-    status.textContent = `Current time: ${formatCookClock(nowMs)} · ${formatCookCountdown(endMs - nowMs)} left in the five-hour window.`;
+    status.textContent = `Current time: ${formatCookClock(nowMs)} · ${formatCookCountdown(endMs - nowMs)} remaining`;
   } else {
     line.classList.remove("visible");
     if (nowMs < startMs) {
-      status.textContent = `Current time is before the cook window. It begins in ${formatCookCountdown(startMs - nowMs)}.`;
+      status.textContent = `Current time: ${formatCookClock(nowMs)} · Cook begins in ${formatCookCountdown(startMs - nowMs)}`;
     } else {
-      status.textContent = `The five-hour cook window ended at ${formatCookClock(endMs)}.`;
+      status.textContent = `Current time: ${formatCookClock(nowMs)} · 00:00:00 remaining`;
     }
   }
 }
@@ -1709,8 +1728,7 @@ function updateLiveCook() {
 function initializeLiveCookTimeline() {
   setDefaultCookTime();
 
-  document.getElementById("startCookBtn").addEventListener("click", () => startCookFromForm(false));
-  document.getElementById("cookStartNowBtn").addEventListener("click", () => startCookFromForm(true));
+  document.getElementById("startCookBtn").addEventListener("click", startCookFromForm);
   document.getElementById("cancelCookBtn").addEventListener("click", () => {
     document.getElementById("cancelCookConfirm").classList.add("visible");
   });
