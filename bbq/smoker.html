@@ -1,1227 +1,1007 @@
-<!-- vibe-coded with ChatGPT 🤝 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Smoker Guy</title>
-
-<link rel="icon" href="favicon.ico">
-<link rel="apple-touch-icon" sizes="152x152" href="smoker-icon.png">
-<link rel="apple-touch-icon" sizes="167x167" href="smoker-icon.png">
-<link rel="apple-touch-icon" sizes="180x180" href="smoker-icon.png">
-
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="theme-color" content="#ffffff" />
-<!-- App title when added to home screen -->
-<meta name="apple-mobile-web-app-title" content="Smoker Guy">
-
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#191719" />
+<meta name="apple-mobile-web-app-title" content="Smoker Guy" />
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&family=Press+Start+2P&family=VT323&display=swap');
-
-* { box-sizing: border-box; margin:0; padding:0; }
-
-body {
-  font-family: -apple-system, system-ui, sans-serif;
-  /*font-family: "VT323", monospace;*/
-  background: #f5f5f7;
-  padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+:root {
+  --ink: #201c1d;
+  --ink-2: #373033;
+  --paper: #f4eddb;
+  --paper-2: #fffaf0;
+  --screen: #262124;
+  --muted: #7a7071;
+  --line: #cfc3ae;
+  --red: #D25A51;
+  --red-dark: #9f3c36;
+  --orange: #E9A82C;
+  --orange-dark: #ad7412;
+  --green: #4f9d69;
+  --grey: #8f898b;
+  --shadow: #151214;
+  --pixel: "Press Start 2P", ui-monospace, monospace;
+  --terminal: "VT323", ui-monospace, monospace;
 }
 
-header {
+* { box-sizing: border-box; }
+html { min-height: 100%; background: var(--ink); }
+body {
+  min-height: 100%;
+  margin: 0;
+  color: var(--ink);
+  background:
+    linear-gradient(rgba(32,28,29,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(32,28,29,.045) 1px, transparent 1px),
+    var(--paper);
+  background-size: 16px 16px;
+  font-family: var(--terminal);
+  font-size: 22px;
+  line-height: 1.15;
+  padding-bottom: calc(26px + env(safe-area-inset-bottom));
+}
+
+button, input, summary { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visible {
+  outline: 3px solid var(--orange);
+  outline-offset: 3px;
+}
+
+.topbar {
   position: sticky;
   top: 0;
-  background: rgba(255,255,255,.9);
-  backdrop-filter: blur(20px);
-  padding: 12px 0;
-  font-weight: 600;
-  font-size: 18px;
-  border-bottom: 1px solid #ddd;
-  text-align: center;
-  margin-bottom: 16px;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  margin-bottom: 8px;
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  /*background: #007aff;*/
-  background: #C11007;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  margin-bottom: 16px;
-}
-
-.build-btn {
-  background: #C11007; /* maroon */
-}
-
-#summary {
-  margin-bottom: 20px;
-  font-size: 14px;
-}
-
-.visualizer {
-  display: flex;
-  gap: 12px;
-  justify-content: space-between;
-}
-
-.set {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  z-index: 50;
+  min-height: calc(62px + env(safe-area-inset-top));
+  padding: calc(10px + env(safe-area-inset-top)) 14px 10px;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: center;
   gap: 8px;
+  color: var(--paper-2);
+  background: var(--ink);
+  border-bottom: 4px solid var(--red);
+  box-shadow: 0 4px 0 rgba(0,0,0,.25);
 }
 
-.rack-bar {
-  background: #e5e5ea;
-  border-radius: 8px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  padding: 0 6px;
-}
-
-.rack-bar.shrink {
-  justify-content: space-between;
-}
-
-.meat {
-  width: 12px;
-  height: 12px;
-  background: red;
-  border-radius: 50%;
-}
-
-/* ==== LABEL GENERATOR ==== */
-
-.label-widget {
-  background: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 20px;
-  font-size: 14px;
-}
-
-.label-dates {
-  /*display: flex;
-  justify-content: space-between;*/
-  margin-bottom: 8px;
-}
-
-.recalc-btn {
-  /*width: 100%;*/
-  padding: 8px;
-  font-size: 14px;
-  background: #34c759; /* iOS green */
-  color: white;
-  border: none;
-  border-radius: 8px;
-}
-
-/* ==== SHIFT TIMELINE  ==== */
-
-/* ===== CLOCK ===== */
-
-#shiftClock {
+.brand {
+  min-width: 0;
   text-align: center;
-  margin-bottom: 30px;
-  font-family: "VT323", monospace;
-}
-
-#currentTimeDisplay {
-  font-size: 52px;
-  /*font-weight: 700;*/
-  letter-spacing: 1px;
-}
-
-#shiftDates {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  margin-top: 4px;
-  font-size: 22px;
-  line-height: 1.1;
-  color: #555;
-}
-
-#shiftDates > span {
-  display: block;
+  font-family: var(--pixel);
+  font-size: clamp(13px, 3.7vw, 18px);
+  letter-spacing: .04em;
+  line-height: 1.25;
+  text-shadow: 3px 3px 0 #000;
   white-space: nowrap;
 }
 
-
-
-/* PORK CALCULATOR */
-.build-btn {
-  flex: 1;
-  background: #e5e5ea;
-  color: #000;
-}
-
-.build-btn.active {
-  /*background: #007aff;*/
-  background: #C11007;
-  color: #fff;
-}
-
-
-#dialImg {
-  display: none;
-}
-#dialImg img {
-  width:100%;
-}
-
-ul {
-  list-style-position: inside;
-  margin-left: 20px; /* Or a suitable value */
-  padding-left: 0; /* Optional: adjust as needed */
-}
-
-
-/* ==== LIVE COOK TIMELINE ==== */
-.cook-widget {
-  background: #fff;
-  border: 1px solid #d9d9de;
-  border-radius: 16px;
-  padding: 14px;
-  margin: 10px 0 24px;
-  box-shadow: 0 4px 18px rgba(0,0,0,.04);
-}
-
-.cook-widget h3 {
-  font-size: 17px;
-  margin-bottom: 4px;
-}
-
-.cook-subtitle,
-.cook-helper,
-.timeline-window,
-.timeline-now-status {
-  color: #666;
-  font-size: 13px;
-  line-height: 1.4;
-}
-
-.cook-setup-row {
+.menu-btn {
+  width: 44px;
+  height: 40px;
+  border: 2px solid var(--paper-2);
+  background: transparent;
+  color: var(--paper-2);
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 10px;
-  align-items: end;
-  margin: 14px 0;
-}
-
-.cook-setup-row label {
-  display: block;
-  font-size: 14px;
-  font-weight: 650;
-}
-
-.cook-setup-row input[type="time"] {
-  margin: 6px 0 0;
-}
-
-.cook-widget button {
-  margin-bottom: 0;
-  font-weight: 650;
+  place-items: center;
+  padding: 0;
+  box-shadow: 3px 3px 0 #000;
   cursor: pointer;
-  min-height: 44px;
+}
+.menu-lines, .menu-lines::before, .menu-lines::after {
+  width: 22px;
+  height: 3px;
+  background: currentColor;
+  content: "";
+  display: block;
+  position: relative;
+}
+.menu-lines::before { position: absolute; top: -7px; }
+.menu-lines::after { position: absolute; top: 7px; }
+.topbar-flame { text-align: center; font-size: 25px; filter: drop-shadow(2px 2px 0 #000); }
+
+.topbar-dates {
+  justify-self: end;
+  display: grid;
+  gap: 2px;
+  min-width: max-content;
+  text-align: left;
+  color: #ede4d2;
+  font-family: var(--terminal);
+  font-size: clamp(13px, 3.3vw, 17px);
+  line-height: .95;
+  white-space: nowrap;
+}
+.topbar-dates strong {
+  color: #fff;
+  font-weight: 700;
 }
 
-.cook-secondary-btn {
-  width: auto;
-  min-width: 104px;
-  background: #e5e5ea;
-  color: #111;
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgba(10,8,9,.62);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .18s ease, visibility .18s ease;
+}
+.drawer-overlay.open { opacity: 1; visibility: visible; }
+
+.drawer {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 80;
+  width: min(320px, 86vw);
+  padding: calc(18px + env(safe-area-inset-top)) 14px 20px;
+  color: var(--paper-2);
+  background: var(--screen);
+  border-right: 5px solid var(--red);
+  box-shadow: 8px 0 0 rgba(0,0,0,.28);
+  transform: translateX(-105%);
+  transition: transform .2s ease;
+  overflow-y: auto;
+}
+.drawer.open { transform: translateX(0); }
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 3px 2px 18px;
+  border-bottom: 2px dashed #696064;
+}
+.drawer-title {
+  font-family: var(--pixel);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--orange);
+}
+.drawer-close {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 2px solid var(--paper-2);
+  color: var(--paper-2);
+  background: transparent;
+  font-family: var(--pixel);
+  font-size: 16px;
+  cursor: pointer;
+}
+.nav-list { display: grid; gap: 10px; margin-top: 18px; }
+.nav-item {
+  width: 100%;
+  min-height: 56px;
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 2px solid #746a6e;
+  color: var(--paper-2);
+  background: #332d30;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #111;
+}
+.nav-item:hover, .nav-item.active {
+  border-color: var(--orange);
+  background: #46383a;
+  transform: translate(-1px,-1px);
+  box-shadow: 5px 5px 0 #111;
+}
+.nav-icon { font-size: 25px; text-align: center; }
+.nav-label { font-family: var(--pixel); font-size: 10px; line-height: 1.5; }
+.drawer-foot { margin-top: 24px; color: #aaa0a3; font-size: 18px; }
+
+.app-shell { width: min(960px, 100%); margin: 0 auto; padding: 18px 14px 0; }
+.app-page { display: none; animation: pageIn .18s ease-out; }
+.app-page.active { display: block; }
+@keyframes pageIn { from { opacity: 0; transform: translateY(4px); } to { opacity:1; transform:none; } }
+
+.breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 14px;
+  padding: 4px 0;
+  color: var(--red-dark);
+  background: transparent;
+  border: 0;
+  font-family: var(--pixel);
+  font-size: 9px;
+  line-height: 1.5;
+  cursor: pointer;
+}
+.breadcrumb:hover { color: var(--red); }
+
+.page-heading { margin-bottom: 16px; }
+.eyebrow {
+  margin: 0 0 7px;
+  color: var(--red-dark);
+  font-family: var(--pixel);
+  font-size: 9px;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+h1, h2, h3 { margin: 0; }
+h1 {
+  font-family: var(--pixel);
+  font-size: clamp(18px, 5vw, 29px);
+  line-height: 1.5;
+  text-shadow: 3px 3px 0 rgba(210,90,81,.2);
+}
+.page-copy { margin: 7px 0 0; color: #5d5556; font-size: 21px; }
+
+.pixel-card {
+  position: relative;
+  margin-bottom: 18px;
+  padding: 16px;
+  background: var(--paper-2);
+  border: 3px solid var(--ink);
+  box-shadow: 6px 6px 0 rgba(32,28,29,.22);
+}
+.pixel-card::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(32,28,29,.12);
+  pointer-events: none;
+}
+.card-title {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 12px;
+  font-family: var(--pixel);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.card-kicker { color: var(--muted); font-size: 19px; margin: -5px 0 14px; }
+
+.clock-card {
+  padding: 14px;
+  color: var(--paper-2);
+  background: var(--screen);
+  border-color: var(--ink);
+}
+.clock-card::after { border-color: rgba(255,255,255,.08); }
+.clock-screen {
+  position: relative;
+  z-index: 1;
+  padding: 17px 12px 15px;
+  text-align: center;
+  background: #171416;
+  border: 4px solid #4c4347;
+  box-shadow: inset 0 0 0 2px #090809;
+}
+#currentTimeDisplay {
+  color: var(--orange);
+  font-family: var(--terminal);
+  font-size: clamp(58px, 17vw, 92px);
+  line-height: .8;
+  letter-spacing: .03em;
+  text-shadow: 3px 3px 0 #000;
+}
+#shiftDates {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 5px;
+  color: var(--ink);
+  font-family: var(--terminal);
+  font-size: clamp(24px, 6vw, 32px);
+  line-height: 1;
+}
+#shiftDates strong { color: var(--ink); font-weight: 700; }
+.date-card {
+  padding: 13px 16px;
+  background: #fff7e8;
+}
+
+.cook-widget { padding: 0; }
+.cook-panel-body { position: relative; z-index: 1; }
+.cook-subtitle, .cook-helper, .timeline-window, .timeline-now-status {
+  color: #655c5e;
+  font-size: 20px;
+  line-height: 1.15;
+}
+.cook-setup-row { margin: 14px 0; }
+.field-label {
+  display: block;
+  margin-bottom: 7px;
+  font-family: var(--pixel);
+  font-size: 9px;
+  line-height: 1.45;
+}
+input[type="time"], input[type="number"] {
+  width: 100%;
+  min-height: 50px;
+  margin: 0;
+  padding: 9px 11px;
+  color: var(--ink);
+  background: #fff;
+  border: 3px solid var(--ink);
+  border-radius: 0;
+  font-family: var(--terminal);
+  font-size: 27px;
+  box-shadow: inset 3px 3px 0 rgba(0,0,0,.08);
 }
 
 .cook-selection-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0,1fr));
   gap: 10px;
-  margin: 12px 0 14px;
+  margin: 14px 0;
 }
-
 .cook-check {
+  min-height: 56px;
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 11px;
-  border: 1px solid #dedee3;
-  border-radius: 12px;
-  background: #fafafa;
-  font-size: 14px;
-  font-weight: 650;
+  gap: 10px;
+  padding: 10px;
+  background: #f2ead8;
+  border: 3px solid var(--ink);
   cursor: pointer;
+  box-shadow: 3px 3px 0 rgba(32,28,29,.18);
 }
-
+.cook-check:has(input:checked) { background: #fff3d5; border-color: var(--orange-dark); }
 .cook-check input {
-  width: 22px;
-  height: 22px;
+  width: 23px;
+  height: 23px;
   margin: 0;
-  accent-color: #C11007;
+  accent-color: var(--red);
   flex: 0 0 auto;
 }
+.cook-check span { font-size: 20px; }
+
+.pixel-btn {
+  min-height: 48px;
+  padding: 11px 14px;
+  border: 3px solid var(--ink);
+  border-radius: 0;
+  color: #fff;
+  background: var(--red);
+  font-family: var(--pixel);
+  font-size: 10px;
+  line-height: 1.45;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 var(--shadow);
+}
+.pixel-btn:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 var(--shadow); }
+.pixel-btn:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 var(--shadow); }
+.pixel-btn.secondary { color: var(--ink); background: #ddd4c2; }
+.pixel-btn.danger { background: #9b2f2a; }
+.pixel-btn.orange { color: var(--ink); background: var(--orange); }
+.full-btn { width: 100%; }
 
 .cook-error {
   display: none;
-  color: #9d0903;
-  background: #fff0ef;
-  border: 1px solid #f2b7b3;
-  border-radius: 10px;
-  padding: 10px;
   margin: 10px 0;
-  font-size: 13px;
-  line-height: 1.35;
+  padding: 10px;
+  color: #7f1d1a;
+  background: #ffe5df;
+  border: 3px solid var(--red);
+  font-size: 19px;
 }
-
-.cook-error.visible { display: block; }
-
-.cook-action-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
+.cook-error.visible { display:block; }
 
 .cook-running-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 12px;
+  margin-bottom: 14px;
 }
+.cook-running-header .pixel-btn { min-height: 42px; padding: 8px 10px; font-size: 8px; }
+.cook-running-title { font-family: var(--pixel); font-size: 12px; line-height: 1.5; }
+#cookScheduleSummary { margin-top: 5px; }
 
-.cook-running-header .cook-secondary-btn {
-  min-width: 86px;
-  min-height: 38px;
-  padding: 7px 10px;
-  font-size: 14px;
+.cancel-confirm {
+  display: none;
+  margin-bottom: 14px;
+  padding: 12px;
+  border: 3px solid var(--red);
+  background: #ffe6df;
 }
+.cancel-confirm.visible { display:block; }
+.cancel-confirm p { margin: 0 0 10px; font-size: 20px; }
+.cancel-confirm-actions { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-.cook-phase-alerts {
-  display: grid;
-  gap: 10px;
-  margin: 0 0 12px;
-}
-
+.cook-alert-stack { display: grid; gap: 10px; margin-bottom: 14px; }
 .cook-phase-alert {
   position: relative;
-  background: #f7f7f8;
-  border: 2px solid #8e8e93;
-  border-radius: 12px;
-  padding: 12px 44px 12px 12px;
-  font-weight: 750;
-  line-height: 1.35;
+  padding: 12px 45px 12px 12px;
+  color: #463006;
+  background: #fff4cf;
+  border: 3px solid var(--orange);
+  font-size: 20px;
+  line-height: 1.15;
+  box-shadow: 3px 3px 0 rgba(32,28,29,.15);
 }
-
-.cook-phase-alert.temp-250-alert {
-  background: #fff5f4;
-  border-color: #D25A51;
-}
-
-.cook-phase-alert.temp-225-alert,
-.cook-phase-alert.firebox-alert {
-  background: #fff8e8;
-  border-color: #E9A82C;
-}
-
 .cook-phase-alert.complete-alert {
-  background: #eaf8ed;
-  border-color: #34a853;
+  color: #173f24;
+  background: #e8f6e9;
+  border-color: var(--green);
 }
-
+.cook-phase-alert.scheduled-alert {
+  color: #4c4546;
+  background: #eee9df;
+  border-color: var(--grey);
+  padding-right: 12px;
+}
 .cook-alert-dismiss {
   position: absolute;
   top: 7px;
   right: 7px;
-  width: 30px !important;
-  min-width: 30px;
-  min-height: 30px !important;
+  width: 30px;
   height: 30px;
-  padding: 0 !important;
-  margin: 0 !important;
-  border-radius: 999px;
-  background: rgba(0,0,0,.08) !important;
-  color: #333 !important;
-  font-size: 20px !important;
-  line-height: 1;
-}
-
-.cook-timer-list {
-  display: grid;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.meat-timer-card {
-  border: 1px solid #b8b8be;
-  border-radius: 13px;
-  padding: 12px;
-  background: #f7f7f8;
-  overflow: hidden;
-  position: relative;
-  transition: background-color .2s ease, border-color .2s ease;
-}
-
-.meat-timer-card::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 5px;
-  background: #8e8e93;
-}
-
-.meat-timer-card.state-waiting {
-  background: #f7f7f8;
-  border-color: #b8b8be;
-}
-.meat-timer-card.state-waiting::before { background: #8e8e93; }
-
-.meat-timer-card.state-250 {
-  background: #fff5f4;
-  border-color: #D25A51;
-}
-.meat-timer-card.state-250::before { background: #D25A51; }
-
-.meat-timer-card.state-225 {
-  background: #fff8e8;
-  border-color: #E9A82C;
-}
-.meat-timer-card.state-225::before { background: #E9A82C; }
-
-.meat-timer-card.complete {
-  background: #eef8f0;
-  border-color: #34a853;
-}
-.meat-timer-card.complete::before { background: #34a853; }
-
-.timer-topline {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.timer-title {
-  font-weight: 800;
-  font-size: 16px;
-}
-
-.timer-temp-badge {
-  border-radius: 999px;
-  padding: 4px 9px;
-  font-size: 12px;
-  font-weight: 800;
-  white-space: nowrap;
-  color: #fff;
-  background: #8e8e93;
-}
-
-.timer-temp-badge.waiting { background: #8e8e93; }
-.timer-temp-badge.temp-250 { background: #D25A51; }
-.timer-temp-badge.temp-225 { background: #E9A82C; }
-.timer-temp-badge.done { background: #34a853; }
-
-.timer-instruction {
+  padding: 0;
+  border: 2px solid currentColor;
+  color: inherit;
+  background: rgba(255,255,255,.4);
+  font-family: var(--pixel);
   font-size: 13px;
-  color: #555;
-  line-height: 1.4;
-  margin-top: 7px;
-}
-
-.timer-countdown-row {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin: 10px 0 4px;
-  flex-wrap: wrap;
-}
-
-.timer-countdown {
-  font-family: "VT323", ui-monospace, monospace;
-  font-size: 46px;
-  letter-spacing: 1px;
-  line-height: 1;
-  margin: 0;
-}
-
-.timer-remaining-label {
-  font-family: "VT323", ui-monospace, monospace;
-  font-size: 25px;
-  line-height: 1;
-  color: currentColor;
-}
-
-.timer-status {
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.timer-complete-message {
-  font-size: 15px;
-  font-weight: 800;
-  line-height: 1.35;
-  margin-top: 9px;
+  cursor: pointer;
 }
 
 .cook-chart-card {
-  border: 1px solid #dedee3;
-  border-radius: 13px;
-  padding: 12px;
-  background: #fff;
-  overflow: hidden;
+  margin-bottom: 14px;
+  padding: 13px;
+  background: #f6efdf;
+  border: 3px solid var(--ink);
 }
-
-.timeline-window { margin: 3px 0 12px; }
-
-.cook-chart-layout {
-  display: grid;
-  grid-template-columns: 76px minmax(0, 1fr);
-  gap: 8px;
-}
-
-.cook-chart-labels,
-.cook-chart-plot {
-  display: grid;
-  grid-auto-rows: 42px;
-  align-items: center;
-}
-
-.cook-chart-labels {
+.cook-chart-card h3 {
+  margin-bottom: 4px;
+  font-family: var(--pixel);
   font-size: 11px;
-  font-weight: 750;
-  color: #444;
+  line-height: 1.5;
 }
-
-.cook-chart-labels .axis-spacer { height: 30px; }
-
-.cook-chart-plot {
-  position: relative;
-  min-width: 0;
-}
-
+.timeline-window { margin: 4px 0 13px; }
+.cook-chart-layout { display:grid; grid-template-columns: 76px minmax(0,1fr); gap: 8px; }
+.cook-chart-labels, .cook-chart-plot { display:grid; grid-auto-rows: 42px; align-items:center; }
+.cook-chart-labels { color: #4d4547; font-size: 17px; line-height: .9; }
+.cook-chart-labels .axis-spacer { height: 31px; }
+.cook-chart-plot { position:relative; min-width:0; }
 .cook-track {
+  position: relative;
   height: 28px;
-  position: relative;
-  border-radius: 7px;
-  background-color: #f0f0f2;
-  background-image: linear-gradient(to right, rgba(0,0,0,.10) 1px, transparent 1px);
+  overflow: hidden;
+  background-color: #ded7ca;
+  background-image: linear-gradient(to right, rgba(32,28,29,.18) 2px, transparent 2px);
   background-size: 20% 100%;
-  overflow: hidden;
+  border: 2px solid #8d8381;
 }
-
-.cook-track.hotdogs-track {
-  background: transparent;
-  overflow: hidden;
-}
-
+.cook-track.hotdogs-track { background: transparent; border-color: transparent; }
 .cook-track.hotdogs-track::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 40%;
-  border-radius: 7px;
-  background-color: #f0f0f2;
-  background-image: linear-gradient(to right, rgba(0,0,0,.10) 1px, transparent 1px);
-  background-size: 33.3333% 100%;
+  content:"";
+  position:absolute;
+  inset: 0 0 0 40%;
+  background-color:#ded7ca;
+  background-image: linear-gradient(to right, rgba(32,28,29,.18) 2px, transparent 2px);
+  background-size:33.3333% 100%;
+  border:2px solid #8d8381;
 }
-
-.cook-bar {
-  position: absolute;
-  top: 4px;
-  bottom: 4px;
-  border-radius: 5px;
-  min-width: 2px;
-  z-index: 1;
-}
-
-.cook-bar.temp250 { background: #D25A51; }
-.cook-bar.temp225 { background: #E9A82C; }
-
+.cook-bar { position:absolute; top:2px; bottom:2px; min-width:2px; z-index:1; }
+.cook-bar.temp250 { background: var(--red); }
+.cook-bar.temp225 { background: var(--orange); }
 .bar-text {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 850;
-  color: #222;
-  white-space: nowrap;
-  overflow: hidden;
+  position:absolute; inset:0; display:grid; place-items:center;
+  color:#241e20; font-family:var(--pixel); font-size:7px; overflow:hidden; white-space:nowrap;
 }
-
 .current-time-line {
-  display: none;
-  position: absolute;
-  top: 0;
-  bottom: 32px;
-  width: 3px;
-  background: #e02020;
-  z-index: 6;
-  transform: translateX(-1px);
-  box-shadow: 0 0 0 1px rgba(255,255,255,.65);
-  pointer-events: none;
+  display:none;
+  position:absolute;
+  top:0;
+  bottom:32px;
+  width:4px;
+  background:#ff1717;
+  z-index:6;
+  transform:translateX(-2px);
+  box-shadow:0 0 0 1px rgba(255,255,255,.7);
+  pointer-events:none;
 }
-
-.current-time-line.visible { display: block; }
+.current-time-line.visible { display:block; }
 .current-time-line::before {
-  content: "";
-  position: absolute;
-  top: -2px;
-  left: 50%;
-  transform: translate(-50%, -100%);
-  width: 0;
-  height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 8px solid #e02020;
+  content:""; position:absolute; top:-2px; left:50%; transform:translate(-50%,-100%);
+  border-left:7px solid transparent; border-right:7px solid transparent; border-top:9px solid #ff1717;
 }
-
-.cook-axis {
-  position: relative;
-  height: 32px;
-  border-top: 1px solid #aaa;
-  margin-top: 4px;
-}
-
+.cook-axis { position:relative; height:32px; border-top:2px solid #686062; margin-top:4px; }
 .cook-axis-tick {
-  position: absolute;
-  top: -4px;
-  transform: translateX(-50%);
-  font-size: 9px;
-  color: #555;
-  white-space: nowrap;
-  padding-top: 9px;
+  position:absolute; top:-4px; transform:translateX(-50%); padding-top:10px;
+  color:#5b5355; font-size:13px; line-height:1; white-space:nowrap;
 }
-.cook-axis-tick::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 50%;
-  height: 6px;
-  border-left: 1px solid #777;
-}
-.cook-axis-tick.first { transform: none; }
-.cook-axis-tick.first::before { left: 0; }
-.cook-axis-tick.last { transform: translateX(-100%); }
-.cook-axis-tick.last::before { left: 100%; }
+.cook-axis-tick::before { content:""; position:absolute; top:0; left:50%; height:7px; border-left:2px solid #686062; }
+.cook-axis-tick.first { transform:none; }
+.cook-axis-tick.first::before { left:0; }
+.cook-axis-tick.last { transform:translateX(-100%); }
+.cook-axis-tick.last::before { left:100%; }
+.timeline-legend { display:flex; flex-wrap:wrap; gap:8px 13px; margin-top:9px; color:#665d5f; font-size:15px; }
+.legend-dot { width:11px; height:11px; display:inline-block; margin-right:4px; border:1px solid rgba(0,0,0,.25); }
+.legend-250 { background:var(--red); }
+.legend-225 { background:var(--orange); }
+.legend-now { width:4px; background:#ff1717; }
 
-.timeline-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 12px;
-  margin-top: 8px;
-  color: #666;
-  font-size: 10px;
+.cook-timer-list { display:grid; gap:11px; }
+.meat-timer-card {
+  position:relative;
+  overflow:hidden;
+  padding:13px 13px 13px 17px;
+  border:3px solid var(--grey);
+  background:#f3f0eb;
+  box-shadow:4px 4px 0 rgba(32,28,29,.14);
 }
-.legend-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 2px;
-  display: inline-block;
-  margin-right: 4px;
+.meat-timer-card::before { content:""; position:absolute; inset:0 auto 0 0; width:7px; background:var(--grey); }
+.meat-timer-card.state-250 { border-color:var(--red); background:#fff0ed; }
+.meat-timer-card.state-250::before { background:var(--red); }
+.meat-timer-card.state-225 { border-color:var(--orange); background:#fff6dc; }
+.meat-timer-card.state-225::before { background:var(--orange); }
+.meat-timer-card.complete { border-color:var(--green); background:#eaf7ec; }
+.meat-timer-card.complete::before { background:var(--green); }
+.timer-topline { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.timer-title { font-family:var(--pixel); font-size:10px; line-height:1.5; }
+.timer-temp-badge {
+  padding:5px 8px;
+  color:#fff;
+  background:var(--grey);
+  border:2px solid var(--ink);
+  font-family:var(--pixel);
+  font-size:8px;
+  line-height:1.2;
+  white-space:nowrap;
+  box-shadow:2px 2px 0 rgba(0,0,0,.3);
 }
-.legend-250 { background: #D25A51; }
-.legend-225 { background: #E9A82C; }
-.legend-now { background: #e02020; width: 3px; }
+.timer-temp-badge.temp-250 { background:var(--red); }
+.timer-temp-badge.temp-225 { color:var(--ink); background:var(--orange); }
+.timer-temp-badge.done { background:var(--green); }
+.timer-instruction { margin-top:8px; color:#5c5355; font-size:19px; line-height:1.15; }
+.timer-countdown-row { display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; margin:9px 0 1px; }
+.timer-countdown { font-size:clamp(43px,13vw,61px); line-height:.8; color:var(--ink); text-shadow:2px 2px 0 rgba(0,0,0,.08); }
+.timer-remaining-label { font-size:29px; line-height:1; color:var(--ink); }
+.state-250 .timer-countdown, .state-250 .timer-remaining-label { color:var(--red-dark); }
+.state-225 .timer-countdown, .state-225 .timer-remaining-label { color:var(--orange-dark); }
+.state-waiting .timer-countdown, .state-waiting .timer-remaining-label { color:#686164; }
+.timer-status { margin-top:4px; color:#5f5658; font-size:18px; }
+.timer-complete-message { margin-top:9px; font-size:23px; line-height:1.08; font-weight:700; color:#173f24; }
 
-.cancel-confirm {
-  display: none;
-  border: 1px solid #efaaa6;
-  background: #fff3f2;
-  border-radius: 12px;
-  padding: 12px;
-  margin-top: 12px;
-}
-.cancel-confirm.visible { display: block; }
-.cancel-confirm p {
-  font-weight: 750;
-  margin-bottom: 10px;
-}
-.cancel-confirm-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-.cancel-confirm .no-btn { background: #e5e5ea; color: #111; }
-.cancel-confirm .yes-btn { background: #8f0903; }
+.widget-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+.widget-grid .pixel-card { margin-bottom:0; }
+.widget-grid .wide { grid-column:1 / -1; }
+.widget-prompt { margin:0 0 10px; font-size:21px; }
+.widget-result { margin-top:14px; padding:11px; background:#f1eadb; border-left:6px solid var(--orange); font-size:20px; line-height:1.15; }
+.target-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:10px 0 13px; }
+.build-btn { padding:9px 5px; min-height:45px; border:3px solid var(--ink); background:#ddd4c2; color:var(--ink); font-family:var(--pixel); font-size:8px; line-height:1.5; cursor:pointer; box-shadow:3px 3px 0 rgba(32,28,29,.22); }
+.build-btn.active { background:var(--red); color:#fff; }
+.visualizer { display:flex; gap:9px; justify-content:space-between; margin-top:12px; }
+.set { flex:1; display:flex; flex-direction:column; gap:7px; }
+.rack-bar { min-width:0; height:31px; display:flex; align-items:center; justify-content:space-evenly; padding:0 4px; background:#d7d0c4; border:2px solid #837a7c; }
+.rack-bar.shrink { justify-content:space-between; }
+.meat { width:11px; height:11px; background:var(--red); border:2px solid var(--red-dark); border-radius:50%; }
+#summary { margin-top:13px; font-size:20px; line-height:1.15; }
+.dial-panel { display:none; margin-top:14px; padding:13px; color:#fff; background:var(--screen); border:3px solid var(--ink); text-align:center; }
+.dial-panel.visible { display:block; }
+.pixel-dial { width:150px; height:150px; margin:12px auto 0; display:grid; place-items:center; border:10px solid #736a6d; border-radius:50%; background:#171416; box-shadow:inset 0 0 0 5px #000; color:var(--orange); font-family:var(--pixel); font-size:18px; text-shadow:3px 3px 0 #000; }
 
-@media (max-width: 390px) {
-  #shiftDates { font-size: 20px; gap: 2px; }
-  .cook-selection-grid { grid-template-columns: 1fr; }
-  .timer-countdown { font-size: 41px; }
-  .timer-remaining-label { font-size: 23px; }
-  .cook-chart-layout { grid-template-columns: 68px minmax(0, 1fr); gap: 6px; }
-  .cook-chart-labels { font-size: 10px; }
-  .cook-axis-tick { font-size: 8px; }
+.faq-list { display:grid; gap:12px; }
+details { border:3px solid var(--ink); background:var(--paper-2); box-shadow:4px 4px 0 rgba(32,28,29,.16); }
+summary { list-style:none; position:relative; padding:14px 42px 14px 14px; font-family:var(--pixel); font-size:10px; line-height:1.5; cursor:pointer; }
+summary::-webkit-details-marker { display:none; }
+summary::after { content:"+"; position:absolute; right:14px; top:50%; transform:translateY(-50%); color:var(--red); font-family:var(--pixel); font-size:18px; }
+details[open] summary { border-bottom:3px solid var(--ink); background:#fff2d2; }
+details[open] summary::after { content:"−"; }
+.faq-body { padding:12px 16px 14px; color:#51494b; font-size:20px; }
+.faq-body ul { margin:0; padding-left:22px; }
+.faq-body li + li { margin-top:5px; }
+
+.cleaning-list { display:grid; gap:11px; }
+.cleaning-check {
+  min-height:58px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:11px 12px;
+  background:#f2ead8;
+  border:3px solid var(--ink);
+  box-shadow:3px 3px 0 rgba(32,28,29,.18);
+  cursor:pointer;
+}
+.cleaning-check:has(input:checked) {
+  color:#355a40;
+  background:#e6f2e5;
+  border-color:var(--green);
+  text-decoration:line-through;
+}
+.cleaning-check input {
+  width:25px;
+  height:25px;
+  margin:0;
+  accent-color:var(--green);
+  flex:0 0 auto;
+}
+.cleaning-check span { font-size:21px; line-height:1.1; }
+.cleaning-reset-note { margin:12px 0 0; color:var(--muted); font-size:18px; }
+
+.notepad-wrap { display:grid; gap:14px; }
+.notepad-card { margin-bottom:0; padding:12px; }
+#notepadText {
+  position:relative;
+  z-index:1;
+  width:100%;
+  min-height:calc(100dvh - 285px);
+  padding:14px;
+  resize:vertical;
+  color:var(--ink);
+  background:#fffaf0;
+  border:3px solid var(--ink);
+  border-radius:0;
+  box-shadow:inset 3px 3px 0 rgba(0,0,0,.08);
+  font-family:var(--terminal);
+  font-size:25px;
+  line-height:1.18;
+}
+#notepadText::placeholder { color:#9a9090; }
+.notepad-actions { display:grid; gap:10px; }
+.notepad-confirm {
+  display:none;
+  padding:12px;
+  background:#ffe6df;
+  border:3px solid var(--red);
+  box-shadow:3px 3px 0 rgba(32,28,29,.14);
+}
+.notepad-confirm.visible { display:block; }
+.notepad-confirm p { margin:0 0 11px; font-size:21px; }
+.notepad-confirm-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+.empty-state { min-height:330px; display:grid; place-items:center; text-align:center; }
+.empty-screen { max-width:520px; padding:28px 20px; color:#eae0cd; background:var(--screen); border:5px solid var(--ink); box-shadow:8px 8px 0 rgba(32,28,29,.25); }
+.empty-icon { font-size:54px; margin-bottom:14px; }
+.empty-title { color:var(--orange); font-family:var(--pixel); font-size:15px; line-height:1.7; }
+.empty-copy { margin:11px 0 0; font-size:22px; color:#c9bec1; }
+
+@media (max-width: 680px) {
+  .app-shell { padding-left:10px; padding-right:10px; }
+  .pixel-card { padding:13px; box-shadow:4px 4px 0 rgba(32,28,29,.22); }
+  .widget-grid { grid-template-columns:1fr; gap:15px; }
+  .widget-grid .wide { grid-column:auto; }
+  .cook-selection-grid { grid-template-columns:1fr; }
+  .cook-chart-layout { grid-template-columns:66px minmax(0,1fr); gap:6px; }
+  .cook-chart-labels { font-size:15px; }
+  .cook-axis-tick { font-size:11px; }
+  .cancel-confirm-actions { grid-template-columns:1fr; }
+  .notepad-confirm-actions { grid-template-columns:1fr; }
+  #notepadText { min-height:calc(100dvh - 300px); }
 }
 
-
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior:auto !important; transition:none !important; animation:none !important; }
+}
 </style>
 </head>
-
 <body>
-
-<header>Smoker Guy</header>
-
-
-<!-- SHIFT CLOCK -->
-<br>
-
-<div id="shiftClock">
-  <div id="currentTimeDisplay"></div>
-  <div id="shiftDates">
+<header class="topbar">
+  <button class="menu-btn" id="menuButton" aria-label="Open menu" aria-expanded="false"><span class="menu-lines"></span></button>
+  <div class="brand">SMOKER GUY!</div>
+  <div class="topbar-dates" aria-label="Label dates">
     <span><strong>Today:</strong> <span id="todayDate"></span></span>
     <span><strong>Use By:</strong> <span id="useByDate"></span></span>
   </div>
-</div>
+</header>
 
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="drawer" id="appDrawer" aria-hidden="true">
+  <div class="drawer-head">
+    <div class="drawer-title">ELI'S BBQ<br>RIVERSIDE</div>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">×</button>
+  </div>
+  <nav class="nav-list" aria-label="App pages">
+    <button class="nav-item active" data-page="today"><span class="nav-icon">🔥</span><span class="nav-label">Today's Cook</span></button>
+    <button class="nav-item" data-page="notepad"><span class="nav-icon">📝</span><span class="nav-label">Notepad</span></button>
+    <button class="nav-item" data-page="helpers"><span class="nav-icon">📱</span><span class="nav-label">Helper Widgets</span></button>
+    <button class="nav-item" data-page="faq"><span class="nav-icon">📖</span><span class="nav-label">Smoker FAQ</span></button>
+    <button class="nav-item" data-page="cleaning"><span class="nav-icon">🧹</span><span class="nav-label">Smoker Cleaning</span></button>
+    <button class="nav-item" data-page="sides"><span class="nav-icon">🥣</span><span class="nav-label">Sides Recipes</span></button>
+    <button class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span><span class="nav-label">Settings</span></button>
+  </nav>
+  <div class="drawer-foot">Links:</div>
+</aside>
 
-<br>
-
-
-
-
-
-<!-- LIVE COOK TIMELINE -->
-<section id="liveCookSection">
-  <!--<h2>Today's Cook</h2>-->
-  <div class="cook-widget" id="liveCookWidget">
-    <div id="cookSetupView">
-      <h3>Today's Cook</h3>
-      <p class="cook-subtitle">Select the meats, choose when cooking began, then start the live schedule.</p>
-
-      <div class="cook-setup-row">
-        <label for="cookStartTime">Cook Start Time:
-          <input type="time" id="cookStartTime" step="60" />
-        </label>
-      </div>
-
-      <div class="cook-selection-grid" aria-label="Meats being cooked">
-        <label class="cook-check"><input type="checkbox" id="cookWings" checked /> 🍗 Wings</label>
-        <label class="cook-check"><input type="checkbox" id="cookTurkey" checked /> 🦃 Turkey Breast</label>
-        <label class="cook-check"><input type="checkbox" id="cookRibs" checked /> 🥓 Ribs &amp; Tips</label>
-        <label class="cook-check"><input type="checkbox" id="cookHotdogs" checked /> 🌭 Hotdogs</label>
-      </div>
-
-      <p class="cook-helper" style="display:none;">Hotdogs use the final one-hour window of the ribs &amp; tips and finish at the same time.</p>
-      <div class="cook-error" id="cookSetupError" role="alert"></div>
-      <button type="button" id="startCookBtn">Start Cooking</button>
+<main class="app-shell">
+  <section class="app-page active" id="page-today" data-page-section="today">
+    <div class="page-heading">
+      <p class="eyebrow">Player 1 · Morning Shift</p>
+      <h1>Today's Cook</h1>
+      <p class="page-copy">Build the schedule, watch the temperatures, and clear each timer.</p>
     </div>
 
-    <div id="cookRunningView" hidden>
-
-      <div class="cook-running-header">
-        <div>
-          <h3>Today’s Cook</h3>
-          <div class="cook-subtitle" id="cookScheduleSummary"></div>
+    <section class="pixel-card cook-widget" id="liveCookWidget">
+      <div class="cook-panel-body" id="cookSetupView">
+        <div class="card-title">NEW COOK</div>
+        <p class="cook-subtitle">Select the meats and enter the time cooking began.</p>
+        <div class="cook-setup-row">
+          <label class="field-label" for="cookStartTime">COOK START TIME</label>
+          <input type="time" id="cookStartTime" step="60" />
         </div>
-        <button type="button" class="cook-secondary-btn" id="cancelCookBtn">Cancel</button>
+        <div class="cook-selection-grid" aria-label="Meats being cooked">
+          <label class="cook-check"><input type="checkbox" id="cookWings" checked><span>🍗 Wings</span></label>
+          <label class="cook-check"><input type="checkbox" id="cookTurkey" checked><span>🦃 Turkey Breast</span></label>
+          <label class="cook-check"><input type="checkbox" id="cookRibs" checked><span>🥓 Ribs &amp; Tips</span></label>
+          <label class="cook-check"><input type="checkbox" id="cookHotdogs" checked><span>🌭 Hotdogs</span></label>
+        </div>
+        <p class="cook-helper">Hotdogs use the final hour of the ribs and finish at the same time.</p>
+        <div class="cook-error" id="cookSetupError" role="alert"></div>
+        <button class="pixel-btn full-btn" type="button" id="startCookBtn">Start Cooking</button>
       </div>
 
-      <div class="cancel-confirm" id="cancelCookConfirm">
-        <p>Are you sure you want to stop and clear today’s cook?</p>
-        <div class="cancel-confirm-actions">
-          <button type="button" class="no-btn" id="keepCookBtn">No, keep running</button>
-          <button type="button" class="yes-btn" id="confirmCancelCookBtn">Yes, cancel cook</button>
+      <div class="cook-panel-body" id="cookRunningView" hidden>
+        <div class="cook-running-header">
+          <div>
+            <div class="cook-running-title">COOK IN PROGRESS</div>
+            <div class="cook-subtitle" id="cookScheduleSummary"></div>
+          </div>
+          <button class="pixel-btn secondary" type="button" id="cancelCookBtn">Cancel</button>
         </div>
-      </div>
 
-      <br>
-
-      <div class="cook-phase-alerts" id="cookPhaseAlert" role="alert" aria-live="assertive"></div>
-
-      <div class="cook-chart-card">
-        <h3>5-Hour Cook Window</h3>
-        <div class="timeline-window" id="timelineWindow"></div>
-        <div class="cook-chart-layout">
-          <div class="cook-chart-labels" id="cookChartLabels"></div>
-          <div class="cook-chart-plot" id="cookChartPlot">
-            <div class="current-time-line" id="currentCookTimeLine" aria-hidden="true"></div>
+        <div class="cancel-confirm" id="cancelCookConfirm">
+          <p>Stop and clear today’s cook?</p>
+          <div class="cancel-confirm-actions">
+            <button class="pixel-btn secondary" type="button" id="keepCookBtn">No, Keep Running!</button>
+            <button class="pixel-btn danger" type="button" id="confirmCancelCookBtn">Yes, Cancel!</button>
           </div>
         </div>
-        <div class="timeline-legend">
-          <span><i class="legend-dot legend-250"></i>250°F</span>
-          <span><i class="legend-dot legend-225"></i>225°F</span>
-          <span><i class="legend-dot legend-now"></i>Current Time</span>
+
+        <div class="cook-alert-stack" id="cookPhaseAlert" role="alert" aria-live="assertive"></div>
+
+        <section class="cook-chart-card">
+          <h3>5-Hour Cook Window</h3>
+          <div class="timeline-window" id="timelineWindow"></div>
+          <div class="cook-chart-layout">
+            <div class="cook-chart-labels" id="cookChartLabels"></div>
+            <div class="cook-chart-plot" id="cookChartPlot">
+              <div class="current-time-line" id="currentCookTimeLine" aria-hidden="true"></div>
+            </div>
+          </div>
+          <div class="timeline-legend">
+            <span><i class="legend-dot legend-250"></i>250°F</span>
+            <span><i class="legend-dot legend-225"></i>225°F</span>
+            <span><i class="legend-dot legend-now"></i>Current Time</span>
+          </div>
+        </section>
+
+        <div class="cook-timer-list" id="cookTimerList" aria-live="polite"></div>
+      </div>
+    </section>
+  </section>
+
+  <section class="app-page" id="page-notepad" data-page-section="notepad">
+    <button class="breadcrumb" data-go-home>◀ Today's Cook</button>
+    <div class="page-heading">
+      <p class="eyebrow">Memory Bank</p>
+      <h1>Notepad</h1>
+      <p class="page-copy">Jot down shift notes here. Your notes stay saved until you clear them.</p>
+    </div>
+
+    <div class="notepad-wrap">
+      <section class="pixel-card notepad-card">
+        <textarea id="notepadText" aria-label="Notepad" placeholder="Type notes here..."></textarea>
+      </section>
+      <div class="notepad-actions">
+        <button class="pixel-btn danger full-btn" type="button" id="clearNotepadBtn">Clear Notepad</button>
+        <div class="notepad-confirm" id="notepadClearConfirm" role="alert">
+          <p>Are you sure you want to clear the notepad?</p>
+          <div class="notepad-confirm-actions">
+            <button class="pixel-btn secondary" type="button" id="keepNotepadBtn">No, Keep Notes!</button>
+            <button class="pixel-btn danger" type="button" id="confirmClearNotepadBtn">Yes, Clear It!</button>
+          </div>
         </div>
       </div>
-
-      <br>
-
-      <div class="cook-timer-list" id="cookTimerList" aria-live="polite"></div>
-
-      
-
-      
     </div>
-  </div>
-</section>
+  </section>
 
-<br>
+  <section class="app-page" id="page-helpers" data-page-section="helpers">
+    <button class="breadcrumb" data-go-home>◀ Today's Cook</button>
+    <div class="page-heading">
+      <p class="eyebrow">Inventory &amp; Loading</p>
+      <h1>Helper Widgets</h1>
+      <p class="page-copy">Fast calculators for pork production and smoker loading.</p>
+    </div>
 
-<br>
+    <div class="widget-grid">
+      <section class="pixel-card">
+        <h2 class="card-title">PULLED PORK PAN CALCULATOR</h2>
+        <p class="widget-prompt">How many cases of pork were loaded?</p>
+        <input type="number" id="casesLoaded" placeholder="Cases" min="0">
+        <button class="pixel-btn full-btn" type="button" id="calculatePansBtn">Calculate Pans</button>
+        <div class="widget-result" id="panResult" hidden></div>
+      </section>
 
-<!-- PULLED PORK PAN CALCULATOR -->
+      <section class="pixel-card">
+        <h2 class="card-title">PORK LOADING HELPER</h2>
+        <p class="widget-prompt">How many pans of pulled pork are currently in the walk-in?</p>
+        <input type="number" id="currentPans" placeholder="Current pans" min="0">
+        <p class="widget-prompt" style="margin-top:12px;">Build to:</p>
+        <div class="target-row">
+          <button class="build-btn active" type="button" data-target="30">30+<br>(Winter)</button>
+          <button class="build-btn" type="button" data-target="35">35+</button>
+          <button class="build-btn" type="button" data-target="40">40+<br>(Summer)</button>
+        </div>
+        <button class="pixel-btn full-btn" type="button" id="calculateBuildBtn">Calculate Load</button>
+        <div class="widget-result" id="buildResult" hidden></div>
+      </section>
 
-<h2>Pulled Pork Pan Calculator</h2>
+      <section class="pixel-card wide">
+        <h2 class="card-title">PORK BUTT BALANCER</h2>
+        <p class="widget-prompt">How many cases of pork butts are you loading?</p>
+        <input type="number" id="cases" placeholder="1–12 cases" min="1" max="12">
+        <button class="pixel-btn full-btn" type="button" id="loadMeatBtn">Balance The Racks</button>
+        <div id="summary"></div>
+        <div class="visualizer" id="visualizer"></div>
+        <div class="dial-panel" id="dialImg">
+          <div>⚠ Set smoker dial to 215°F</div>
+          <div class="pixel-dial">215°F</div>
+        </div>
+      </section>
+    </div>
+  </section>
 
-<br>
+  <section class="app-page" id="page-faq" data-page-section="faq">
+    <button class="breadcrumb" data-go-home>◀ Today's Cook</button>
+    <div class="page-heading">
+      <p class="eyebrow">Reference Manual</p>
+      <h1>Smoker FAQ</h1>
+      <p class="page-copy">Cook times, temperatures, and loading notes for each meat.</p>
+    </div>
+    <div class="faq-list">
+      <details>
+        <summary>🍗 Wings (165°F)</summary>
+        <div class="faq-body"><ul>
+          <li>Cook 2 hours at 250°F, then check temp.</li>
+          <li>Minimum internal temperature: 165°F (several large drumsticks).</li>
+          <li>Use 1/2 bag of dry rub per case.</li>
+          <li>⚠️ Use top racks to cook fastest.</li>
+        </ul></div>
+      </details>
+      <details>
+        <summary>🦃 Turkey Breast (165°F)</summary>
+        <div class="faq-body"><ul>
+          <li>Cook 3 hours at 250°F, then check temp.</li>
+          <li>Minimum internal temperature: 165°F (tallest part of the breast).</li>
+          <li>Cook fat side DOWN (on bottom).</li>
+          <li>⚠️ Use top racks to cook fastest.</li>
+        </ul></div>
+      </details>
+      <details>
+        <summary>🥓 Ribs &amp; Tips (195-210°F)</summary>
+        <div class="faq-body"><ul>
+          <li>Cook 5 hours total.</li>
+          <li>Start at 250°F and finish at 225°F.</li>
+          <li>Use TODAY'S COOK widget to plan the cooking schedule.</li>
+          <li>Minimum internal temperature: 195°F (Ideal: 200-210°F).</li>
+          <li>Tips do not need to be temped.</li>
+          <li>⚠️ Turn the dial down to 225°F after wings and turkey are complete.</li>
+          <li>Move big ribs to upper racks whenever space becomes available.</li>
+        </ul></div>
+      </details>
+      <details>
+        <summary>🌭 Hotdogs (1 Hour)</summary>
+        <div class="faq-body"><ul>
+          <li>Smoke 1 hour at 225°F (or 40 mins at 250°F).</li>
+          <li>⚠️ Hotdogs can be smoked any time after the first 2 hours (do not mix with raw meats).</li>
+          <li>Recommendation: Load during the final hour of ribs & tips and remove at the same time.</li>
+        </ul></div>
+      </details>
+      <details>
+        <summary>🥩 Pork Shoulder Butts</summary>
+        <div class="faq-body"><ul>
+          <li>Cook overnight at 215°F (5:00PM to 9:00AM).</li>
+          <li>Rub all sides with dry rub except the fat side.</li>
+          <li>Cook fat side UP (on top).</li>
+          <li>Use the PORK BUTT BALANCER widget to spread the weight evenly across the racks.</li>
+          <li>⚠️ Do not use top racks (unless absolutely necessary).</li>
+        </ul></div>
+      </details>
+    </div>
 
-<div class="label-widget" id="panWidget">
-
-  <div style="margin-bottom:10px; font-weight:600;">
-    How many cases of pork were loaded?
-  </div>
-
-  <input type="number" id="casesLoaded" placeholder="Enter number of cases" min="0">
-
-  <button onclick="calculatePans()">Submit</button>
-
-  <div id="panResult" style="margin-top:14px; font-size:14px;"></div>
-
-</div>
-
-<br>
-
-
-<!-- PULLED PORK BUILD CALCULATOR -->
-
-<h2>Pork Loading Helper</h2>
-
-<br>
-
-<div class="label-widget" id="buildWidget">
-
-  <div style="margin-bottom:10px; font-weight:600;">
-    How many pans of pulled pork do we currently have in the walk-in?
-  </div>
-
-  <input type="number" id="currentPans" placeholder="Enter number of pans" min="0">
-
-  <div style="margin:12px 0 6px 0; font-weight:600;">Build to?</div>
-
-  <div style="display:flex; gap:10px; margin-bottom:12px;">
-    <button class="build-btn active" data-target="30">30+ (Winter)</button>
-    <button class="build-btn" data-target="35">35+</button>
-    <button class="build-btn" data-target="40">40+ (Summer)</button>
-  </div>
-
-  <button onclick="calculateBuild()">Submit</button>
-
-  <div id="buildResult" style="margin-top:14px; font-size:14px;"></div>
-
-</div>
-
-
-<br>
-
-<!-- PORK BUTT LOADING VISUALIZER -->
-<h2>Pork Butt Balancer</h2>
-
-<br>
-<div><b>How many cases of pork butts to load?</b></div>
-<br>
-<br>
-
-<input type="number" id="cases" placeholder="Enter number of cases" min="1">
-<button onclick="loadMeat()">Submit</button>
-
-<div id="summary"></div>
-<div class="visualizer" id="visualizer"></div>
-
-<br>
-<div id="dialImg">
-  ⚠️ Set smoker dial to 215°F
-  <img src="smoker-dial-215.jpg" />
-</div>
-
-<br>
-<br>
-
-<div id="cookingGuide">
-  <h2>Cooking Guide</h2>
-  <br>
-
-  <details>
-    <summary style="font-weight: bold;">🍗 Wings</summary>
-    <ul>
-      <li>Cook ~2 hrs @ 250°F (11:00AM - 1:00PM)</li>
-      <li>165+°F internal temp</li>
-      <li>Use 1/2 bag of dry rub per case</li>
-      <li>Use top racks to cook fastest</li>
-
-    </ul>
-  </details>
-  <br>
     
-  <details>
-    <summary style="font-weight: bold;">🦃 Turkey</summary>
-    <ul>
-      <li>Cook ~3 hrs @ 250°F (11:00AM - 2:00PM)</li>
-      <li>165+°F internal temp</li>
-      <li>Use top racks to cook fastest</li>
-    </ul>
-  </details>
-  <br>
+    <div class="page-heading">
+      <!--<p class="eyebrow">Reference Manual</p>
+      <h1>Smoker FAQ</h1>-->
+      <br>
+      <p class="page-copy">Additional duties and information to help during your shift.</p>
+    </div>
+    <div class="faq-list">
+      <details>
+        <summary>Pulling Pork</summary>
+        <div class="faq-body"><ul>
+          <li>⚠️ Coming Soon</li>
+        </ul></div>
+      </details>
+      <details>
+        <summary>Meat-To-Lug Conversion Chart</summary>
+        <div class="faq-body"><ul>
+          <li>⚠️ Coming Soon</li>
+        </ul></div>
+      </details>
+    </div>
+  </section>
 
-  <details>
-    <summary style="font-weight: bold;">🥓 Ribs & Tips</summary>
-    <ul>
-      <li>Cook ~5 hrs total: start @ 250°F, finish @ 225°F</li>
-      <li>195+°F internal temp</li>
-      <li>Can start at 250°F with wings & turkey</li>
-      <li>⚠️ Turn dial down to 225°F after all wings & turkey done</li>
-      <li>When space becomes available, move ribs up to top racks</li>
-    </ul>
-  </details>
-  <br>
-  
-  <details>
-    <summary style="font-weight: bold;">🌭 Hotdogs</summary>
-    <ul>
-      <li>Cook 1 hr @ 225°F during the final hour of ribs &amp; tips</li>
-    </ul>
-  </details>
-  <br>
+  <section class="app-page" id="page-cleaning" data-page-section="cleaning">
+    <button class="breadcrumb" data-go-home>◀ Today's Cook</button>
+    <div class="page-heading">
+      <p class="eyebrow">Monthly Quest</p>
+      <h1>Smoker Cleaning</h1>
+      <p class="page-copy">Check off each task to complete the quest.</p>
+    </div>
 
-  <details>
-    <summary style="font-weight: bold;">🥩 Pork Shoulder Butts</summary>
-    <ul>
-      <li>Cook overnight @ 215°F (5:00PM - 9:00AM)</li>
-      <li>⚠️ Do not use top racks</li>
-    </ul>
-  </details>
-  <br>
+    <section class="pixel-card">
+      <h2 class="card-title">CLEANING CHECKLIST</h2>
+      <div class="cleaning-list" id="cleaningChecklist">
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task1"><span>Crank the smoker all the way up to 350°F to carbonize the racks.</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task1"><span>Acquire TARP, SCRAPERS, and SHOVEL from the storage shed.</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task1"><span>Empty the grease and transport to grease trap.</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task2"><span>Scrape cooking racks and brush with steel wool.</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task3"><span>Scoop up scraped debris from the smoker area and take to dumpster.</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task4"><span>Remove 2 rack cages and clean inside smoker (use double bags for grease).</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task5"><span>Replace rack cages and reassemble cooking racks (loose racks should go on the bottom shelves).</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task5"><span>Run trash to dumpster and return tools to the shed.</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task5"><span>Clean smoker doors and hose off the concrete slab (time permitting).</span></label>
+      </div>
+      <!--<p class="cleaning-reset-note">Checklist resets automatically at midnight.</p>-->
+    </section>
+  </section>
 
+  <section class="app-page" id="page-sides" data-page-section="sides">
+    <button class="breadcrumb" data-go-home>◀ Today's Cook</button>
+    <div class="page-heading">
+      <p class="eyebrow">Recipe Book</p>
+      <h1>Sides Recipes</h1>
+    </div>
+    <div class="empty-state"><div class="empty-screen"><div class="empty-icon">📖</div><div class="empty-title">COMING SOON</div><p class="empty-copy">This screen is ready for sides recipes whenever you are.</p></div></div>
+  </section>
 
-</div>
-
-
-<br>
-<br>
-<br>
+  <section class="app-page" id="page-settings" data-page-section="settings">
+    <button class="breadcrumb" data-go-home>◀ Today's Cook</button>
+    <div class="page-heading">
+      <p class="eyebrow">System Menu</p>
+      <h1>Settings</h1>
+    </div>
+    <div class="empty-state"><div class="empty-screen"><div class="empty-icon">⚙️</div><div class="empty-title">NO OPTIONS YET</div><p class="empty-copy">Future display, sound, and cook defaults can live here.</p></div></div>
+  </section>
+</main>
 
 <script>
+"use strict";
 
-const SHIFT_START = 9; // 9:00 AM
-const SHIFT_END = 17; // 5:00 PM
-
-// Format Time
-function formatTime(date){
-  return date.toLocaleTimeString([],{
-    hour:'numeric',
-    minute:'2-digit',
-    hour12:true
-  });
-}
-
-
-/* ====================
-  SHIFT CLOCK
-=======================*/
-
-function formatMilestoneTime(date){
-  return date.toLocaleTimeString([],{
-    hour:'numeric',
-    minute:'2-digit',
-    hour12:true
-  }).replace(/\s?(AM|PM)/i, '');
-}
-
-function startLiveShiftSystem() {
-  function update() {
-    const now = new Date();
-    const timeString = now.toLocaleTimeString([], {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true
-    });
-    document.getElementById("currentTimeDisplay").textContent = timeString;
-  }
-
-  update();
-  setInterval(update, 1000);
-}
-
-startLiveShiftSystem();
-
-
-
-/* =================
-  LABEL GENERATOR 
-  ================== */
-function formatDate(date) {
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  return `${month}-${day.toString().padStart(2, '0')}`;
-}
-
-function generateDates() {
-  const today = new Date();
-
-  const useBy = new Date();
-  useBy.setDate(today.getDate() + 6); // auto handles month/year rollover
-
-  document.getElementById("todayDate").textContent = formatDate(today);
-  document.getElementById("useByDate").textContent = formatDate(useBy);
-}
-
-// Auto-generate on page load
-generateDates();
-
-
-
-/* ======================================
-  PORK BUTT LOADING VISUALIZER/BALANCER
-========================================= */
-function loadMeat() {
-  const cases = parseInt(document.getElementById('cases').value);
-  if (!cases || cases < 1) return;
-  if (cases > 12) return;
-
-  const totalMeats = cases * 8;
-  const sets = 5;
-
-  let meatsPerSet = Math.floor(totalMeats / sets);
-  let remainder = totalMeats % sets;
-
-  const distribution = [];
-
-  for (let i = 0; i < sets; i++) {
-    let meats = meatsPerSet + (i < remainder ? 1 : 0);
-    distribution.push(distributeToRacks(meats));
-  }
-
-  renderSummary(cases, totalMeats, meatsPerSet, remainder);
-  renderVisualizer(distribution);
-}
-
-function distributeToRacks(meats) {
-  const racks = [0,0,0,0]; // 1(top),2,3,4(bottom)
-
-  // Determine max capacity per rack
-  const maxPerRack = meats > 8 ? 5 : 4;
-
-  // Decide which racks are active
-  let activeRacks = [1,2]; // rack 2 and 3 (0-based index: 1,2)
-
-  if (meats > 10) activeRacks.push(3); // add rack 4
-  if (meats > 15) activeRacks.push(0); // add rack 1
-
-  let remaining = meats;
-
-  // Even vertical distribution
-  while (remaining > 0) {
-    for (let r of activeRacks) {
-      if (remaining === 0) break;
-      if (racks[r] < maxPerRack) {
-        racks[r]++;
-        remaining--;
-      }
-    }
-  }
-
-  return racks;
-}
-
-function renderSummary(cases, totalMeats, meatsPerSet, remainder) {
-    
-    let warning = "";
-    if (cases < 8) {
-      warning = "⚠️ Leave top racks empty";
-    }
-
-    document.getElementById('summary').innerHTML =
-    `<strong>${cases} cases</strong> = ${totalMeats} meats<br>
-     Evenly spread across 5 sets<br>
-     ${meatsPerSet}${remainder ? "–" + (meatsPerSet+1) : ""} meats per set<br>
-     ${warning}`;
-
-     // show the dial image
-     document.getElementById("dialImg").style.display = "block";
-
-}
-
-function renderVisualizer(distribution) {
-  const container = document.getElementById('visualizer');
-  container.innerHTML = "";
-
-  distribution.forEach(racks => {
-    const setDiv = document.createElement("div");
-    setDiv.className = "set";
-
-    racks.forEach(count => {
-      const rackBar = document.createElement("div");
-      rackBar.className = "rack-bar";
-      if (count > 4) rackBar.classList.add("shrink");
-
-      for (let i = 0; i < count; i++) {
-        const meat = document.createElement("div");
-        meat.className = "meat";
-        rackBar.appendChild(meat);
-      }
-
-      setDiv.appendChild(rackBar);
-    });
-
-    container.appendChild(setDiv);
-  });
-}
-
-
-
-/* ============================
-  PULLED PORK PAN CALCULATOR
-=============================== */
-
-function calculatePans() {
-
-  const cases = parseInt(document.getElementById("casesLoaded").value);
-
-  if (isNaN(cases) || cases < 0) return;
-
-  const meatsPerCase = 8;
-  const meatsPerPan = 3;
-
-  const totalMeats = cases * meatsPerCase;
-
-  // Always round up final pan count
-  const pans = Math.ceil(totalMeats / meatsPerPan);
-
-  document.getElementById("panResult").innerHTML = `
-    <strong>${cases} case${cases !== 1 ? "s" : ""}</strong><br><br>
-    ${cases} × 8 meats = ${totalMeats} meats<br>
-    ${totalMeats} meats ÷ 3 meats per pan = <strong>${pans} pans</strong><br><br>
-    <strong>Final Output: ${pans} pans of pulled pork</strong>
-  `;
-}
-
-/* =============================
-  PULLED PORK LOADING HELPER
-================================ */
-
-let buildTarget = 30; // default
-
-// Toggle buttons
-document.querySelectorAll(".build-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".build-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    buildTarget = parseInt(btn.dataset.target);
-  });
-});
-
-function calculateBuild() {
-
-  const current = parseInt(document.getElementById("currentPans").value);
-  if (isNaN(current) || current < 0) return;
-
-  const meatsPerCase = 8;
-  const meatsPerPan = 3;
-
-  const pansNeeded = Math.max(0, buildTarget - current);
-
-  if (pansNeeded === 0) {
-    document.getElementById("buildResult").innerHTML =
-      `<strong>You're already at ${current} pans.</strong><br>
-       No additional cases needed to reach ${buildTarget}+.`;
-    return;
-  }
-
-  // Convert pans needed to meats
-  const meatsNeeded = pansNeeded * meatsPerPan;
-
-  // Convert meats to cases (round up)
-  const casesNeeded = Math.ceil(meatsNeeded / meatsPerCase);
-
-  // Calculate actual pans produced from those cases
-  const actualPansProduced = Math.ceil((casesNeeded * meatsPerCase) / meatsPerPan);
-
-  const finalTotal = current + actualPansProduced;
-
-  document.getElementById("buildResult").innerHTML = `
-    <strong>Recommendation: Load ${casesNeeded} case${casesNeeded > 1 ? "s" : ""}</strong><br><br>
-    Build Target: ${buildTarget}+ pans<br>
-    Current: ${current} pans<br>
-    Needed: ${pansNeeded} pans<br><br>
-    ${casesNeeded} cases × 8 meats = ${casesNeeded * meatsPerCase} meats<br>
-    ${casesNeeded * meatsPerCase} meats ÷ 3 meats per pan = ${actualPansProduced} pans<br><br>
-    Final total: <strong>${finalTotal} pans</strong>
-  `;
-}
-
-
-/* =====================================
-   LIVE COOK TIMELINE / PERSISTENT TIMERS
-======================================== */
 const COOK_STORAGE_KEY = "smokerLiveCookStateV1";
+const CLEANING_STORAGE_KEY = "smokerCleaningStateV1";
+const NOTEPAD_STORAGE_KEY = "smokerNotepadV1";
 const COOK_HOUR = 60 * 60 * 1000;
 const COOK_LENGTH_MS = 5 * COOK_HOUR;
 const MEAT_CONFIG = {
-  wings: {
-    label: "🍗 Wings",
-    className: "wings",
-    durationHours: 2,
-    finishTemp: "165°F+",
-    instruction: "Cook for 2 hours at 250°F."
-  },
-  turkey: {
-    label: "🦃 Turkey Breast",
-    className: "turkey",
-    durationHours: 3,
-    finishTemp: "165°F+",
-    instruction: "Cook for 3 hours at 250°F."
-  },
-  ribs: {
-    label: "🥓 Ribs & Tips",
-    className: "ribs",
-    durationHours: 5,
-    finishTemp: "Ribs 195°F+",
-    instruction: "Cook for 5 hours. Start at 250°F, then finish at 225°F."
-  },
-  hotdogs: {
-    label: "🌭 Hotdogs",
-    className: "hotdogs",
-    durationHours: 1,
-    instruction: "Cook during the final hour of the ribs & tips at 225°F."
-  }
+  wings: { label: "🍗 Wings", durationHours: 2, instruction: "Cook for 2 hours at 250°F." },
+  turkey: { label: "🦃 Turkey Breast", durationHours: 3, instruction: "Cook for 3 hours at 250°F." },
+  ribs: { label: "🥓 Ribs & Tips", durationHours: 5, instruction: "Cook for 5 hours. Start at 250°F, then finish at 225°F." },
+  hotdogs: { label: "🌭 Hotdogs", durationHours: 1, instruction: "Cook during the final hour of the ribs & tips at 225°F." }
 };
 
 let activeCookState = null;
 let cookTicker = null;
+let buildTarget = 30;
 
 function localDateKey(date = new Date()) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+}
+
+function formatDate(date) {
+  return `${date.getMonth()+1}-${String(date.getDate()).padStart(2,"0")}`;
 }
 
 function formatCookClock(ms) {
-  return new Date(ms).toLocaleTimeString([], {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true
-  }).replace(/\s/g, "");
+  return new Date(ms).toLocaleTimeString([], { hour:"numeric", minute:"2-digit", hour12:true }).replace(/\s/g, "");
 }
 
 function formatCookCountdown(ms) {
@@ -1229,11 +1009,124 @@ function formatCookCountdown(ms) {
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  return `${String(hours).padStart(2,"0")}:${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}`;
 }
 
 function timeInputValue(date = new Date()) {
-  return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+  return `${String(date.getHours()).padStart(2,"0")}:${String(date.getMinutes()).padStart(2,"0")}`;
+}
+
+function generateDates() {
+  const today = new Date();
+  const useBy = new Date(today);
+  useBy.setDate(today.getDate() + 6);
+  document.getElementById("todayDate").textContent = formatDate(today);
+  document.getElementById("useByDate").textContent = formatDate(useBy);
+}
+
+function openDrawer() {
+  document.getElementById("appDrawer").classList.add("open");
+  document.getElementById("drawerOverlay").classList.add("open");
+  document.getElementById("appDrawer").setAttribute("aria-hidden", "false");
+  document.getElementById("menuButton").setAttribute("aria-expanded", "true");
+}
+
+function closeDrawer() {
+  document.getElementById("appDrawer").classList.remove("open");
+  document.getElementById("drawerOverlay").classList.remove("open");
+  document.getElementById("appDrawer").setAttribute("aria-hidden", "true");
+  document.getElementById("menuButton").setAttribute("aria-expanded", "false");
+}
+
+function showPage(page) {
+  const validPage = document.querySelector(`[data-page-section="${page}"]`) ? page : "today";
+  document.querySelectorAll("[data-page-section]").forEach(section => section.classList.toggle("active", section.dataset.pageSection === validPage));
+  document.querySelectorAll(".nav-item").forEach(item => item.classList.toggle("active", item.dataset.page === validPage));
+  try {
+    if (location.protocol !== "file:" && location.protocol !== "about:") {
+      history.replaceState(null, "", validPage === "today" ? location.pathname + location.search : `#${validPage}`);
+    }
+  } catch {
+    // Navigation still works even when a local browser blocks URL history updates.
+  }
+  closeDrawer();
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+
+function initializeNavigation() {
+  document.getElementById("menuButton").addEventListener("click", openDrawer);
+  document.getElementById("drawerClose").addEventListener("click", closeDrawer);
+  document.getElementById("drawerOverlay").addEventListener("click", closeDrawer);
+  document.querySelectorAll(".nav-item").forEach(item => item.addEventListener("click", () => showPage(item.dataset.page)));
+  document.querySelectorAll("[data-go-home]").forEach(item => item.addEventListener("click", () => showPage("today")));
+  document.addEventListener("keydown", event => { if (event.key === "Escape") closeDrawer(); });
+  showPage(location.hash.replace("#", "") || "today");
+}
+
+function calculatePans() {
+  const cases = Number.parseInt(document.getElementById("casesLoaded").value, 10);
+  if (!Number.isFinite(cases) || cases < 0) return;
+  const totalMeats = cases * 8;
+  const pans = Math.ceil(totalMeats / 3);
+  const result = document.getElementById("panResult");
+  result.hidden = false;
+  result.innerHTML = `<strong>${cases} case${cases === 1 ? "" : "s"}</strong><br>${cases} × 8 = ${totalMeats} meats<br>${totalMeats} ÷ 3 = <strong>${pans} pans</strong>`;
+}
+
+function calculateBuild() {
+  const current = Number.parseInt(document.getElementById("currentPans").value, 10);
+  if (!Number.isFinite(current) || current < 0) return;
+  const result = document.getElementById("buildResult");
+  result.hidden = false;
+  const pansNeeded = Math.max(0, buildTarget - current);
+  if (pansNeeded === 0) {
+    result.innerHTML = `<strong>No additional cases needed.</strong><br>You already have ${current} pans toward the ${buildTarget}+ target.`;
+    return;
+  }
+  const casesNeeded = Math.ceil((pansNeeded * 3) / 8);
+  const actualPans = Math.ceil((casesNeeded * 8) / 3);
+  const finalTotal = current + actualPans;
+  result.innerHTML = `Recommendation: <strong>Load ${casesNeeded} case${casesNeeded === 1 ? "" : "s"}.</strong><br>${casesNeeded} cases = ${casesNeeded * 8} meats = ${actualPans} pans<br>Final total: <strong>${finalTotal} pans</strong>`;
+}
+
+function distributeToRacks(meats) {
+  const racks = [0,0,0,0];
+  const maxPerRack = meats > 8 ? 5 : 4;
+  const activeRacks = [1,2];
+  if (meats > 10) activeRacks.push(3);
+  if (meats > 15) activeRacks.push(0);
+  let remaining = meats;
+  while (remaining > 0) {
+    for (const rack of activeRacks) {
+      if (remaining === 0) break;
+      if (racks[rack] < maxPerRack) { racks[rack]++; remaining--; }
+    }
+  }
+  return racks;
+}
+
+function loadMeat() {
+  const cases = Number.parseInt(document.getElementById("cases").value, 10);
+  if (!Number.isFinite(cases) || cases < 1 || cases > 12) return;
+  const totalMeats = cases * 8;
+  const base = Math.floor(totalMeats / 5);
+  const remainder = totalMeats % 5;
+  const distribution = Array.from({length:5}, (_, index) => distributeToRacks(base + (index < remainder ? 1 : 0)));
+  document.getElementById("summary").innerHTML = `<strong>${cases} cases = ${totalMeats} meats</strong><br>${base}${remainder ? `–${base+1}` : ""} meats per set${cases < 8 ? "<br>⚠️ Leave top racks empty" : ""}`;
+  const visualizer = document.getElementById("visualizer");
+  visualizer.innerHTML = "";
+  distribution.forEach(racks => {
+    const set = document.createElement("div");
+    set.className = "set";
+    racks.forEach(count => {
+      const rack = document.createElement("div");
+      rack.className = `rack-bar${count > 4 ? " shrink" : ""}`;
+      for (let i=0; i<count; i++) { const meat = document.createElement("div"); meat.className = "meat"; rack.appendChild(meat); }
+      set.appendChild(rack);
+    });
+    visualizer.appendChild(set);
+  });
+  document.getElementById("dialImg").classList.add("visible");
 }
 
 function setDefaultCookTime() {
@@ -1267,52 +1160,113 @@ function showCookSetupError(message) {
 }
 
 function calculateRibTurnDownOffsetHours(selected) {
-  let hours = 2;
-  if (selected.wings) hours = Math.max(hours, 2);
-  if (selected.turkey) hours = Math.max(hours, 3);
-  return hours;
+  return selected.turkey ? 3 : 2;
 }
 
 function buildCookState(startMs, selected) {
-  return {
-    version: 1,
-    dateKey: localDateKey(new Date(startMs)),
-    startMs,
-    selected,
-    ribTurnDownOffsetHours: calculateRibTurnDownOffsetHours(selected),
-    alerted: {},
-    dismissed: {}
-  };
+  return { version:2, dateKey:localDateKey(new Date(startMs)), startMs, selected, ribTurnDownOffsetHours:calculateRibTurnDownOffsetHours(selected), alerted:{}, dismissed:{} };
+}
+
+function safeStorageGet(key) {
+  try { return window.localStorage.getItem(key); } catch { return null; }
+}
+
+function safeStorageSet(key, value) {
+  try { window.localStorage.setItem(key, value); } catch {}
+}
+
+function safeStorageRemove(key) {
+  try { window.localStorage.removeItem(key); } catch {}
+}
+
+function defaultCleaningState() {
+  return { dateKey: localDateKey(), checked: {} };
+}
+
+function loadCleaningState() {
+  try {
+    const raw = safeStorageGet(CLEANING_STORAGE_KEY);
+    if (!raw) return defaultCleaningState();
+    const state = JSON.parse(raw);
+    if (!state || state.dateKey !== localDateKey()) return defaultCleaningState();
+    state.checked ||= {};
+    return state;
+  } catch {
+    return defaultCleaningState();
+  }
+}
+
+function applyCleaningState(state) {
+  document.querySelectorAll("[data-cleaning-id]").forEach(checkbox => {
+    checkbox.checked = Boolean(state.checked[checkbox.dataset.cleaningId]);
+  });
+}
+
+function resetCleaningIfNewDay() {
+  const state = loadCleaningState();
+  const storedRaw = safeStorageGet(CLEANING_STORAGE_KEY);
+  let storedDateKey = null;
+  if (storedRaw) {
+    try { storedDateKey = JSON.parse(storedRaw)?.dateKey || null; } catch {}
+  }
+  if (storedDateKey !== localDateKey()) {
+    const freshState = defaultCleaningState();
+    safeStorageSet(CLEANING_STORAGE_KEY, JSON.stringify(freshState));
+    applyCleaningState(freshState);
+    return freshState;
+  }
+  applyCleaningState(state);
+  return state;
+}
+
+function initializeCleaningChecklist() {
+  let cleaningState = resetCleaningIfNewDay();
+  document.getElementById("cleaningChecklist").addEventListener("change", event => {
+    const checkbox = event.target.closest("[data-cleaning-id]");
+    if (!checkbox) return;
+    if (cleaningState.dateKey !== localDateKey()) cleaningState = defaultCleaningState();
+    cleaningState.checked[checkbox.dataset.cleaningId] = checkbox.checked;
+    safeStorageSet(CLEANING_STORAGE_KEY, JSON.stringify(cleaningState));
+  });
+  setInterval(() => { cleaningState = resetCleaningIfNewDay(); }, 30000);
+}
+
+function initializeNotepad() {
+  const textarea = document.getElementById("notepadText");
+  const confirmPanel = document.getElementById("notepadClearConfirm");
+  textarea.value = safeStorageGet(NOTEPAD_STORAGE_KEY) || "";
+  textarea.addEventListener("input", () => safeStorageSet(NOTEPAD_STORAGE_KEY, textarea.value));
+  document.getElementById("clearNotepadBtn").addEventListener("click", () => confirmPanel.classList.add("visible"));
+  document.getElementById("keepNotepadBtn").addEventListener("click", () => confirmPanel.classList.remove("visible"));
+  document.getElementById("confirmClearNotepadBtn").addEventListener("click", () => {
+    textarea.value = "";
+    safeStorageRemove(NOTEPAD_STORAGE_KEY);
+    confirmPanel.classList.remove("visible");
+    textarea.focus();
+  });
 }
 
 function saveCookState() {
-  if (!activeCookState) return;
-  localStorage.setItem(COOK_STORAGE_KEY, JSON.stringify(activeCookState));
+  if (activeCookState) safeStorageSet(COOK_STORAGE_KEY, JSON.stringify(activeCookState));
 }
 
 function clearCookState() {
   activeCookState = null;
-  localStorage.removeItem(COOK_STORAGE_KEY);
-  if (cookTicker) {
-    clearInterval(cookTicker);
-    cookTicker = null;
-  }
+  safeStorageRemove(COOK_STORAGE_KEY);
+  if (cookTicker) { clearInterval(cookTicker); cookTicker = null; }
 }
 
 function loadCookState() {
   try {
-    const raw = localStorage.getItem(COOK_STORAGE_KEY);
+    const raw = safeStorageGet(COOK_STORAGE_KEY);
     if (!raw) return null;
     const state = JSON.parse(raw);
-    if (!state || state.dateKey !== localDateKey()) {
-      localStorage.removeItem(COOK_STORAGE_KEY);
-      return null;
-    }
-    state.alerted = state.alerted || {};
-    state.dismissed = state.dismissed || {};
+    if (!state || state.dateKey !== localDateKey()) { safeStorageRemove(COOK_STORAGE_KEY); return null; }
+    state.alerted ||= {};
+    state.dismissed ||= {};
     return state;
-  } catch (error) {
-    localStorage.removeItem(COOK_STORAGE_KEY);
+  } catch {
+    safeStorageRemove(COOK_STORAGE_KEY);
     return null;
   }
 }
@@ -1320,22 +1274,10 @@ function loadCookState() {
 function startCookFromForm() {
   showCookSetupError("");
   const selected = getSelectedMeats();
-  if (!Object.values(selected).some(Boolean)) {
-    showCookSetupError("Select at least one type of meat before starting the cook.");
-    return;
-  }
-  if (selected.hotdogs && !selected.ribs) {
-    showCookSetupError("Hotdogs require Ribs & Tips because they cook during the ribs’ final hour.");
-    return;
-  }
-
+  if (!Object.values(selected).some(Boolean)) { showCookSetupError("Select at least one type of meat."); return; }
+  if (selected.hotdogs && !selected.ribs) { showCookSetupError("Hotdogs require Ribs & Tips because they cook during the final hour."); return; }
   const startMs = selectedStartMsFromInput();
-
-  if (startMs === null) {
-    showCookSetupError("Enter a valid cook start time.");
-    return;
-  }
-
+  if (startMs === null) { showCookSetupError("Enter a valid cook start time."); return; }
   activeCookState = buildCookState(startMs, selected);
   saveCookState();
   showRunningCook();
@@ -1362,20 +1304,17 @@ function showCookSetup() {
 function getMeatTiming(key) {
   const startMs = activeCookState.startMs;
   if (key === "hotdogs") {
-    const ribsFinish = startMs + (5 * COOK_HOUR);
-    return { startMs: ribsFinish - COOK_HOUR, finishMs: ribsFinish };
+    const finishMs = startMs + 5 * COOK_HOUR;
+    return { startMs:finishMs - COOK_HOUR, finishMs };
   }
-  return {
-    startMs,
-    finishMs: startMs + (MEAT_CONFIG[key].durationHours * COOK_HOUR)
-  };
+  return { startMs, finishMs:startMs + MEAT_CONFIG[key].durationHours * COOK_HOUR };
 }
 
 function getTimerPhase(key, nowMs, timing) {
   if (nowMs < timing.startMs) return "scheduled";
   if (nowMs >= timing.finishMs) return "complete";
   if (key === "ribs") {
-    const turnDownMs = activeCookState.startMs + (activeCookState.ribTurnDownOffsetHours * COOK_HOUR);
+    const turnDownMs = activeCookState.startMs + activeCookState.ribTurnDownOffsetHours * COOK_HOUR;
     return nowMs < turnDownMs ? "ribs250" : "ribs225";
   }
   return "cooking";
@@ -1384,7 +1323,7 @@ function getTimerPhase(key, nowMs, timing) {
 function completeMessageFor(key) {
   if (key === "wings") return "Wings are ready! Verify internal temperature of 165°F+.";
   if (key === "turkey") return "Turkey breast is ready! Verify internal temperature of 165°F+.";
-  if (key === "ribs") return "Ribs & tips are ready! Verify ribs are 195°F+ internal temp. (Tips do not need to be temped.)";
+  if (key === "ribs") return "Ribs & tips are ready! Verify ribs are 195°F+. Tips do not need to be temped.";
   return "Hotdogs are ready! Remove them with the ribs & tips.";
 }
 
@@ -1393,11 +1332,10 @@ function buildTimerCard(key, nowMs) {
   const timing = getMeatTiming(key);
   const phase = getTimerPhase(key, nowMs, timing);
   const card = document.createElement("article");
-  card.className = `meat-timer-card ${config.className}`;
-
+  card.className = "meat-timer-card";
   let badgeText = "250°F";
   let badgeClass = "temp-250";
-  let cardStateClass = "state-250";
+  let cardState = "state-250";
   let instruction = config.instruction;
   let countdown = "";
   let status = "";
@@ -1405,108 +1343,59 @@ function buildTimerCard(key, nowMs) {
   let showRemaining = false;
 
   if (phase === "scheduled") {
-    cardStateClass = "state-waiting";
+    cardState = "state-waiting";
     badgeText = "WAIT";
     badgeClass = "waiting";
     countdown = formatCookCountdown(timing.startMs - nowMs);
-    status = key === "hotdogs"
-      ? `Until hotdogs go on at ${formatCookClock(timing.startMs)}`
-      : `Until cooking begins at ${formatCookClock(timing.startMs)}`;
-
-    if (key === "hotdogs") {
-      instruction = `Smoke hotdogs during the final hour of the ribs. Put them on at ${formatCookClock(timing.startMs)} and remove at ${formatCookClock(timing.finishMs)}.`;
-    } else {
-      instruction += ` Take them off at ${formatCookClock(timing.finishMs)}.`;
-    }
+    status = key === "hotdogs" ? `Goes on at ${formatCookClock(timing.startMs)}` : `Cooking begins at ${formatCookClock(timing.startMs)}`;
+    instruction = key === "hotdogs"
+      ? `Smoke during the final hour of the ribs. Put on at ${formatCookClock(timing.startMs)} and remove at ${formatCookClock(timing.finishMs)}.`
+      : `${instruction} Take off at ${formatCookClock(timing.finishMs)}.`;
   } else if (phase === "complete") {
     card.classList.add("complete");
     badgeText = "READY";
     badgeClass = "done";
-
-    if (key === "wings") {
-      instruction = `Cook for 2 hours at 250°F. Finished at ${formatCookClock(timing.finishMs)}.`;
-    } else if (key === "turkey") {
-      instruction = `Cook for 3 hours at 250°F. Finished at ${formatCookClock(timing.finishMs)}.`;
-    } else if (key === "ribs") {
-      instruction = `Cook for 5 hours. Start at 250°F, then finish at 225°F. Finished at ${formatCookClock(timing.finishMs)}.`;
-    } else {
-      instruction = `Cook during the final hour of the ribs & tips at 225°F. Finished at ${formatCookClock(timing.finishMs)}.`;
-    }
-
+    instruction = key === "wings" ? `Cook for 2 hours at 250°F. Finished at ${formatCookClock(timing.finishMs)}.`
+      : key === "turkey" ? `Cook for 3 hours at 250°F. Finished at ${formatCookClock(timing.finishMs)}.`
+      : key === "ribs" ? `Cook for 5 hours. Start at 250°F, then finish at 225°F. Finished at ${formatCookClock(timing.finishMs)}.`
+      : `Cook during the final hour of the ribs & tips at 225°F. Finished at ${formatCookClock(timing.finishMs)}.`;
     completeMessage = completeMessageFor(key);
   } else {
     countdown = formatCookCountdown(timing.finishMs - nowMs);
     showRemaining = true;
     status = `Ready at ${formatCookClock(timing.finishMs)}`;
-
-    if (key === "wings") {
-      instruction = `Cook for 2 hours at 250°F. Ready to temp at ${formatCookClock(timing.finishMs)}.`;
-    } else if (key === "turkey") {
-      instruction = `Cook for 3 hours at 250°F. Ready to temp at ${formatCookClock(timing.finishMs)}.`;
-    } else if (key === "hotdogs") {
-      cardStateClass = "state-225";
-      badgeText = "225°F";
-      badgeClass = "temp-225";
-      instruction = `Hotdogs are cooking at 225°F. Remove them with the ribs at ${formatCookClock(timing.finishMs)}.`;
-    } else if (phase === "ribs250") {
-      const turnDownMs = activeCookState.startMs + (activeCookState.ribTurnDownOffsetHours * COOK_HOUR);
-      instruction = `Keep smoker at 250°F until ${formatCookClock(turnDownMs)}, then turn it down to 225°F. Ribs finish at ${formatCookClock(timing.finishMs)}.`;
-    } else {
-      cardStateClass = "state-225";
-      badgeText = "225°F";
-      badgeClass = "temp-225";
-      instruction = `Smoker should now be at 225°F. Finish ribs & tips at ${formatCookClock(timing.finishMs)}.`;
-    }
+    if (key === "wings") instruction = `Cook for 2 hours at 250°F. Ready to temp at ${formatCookClock(timing.finishMs)}.`;
+    else if (key === "turkey") instruction = `Cook for 3 hours at 250°F. Ready to temp at ${formatCookClock(timing.finishMs)}.`;
+    else if (key === "hotdogs") { cardState="state-225"; badgeText="225°F"; badgeClass="temp-225"; instruction=`Hotdogs are cooking at 225°F. Remove with the ribs at ${formatCookClock(timing.finishMs)}.`; }
+    else if (phase === "ribs250") { const turnDownMs = activeCookState.startMs + activeCookState.ribTurnDownOffsetHours * COOK_HOUR; instruction=`Keep smoker at 250°F until ${formatCookClock(turnDownMs)}, then turn down to 225°F. Finish at ${formatCookClock(timing.finishMs)}.`; }
+    else { cardState="state-225"; badgeText="225°F"; badgeClass="temp-225"; instruction=`Smoker should now be at 225°F. Finish ribs & tips at ${formatCookClock(timing.finishMs)}.`; }
   }
 
-  if (phase !== "complete") card.classList.add(cardStateClass);
-
-  const countdownMarkup = phase === "complete"
-    ? ""
-    : `<div class="timer-countdown-row"><div class="timer-countdown">${countdown}</div>${showRemaining ? '<div class="timer-remaining-label">remaining</div>' : ""}</div>`;
-
-  card.innerHTML = `
-    <div class="timer-topline">
-      <div class="timer-title">${config.label}</div>
-      <div class="timer-temp-badge ${badgeClass}">${badgeText}</div>
-    </div>
-    <div class="timer-instruction">${instruction}</div>
-    ${countdownMarkup}
-    ${status ? `<div class="timer-status">${status}</div>` : ""}
-    ${completeMessage ? `<div class="timer-complete-message">${completeMessage}</div>` : ""}
-  `;
+  if (phase !== "complete") card.classList.add(cardState);
+  const countdownMarkup = phase === "complete" ? "" : `<div class="timer-countdown-row"><div class="timer-countdown">${countdown}</div>${showRemaining ? '<div class="timer-remaining-label">remaining</div>' : ""}</div>`;
+  card.innerHTML = `<div class="timer-topline"><div class="timer-title">${config.label}</div><div class="timer-temp-badge ${badgeClass}">${badgeText}</div></div><div class="timer-instruction">${instruction}</div>${countdownMarkup}${status ? `<div class="timer-status">${status}</div>` : ""}${completeMessage ? `<div class="timer-complete-message">${completeMessage}</div>` : ""}`;
   return card;
 }
 
 function renderTimerCards(nowMs) {
   const list = document.getElementById("cookTimerList");
   list.innerHTML = "";
-  ["wings", "turkey", "ribs", "hotdogs"].forEach(key => {
-    if (activeCookState.selected[key]) list.appendChild(buildTimerCard(key, nowMs));
-  });
+  ["wings","turkey","ribs","hotdogs"].forEach(key => { if (activeCookState.selected[key]) list.appendChild(buildTimerCard(key, nowMs)); });
 }
 
 function requiredSmokerTempAt(nowMs) {
   const selected = activeCookState.selected;
   if (selected.wings && nowMs < getMeatTiming("wings").finishMs) return 250;
   if (selected.turkey && nowMs < getMeatTiming("turkey").finishMs) return 250;
-
   if (selected.ribs) {
-    const turnDownMs = activeCookState.startMs + (activeCookState.ribTurnDownOffsetHours * COOK_HOUR);
+    const turnDownMs = activeCookState.startMs + activeCookState.ribTurnDownOffsetHours * COOK_HOUR;
     if (nowMs < turnDownMs) return 250;
   }
-
   return 225;
 }
 
-function cookAlertMarkup(id, message, temp = null, dismissible = true, extraClass = "") {
-  const tempClass = temp === 250 ? "temp-250-alert" : temp === 225 ? "temp-225-alert" : "";
-  return `
-    <div class="cook-phase-alert ${tempClass} ${extraClass}">
-      <span>${message}</span>
-      ${dismissible ? `<button type="button" class="cook-alert-dismiss" data-dismiss-cook-alert="${id}" aria-label="Dismiss alert">×</button>` : ""}
-    </div>
-  `;
+function cookAlertMarkup(id, message, dismissible = true, extraClass = "") {
+  return `<div class="cook-phase-alert ${extraClass}"><span>${message}</span>${dismissible ? `<button type="button" class="cook-alert-dismiss" data-dismiss-cook-alert="${id}" aria-label="Dismiss alert">×</button>` : ""}</div>`;
 }
 
 function currentCookAlert(nowMs) {
@@ -1515,89 +1404,40 @@ function currentCookAlert(nowMs) {
   const selected = activeCookState.selected;
   const finishMs = startMs + COOK_LENGTH_MS;
   const oneHourMs = startMs + COOK_HOUR;
-  const turnDownMs = startMs + (activeCookState.ribTurnDownOffsetHours * COOK_HOUR);
+  const turnDownMs = startMs + activeCookState.ribTurnDownOffsetHours * COOK_HOUR;
   const alerts = [];
 
   if (nowMs < startMs) {
-    alerts.push(cookAlertMarkup(
-      "scheduled",
-      `Cook is scheduled to begin at ${formatCookClock(startMs)}.`,
-      null,
-      false
-    ));
-    alertsEl.innerHTML = alerts.join("");
+    alertsEl.innerHTML = cookAlertMarkup("scheduled", `Cook is scheduled to begin at ${formatCookClock(startMs)}.`, false, "scheduled-alert");
     return;
   }
-
-  const startTemp = requiredSmokerTempAt(startMs);
   if (!activeCookState.dismissed.startFire) {
-    alerts.push(cookAlertMarkup(
-      "startFire",
-      `🔥 Keep firebox door slightly open until smoker reaches ${startTemp}°F.`,
-      null,
-      true,
-      "firebox-alert"
-    ));
+    const startTemp = requiredSmokerTempAt(startMs);
+    alerts.push(cookAlertMarkup("startFire", `🔥 Keep firebox door slightly open until smoker reaches ${startTemp}°F.`));
   }
-
   if (nowMs >= oneHourMs && !activeCookState.dismissed.closeFirebox) {
     const oneHourTemp = requiredSmokerTempAt(oneHourMs);
-    alerts.push(cookAlertMarkup(
-      "closeFirebox",
-      `🌡️ Smoker should now be up to cooking temperature (${oneHourTemp}°F). Close the firebox door.`,
-      null,
-      true,
-      "firebox-alert"
-    ));
+    alerts.push(cookAlertMarkup("closeFirebox", `🌡️ Smoker should now be up to cooking temperature (${oneHourTemp}°F). Close the firebox door.`));
   }
-
   if (selected.ribs && nowMs >= turnDownMs && nowMs < finishMs && !activeCookState.dismissed.turnDown) {
-    alerts.push(cookAlertMarkup(
-      "turnDown",
-      `⚠️ Turn the smoker down to 225°F now. Ribs & tips finish at ${formatCookClock(finishMs)}.`,
-      225
-    ));
+    alerts.push(cookAlertMarkup("turnDown", `⚠️ Turn the smoker down to 225°F now. Ribs & tips finish at ${formatCookClock(finishMs)}.`));
   }
-
-  const selectedFinishTimes = Object.keys(selected)
-    .filter(key => selected[key])
-    .map(key => getMeatTiming(key).finishMs);
-  const allComplete = selectedFinishTimes.length && selectedFinishTimes.every(ms => nowMs >= ms);
-
-  if (allComplete) {
-    alerts.push(cookAlertMarkup(
-      "complete",
-      "✅ Today’s selected cook is complete. Verify required internal temperatures.",
-      null,
-      false,
-      "complete-alert"
-    ));
-  }
-
+  const finishTimes = Object.keys(selected).filter(key => selected[key]).map(key => getMeatTiming(key).finishMs);
+  if (finishTimes.length && finishTimes.every(time => nowMs >= time)) alerts.push(cookAlertMarkup("complete", "✅ Today’s selected cook is complete. Verify required internal temperatures.", false, "complete-alert"));
   alertsEl.innerHTML = alerts.join("");
 }
 
 function maybeSoundCookAlerts(nowMs) {
-  const milestones = [];
   const selected = activeCookState.selected;
-  if (selected.ribs) {
-    milestones.push({
-      id: "turnDown",
-      time: activeCookState.startMs + (activeCookState.ribTurnDownOffsetHours * COOK_HOUR)
-    });
-  }
-  ["wings", "turkey", "ribs", "hotdogs"].forEach(key => {
-    if (selected[key]) milestones.push({ id: `${key}Complete`, time: getMeatTiming(key).finishMs });
-  });
-  if (selected.hotdogs) milestones.push({ id: "hotdogsStart", time: getMeatTiming("hotdogs").startMs });
-
+  const milestones = [];
+  if (selected.ribs) milestones.push({ id:"turnDown", time:activeCookState.startMs + activeCookState.ribTurnDownOffsetHours * COOK_HOUR });
+  ["wings","turkey","ribs","hotdogs"].forEach(key => { if (selected[key]) milestones.push({ id:`${key}Complete`, time:getMeatTiming(key).finishMs }); });
+  if (selected.hotdogs) milestones.push({ id:"hotdogsStart", time:getMeatTiming("hotdogs").startMs });
   let changed = false;
   milestones.forEach(milestone => {
     if (!activeCookState.alerted[milestone.id] && nowMs >= milestone.time) {
       activeCookState.alerted[milestone.id] = true;
       changed = true;
-      // Sound only when the milestone has just occurred. Reopening an older
-      // cook should restore the correct visual state without replaying every alert.
       if (nowMs - milestone.time <= 5000) playCookBeep();
     }
   });
@@ -1611,19 +1451,14 @@ function playCookBeep() {
     const context = new AudioContextClass();
     const oscillator = context.createOscillator();
     const gain = context.createGain();
-    oscillator.type = "sine";
-    oscillator.frequency.value = 880;
-    gain.gain.setValueAtTime(0.0001, context.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.16, context.currentTime + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.35);
-    oscillator.connect(gain);
-    gain.connect(context.destination);
-    oscillator.start();
-    oscillator.stop(context.currentTime + 0.36);
+    oscillator.type = "square";
+    oscillator.frequency.value = 760;
+    gain.gain.setValueAtTime(.0001, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(.12, context.currentTime + .02);
+    gain.gain.exponentialRampToValueAtTime(.0001, context.currentTime + .32);
+    oscillator.connect(gain); gain.connect(context.destination); oscillator.start(); oscillator.stop(context.currentTime + .33);
     oscillator.addEventListener("ended", () => context.close());
-  } catch (error) {
-    // Visual alerts still work if the browser blocks audio.
-  }
+  } catch {}
 }
 
 function renderCookChart() {
@@ -1631,56 +1466,36 @@ function renderCookChart() {
   const labels = document.getElementById("cookChartLabels");
   const plot = document.getElementById("cookChartPlot");
   labels.innerHTML = "";
-  plot.querySelectorAll(".cook-track, .cook-axis").forEach(el => el.remove());
+  plot.querySelectorAll(".cook-track, .cook-axis").forEach(element => element.remove());
 
-  const addRow = (label, segments, trackClass = "") => {
-    const labelEl = document.createElement("div");
-    labelEl.textContent = label;
-    labels.appendChild(labelEl);
-
-    const track = document.createElement("div");
-    track.className = `cook-track ${trackClass}`.trim();
+  const addRow = (label, segments, trackClass="") => {
+    const labelElement = document.createElement("div"); labelElement.textContent = label; labels.appendChild(labelElement);
+    const track = document.createElement("div"); track.className = `cook-track ${trackClass}`.trim();
     segments.forEach(segment => {
-      const bar = document.createElement("div");
-      bar.className = `cook-bar ${segment.className}`;
-      bar.style.left = `${(segment.startHour / 5) * 100}%`;
-      bar.style.width = `${((segment.endHour - segment.startHour) / 5) * 100}%`;
+      const bar = document.createElement("div"); bar.className = `cook-bar ${segment.className}`;
+      bar.style.left = `${segment.startHour / 5 * 100}%`;
+      bar.style.width = `${(segment.endHour - segment.startHour) / 5 * 100}%`;
       if (segment.text) bar.innerHTML = `<span class="bar-text">${segment.text}</span>`;
       track.appendChild(bar);
     });
     plot.appendChild(track);
   };
 
-  if (selected.wings) addRow("Wings", [{ startHour: 0, endHour: 2, className: "temp250", text: "250°F" }]);
-  if (selected.turkey) addRow("Turkey", [{ startHour: 0, endHour: 3, className: "temp250", text: "250°F" }]);
-  if (selected.ribs) {
-    const changeHour = activeCookState.ribTurnDownOffsetHours;
-    addRow("Ribs", [
-      { startHour: 0, endHour: changeHour, className: "temp250", text: "250°F" },
-      { startHour: changeHour, endHour: 5, className: "temp225", text: "225°F" }
-    ]);
-  }
-  if (selected.hotdogs) {
-    addRow("Hotdogs", [{ startHour: 4, endHour: 5, className: "temp225", text: "225°F" }], "hotdogs-track");
-  }
+  if (selected.wings) addRow("Wings", [{startHour:0,endHour:2,className:"temp250",text:"250°F"}]);
+  if (selected.turkey) addRow("Turkey", [{startHour:0,endHour:3,className:"temp250",text:"250°F"}]);
+  if (selected.ribs) addRow("Ribs", [{startHour:0,endHour:activeCookState.ribTurnDownOffsetHours,className:"temp250",text:"250°F"},{startHour:activeCookState.ribTurnDownOffsetHours,endHour:5,className:"temp225",text:"225°F"}]);
+  if (selected.hotdogs) addRow("Hotdogs", [{startHour:4,endHour:5,className:"temp225",text:"225°F"}], "hotdogs-track");
 
-  const axisSpacer = document.createElement("div");
-  axisSpacer.className = "axis-spacer";
-  labels.appendChild(axisSpacer);
-
-  const axis = document.createElement("div");
-  axis.className = "cook-axis";
-  for (let hour = 0; hour <= 5; hour++) {
+  const spacer = document.createElement("div"); spacer.className = "axis-spacer"; labels.appendChild(spacer);
+  const axis = document.createElement("div"); axis.className = "cook-axis";
+  for (let hour=0; hour<=5; hour++) {
     const tick = document.createElement("span");
-    tick.className = "cook-axis-tick";
-    if (hour === 0) tick.classList.add("first");
-    if (hour === 5) tick.classList.add("last");
-    tick.style.left = `${(hour / 5) * 100}%`;
-    tick.textContent = formatCookClock(activeCookState.startMs + (hour * COOK_HOUR));
+    tick.className = `cook-axis-tick${hour===0 ? " first" : ""}${hour===5 ? " last" : ""}`;
+    tick.style.left = `${hour / 5 * 100}%`;
+    tick.textContent = formatCookClock(activeCookState.startMs + hour * COOK_HOUR);
     axis.appendChild(tick);
   }
   plot.appendChild(axis);
-
 }
 
 function updateCurrentTimeLine(nowMs) {
@@ -1688,37 +1503,24 @@ function updateCurrentTimeLine(nowMs) {
   const status = document.getElementById("timelineWindow");
   const startMs = activeCookState.startMs;
   const endMs = startMs + COOK_LENGTH_MS;
-
   if (nowMs >= startMs && nowMs <= endMs) {
-    const percent = ((nowMs - startMs) / COOK_LENGTH_MS) * 100;
-    line.style.left = `${percent}%`;
+    line.style.left = `${(nowMs - startMs) / COOK_LENGTH_MS * 100}%`;
     line.classList.add("visible");
     status.textContent = `Current time: ${formatCookClock(nowMs)} · ${formatCookCountdown(endMs - nowMs)} remaining`;
   } else {
     line.classList.remove("visible");
-    if (nowMs < startMs) {
-      status.textContent = `Current time: ${formatCookClock(nowMs)} · Cook begins in ${formatCookCountdown(startMs - nowMs)}`;
-    } else {
-      status.textContent = `Current time: ${formatCookClock(nowMs)} · 00:00:00 remaining`;
-    }
+    status.textContent = nowMs < startMs
+      ? `Current time: ${formatCookClock(nowMs)} · Cook begins in ${formatCookCountdown(startMs - nowMs)}`
+      : `Current time: ${formatCookClock(nowMs)} · 00:00:00 remaining`;
   }
 }
 
 function updateLiveCook() {
   if (!activeCookState) return;
-  if (activeCookState.dateKey !== localDateKey()) {
-    clearCookState();
-    showCookSetup();
-    return;
-  }
-
+  if (activeCookState.dateKey !== localDateKey()) { clearCookState(); showCookSetup(); return; }
   const nowMs = Date.now();
-  const selected = activeCookState.selected;
-  const endTimes = Object.keys(selected)
-    .filter(key => selected[key])
-    .map(key => getMeatTiming(key).finishMs);
-  const scheduleFinishMs = Math.max(...endTimes);
-  document.getElementById("cookScheduleSummary").textContent = `Started ${formatCookClock(activeCookState.startMs)} · Finish ${formatCookClock(scheduleFinishMs)}`;
+  const endTimes = Object.keys(activeCookState.selected).filter(key => activeCookState.selected[key]).map(key => getMeatTiming(key).finishMs);
+  document.getElementById("cookScheduleSummary").textContent = `Started ${formatCookClock(activeCookState.startMs)} · Finish ${formatCookClock(Math.max(...endTimes))}`;
   renderTimerCards(nowMs);
   currentCookAlert(nowMs);
   updateCurrentTimeLine(nowMs);
@@ -1727,37 +1529,38 @@ function updateLiveCook() {
 
 function initializeLiveCookTimeline() {
   setDefaultCookTime();
-
   document.getElementById("startCookBtn").addEventListener("click", startCookFromForm);
-  document.getElementById("cancelCookBtn").addEventListener("click", () => {
-    document.getElementById("cancelCookConfirm").classList.add("visible");
-  });
-  document.getElementById("keepCookBtn").addEventListener("click", () => {
-    document.getElementById("cancelCookConfirm").classList.remove("visible");
-  });
-  document.getElementById("confirmCancelCookBtn").addEventListener("click", () => {
-    clearCookState();
-    showCookSetup();
-  });
+  document.getElementById("cancelCookBtn").addEventListener("click", () => document.getElementById("cancelCookConfirm").classList.add("visible"));
+  document.getElementById("keepCookBtn").addEventListener("click", () => document.getElementById("cancelCookConfirm").classList.remove("visible"));
+  document.getElementById("confirmCancelCookBtn").addEventListener("click", () => { clearCookState(); showCookSetup(); });
   document.getElementById("cookPhaseAlert").addEventListener("click", event => {
-    const dismissButton = event.target.closest("[data-dismiss-cook-alert]");
-    if (!dismissButton || !activeCookState) return;
-    const alertId = dismissButton.dataset.dismissCookAlert;
-    activeCookState.dismissed = activeCookState.dismissed || {};
-    activeCookState.dismissed[alertId] = true;
+    const button = event.target.closest("[data-dismiss-cook-alert]");
+    if (!button || !activeCookState) return;
+    activeCookState.dismissed[button.dataset.dismissCookAlert] = true;
     saveCookState();
     currentCookAlert(Date.now());
   });
-
   activeCookState = loadCookState();
-  if (activeCookState) showRunningCook();
-  else showCookSetup();
+  activeCookState ? showRunningCook() : showCookSetup();
 }
 
+function initializeHelpers() {
+  document.getElementById("calculatePansBtn").addEventListener("click", calculatePans);
+  document.getElementById("calculateBuildBtn").addEventListener("click", calculateBuild);
+  document.getElementById("loadMeatBtn").addEventListener("click", loadMeat);
+  document.querySelectorAll(".build-btn").forEach(button => button.addEventListener("click", () => {
+    document.querySelectorAll(".build-btn").forEach(item => item.classList.remove("active"));
+    button.classList.add("active");
+    buildTarget = Number.parseInt(button.dataset.target, 10);
+  }));
+}
+
+generateDates();
+initializeNavigation();
+initializeHelpers();
+initializeCleaningChecklist();
+initializeNotepad();
 initializeLiveCookTimeline();
-
-
 </script>
-
 </body>
 </html>
