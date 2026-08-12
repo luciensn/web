@@ -61,7 +61,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
   min-height: calc(62px + env(safe-area-inset-top));
   padding: calc(10px + env(safe-area-inset-top)) 14px 10px;
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr) auto;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
   align-items: center;
   gap: 8px;
   color: var(--paper-2);
@@ -229,6 +229,12 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
   line-height: 1.5;
   text-transform: uppercase;
 }
+.today-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: nowrap;
+}
 h1, h2, h3 { margin: 0; }
 h1 {
   font-family: var(--pixel);
@@ -294,12 +300,14 @@ h1 {
   gap: 5px;
   color: var(--ink);
   font-family: var(--terminal);
-  font-size: clamp(24px, 6vw, 32px);
+  font-size: clamp(19px, 4.8vw, 24px);
   line-height: 1;
 }
 #shiftDates strong { color: var(--ink); font-weight: 700; }
 .date-card {
-  padding: 13px 16px;
+  width: fit-content;
+  min-width: 180px;
+  padding: 10px 13px;
   background: #fff7e8;
 }
 
@@ -462,7 +470,11 @@ input[type="time"], input[type="number"] {
   font-size: 11px;
   line-height: 1.5;
 }
-.timeline-window { margin: 4px 0 13px; }
+.timeline-window {
+  margin: 4px 0 13px;
+  display: grid;
+  gap: 2px;
+}
 .cook-chart-layout { display:grid; grid-template-columns: 76px minmax(0,1fr); gap: 8px; }
 .cook-chart-labels, .cook-chart-plot { display:grid; grid-auto-rows: 42px; align-items:center; }
 .cook-chart-labels { color: #4d4547; font-size: 17px; line-height: .9; }
@@ -549,12 +561,12 @@ input[type="time"], input[type="number"] {
   padding:5px 8px;
   color:#fff;
   background:var(--grey);
-  border:2px solid var(--ink);
+  border:0;
   font-family:var(--pixel);
   font-size:8px;
   line-height:1.2;
   white-space:nowrap;
-  box-shadow:2px 2px 0 rgba(0,0,0,.3);
+  box-shadow:none;
 }
 .timer-temp-badge.temp-250 { background:var(--red); }
 .timer-temp-badge.temp-225 { color:var(--ink); background:var(--orange); }
@@ -567,6 +579,9 @@ input[type="time"], input[type="number"] {
 .state-225 .timer-countdown, .state-225 .timer-remaining-label { color:var(--orange-dark); }
 .state-waiting .timer-countdown, .state-waiting .timer-remaining-label { color:#686164; }
 .timer-status { margin-top:4px; color:#5f5658; font-size:18px; }
+.state-250 .timer-status { color:var(--red-dark); }
+.state-225 .timer-status { color:var(--orange-dark); }
+.state-waiting .timer-status { color:#686164; }
 .timer-complete-message { margin-top:9px; font-size:23px; line-height:1.08; font-weight:700; color:#173f24; }
 
 .widget-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
@@ -686,16 +701,13 @@ details[open] summary::after { content:"−"; }
 <header class="topbar">
   <button class="menu-btn" id="menuButton" aria-label="Open menu" aria-expanded="false"><span class="menu-lines"></span></button>
   <div class="brand">SMOKER GUY!</div>
-  <div class="topbar-dates" aria-label="Label dates">
-    <span><strong>Today:</strong> <span id="todayDate"></span></span>
-    <span><strong>Use By:</strong> <span id="useByDate"></span></span>
-  </div>
+  <div aria-hidden="true"></div>
 </header>
 
 <div class="drawer-overlay" id="drawerOverlay"></div>
 <aside class="drawer" id="appDrawer" aria-hidden="true">
   <div class="drawer-head">
-    <div class="drawer-title">ELI'S BBQ<br>RIVERSIDE</div>
+    <div class="drawer-title">ELI'S BBQ<br>SELECT SCREEN</div>
     <button class="drawer-close" id="drawerClose" aria-label="Close menu">×</button>
   </div>
   <nav class="nav-list" aria-label="App pages">
@@ -707,16 +719,35 @@ details[open] summary::after { content:"−"; }
     <button class="nav-item" data-page="sides"><span class="nav-icon">🥣</span><span class="nav-label">Sides Recipes</span></button>
     <button class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span><span class="nav-label">Settings</span></button>
   </nav>
-  <div class="drawer-foot">Links:</div>
+  <div class="drawer-foot">
+    Links:
+    <br>
+    <a target="_blank" href="https://www.elisbarbeque.com">Eli's BBQ ↗</a>
+    <br>
+    <a target="_blank" href="https://www.elisbarbeque.com">HotSchedules ↗</a>
+    <br>
+    <a target="_blank" href="https://www.elisbarbeque.com">Paycor ↗</a>
+  </div>
 </aside>
 
 <main class="app-shell">
   <section class="app-page active" id="page-today" data-page-section="today">
     <div class="page-heading">
-      <p class="eyebrow">Player 1 · Morning Shift</p>
+      <p class="eyebrow today-eyebrow">
+        <span id="todayWeekday"></span>
+        <span aria-hidden="true">·</span>
+        <span id="todayLongDate"></span>
+      </p>
       <h1>Today's Cook</h1>
       <p class="page-copy">Build the schedule, watch the temperatures, and clear each timer.</p>
     </div>
+
+    <section class="pixel-card date-card" aria-label="Label dates">
+      <div id="shiftDates">
+        <span><strong>Today:</strong> <span id="todayDate"></span></span>
+        <span><strong>Use By:</strong> <span id="useByDate"></span></span>
+      </div>
+    </section>
 
     <section class="pixel-card cook-widget" id="liveCookWidget">
       <div class="cook-panel-body" id="cookSetupView">
@@ -860,7 +891,8 @@ details[open] summary::after { content:"−"; }
         <summary>🍗 Wings (165°F)</summary>
         <div class="faq-body"><ul>
           <li>Cook 2 hours at 250°F, then check temp.</li>
-          <li>Minimum internal temperature: 165°F (several large drumsticks).</li>
+          <li>Minimum internal temperature: 165°F.</li>
+          <li>Temp several large drumsticks.</li>
           <li>Use 1/2 bag of dry rub per case.</li>
           <li>⚠️ Use top racks to cook fastest.</li>
         </ul></div>
@@ -869,7 +901,8 @@ details[open] summary::after { content:"−"; }
         <summary>🦃 Turkey Breast (165°F)</summary>
         <div class="faq-body"><ul>
           <li>Cook 3 hours at 250°F, then check temp.</li>
-          <li>Minimum internal temperature: 165°F (tallest part of the breast).</li>
+          <li>Minimum internal temperature: 165°F.</li>
+          <li>Temp the tallest part of the breast.</li>
           <li>Cook fat side DOWN (on bottom).</li>
           <li>⚠️ Use top racks to cook fastest.</li>
         </ul></div>
@@ -889,7 +922,7 @@ details[open] summary::after { content:"−"; }
       <details>
         <summary>🌭 Hotdogs (1 Hour)</summary>
         <div class="faq-body"><ul>
-          <li>Smoke 1 hour at 225°F (or 40 mins at 250°F).</li>
+          <li>Smoke for 1 hour at 225°F (or 40 mins at 250°F).</li>
           <li>⚠️ Hotdogs can be smoked any time after the first 2 hours (do not mix with raw meats).</li>
           <li>Recommendation: Load during the final hour of ribs & tips and remove at the same time.</li>
         </ul></div>
@@ -911,17 +944,23 @@ details[open] summary::after { content:"−"; }
       <!--<p class="eyebrow">Reference Manual</p>
       <h1>Smoker FAQ</h1>-->
       <br>
-      <p class="page-copy">Additional duties and information to help during your shift.</p>
+      <p class="page-copy">Additional information to help during your shift.</p>
     </div>
     <div class="faq-list">
       <details>
-        <summary>Pulling Pork</summary>
+        <summary>Meat-To-Lug Conversion Chart</summary>
         <div class="faq-body"><ul>
           <li>⚠️ Coming Soon</li>
         </ul></div>
       </details>
       <details>
-        <summary>Meat-To-Lug Conversion Chart</summary>
+        <summary>Cutting Ribs</summary>
+        <div class="faq-body"><ul>
+          <li>⚠️ Coming Soon</li>
+        </ul></div>
+      </details>
+      <details>
+        <summary>Pulling Pork</summary>
         <div class="faq-body"><ul>
           <li>⚠️ Coming Soon</li>
         </ul></div>
@@ -1022,6 +1061,8 @@ function generateDates() {
   useBy.setDate(today.getDate() + 6);
   document.getElementById("todayDate").textContent = formatDate(today);
   document.getElementById("useByDate").textContent = formatDate(useBy);
+  document.getElementById("todayWeekday").textContent = today.toLocaleDateString([], { weekday:"long" });
+  document.getElementById("todayLongDate").textContent = today.toLocaleDateString([], { month:"long", day:"numeric" });
 }
 
 function openDrawer() {
@@ -1340,14 +1381,13 @@ function buildTimerCard(key, nowMs) {
   let countdown = "";
   let status = "";
   let completeMessage = "";
-  let showRemaining = false;
 
   if (phase === "scheduled") {
     cardState = "state-waiting";
     badgeText = "WAIT";
     badgeClass = "waiting";
     countdown = formatCookCountdown(timing.startMs - nowMs);
-    status = key === "hotdogs" ? `Goes on at ${formatCookClock(timing.startMs)}` : `Cooking begins at ${formatCookClock(timing.startMs)}`;
+    status = key === "hotdogs" ? `Until hotdogs go on at ${formatCookClock(timing.startMs)}` : `Cooking begins at ${formatCookClock(timing.startMs)}`;
     instruction = key === "hotdogs"
       ? `Smoke during the final hour of the ribs. Put on at ${formatCookClock(timing.startMs)} and remove at ${formatCookClock(timing.finishMs)}.`
       : `${instruction} Take off at ${formatCookClock(timing.finishMs)}.`;
@@ -1362,7 +1402,6 @@ function buildTimerCard(key, nowMs) {
     completeMessage = completeMessageFor(key);
   } else {
     countdown = formatCookCountdown(timing.finishMs - nowMs);
-    showRemaining = true;
     status = `Ready at ${formatCookClock(timing.finishMs)}`;
     if (key === "wings") instruction = `Cook for 2 hours at 250°F. Ready to temp at ${formatCookClock(timing.finishMs)}.`;
     else if (key === "turkey") instruction = `Cook for 3 hours at 250°F. Ready to temp at ${formatCookClock(timing.finishMs)}.`;
@@ -1372,7 +1411,7 @@ function buildTimerCard(key, nowMs) {
   }
 
   if (phase !== "complete") card.classList.add(cardState);
-  const countdownMarkup = phase === "complete" ? "" : `<div class="timer-countdown-row"><div class="timer-countdown">${countdown}</div>${showRemaining ? '<div class="timer-remaining-label">remaining</div>' : ""}</div>`;
+  const countdownMarkup = phase === "complete" ? "" : `<div class="timer-countdown-row"><div class="timer-countdown">${countdown}</div></div>`;
   card.innerHTML = `<div class="timer-topline"><div class="timer-title">${config.label}</div><div class="timer-temp-badge ${badgeClass}">${badgeText}</div></div><div class="timer-instruction">${instruction}</div>${countdownMarkup}${status ? `<div class="timer-status">${status}</div>` : ""}${completeMessage ? `<div class="timer-complete-message">${completeMessage}</div>` : ""}`;
   return card;
 }
@@ -1503,15 +1542,20 @@ function updateCurrentTimeLine(nowMs) {
   const status = document.getElementById("timelineWindow");
   const startMs = activeCookState.startMs;
   const endMs = startMs + COOK_LENGTH_MS;
+
+  let remainingMs = COOK_LENGTH_MS;
+  if (nowMs >= startMs) remainingMs = Math.max(0, endMs - nowMs);
+
+  status.innerHTML = `
+    <span>Current time: ${formatCookClock(nowMs)}</span>
+    <span>${formatCookCountdown(remainingMs)} remaining</span>
+  `;
+
   if (nowMs >= startMs && nowMs <= endMs) {
     line.style.left = `${(nowMs - startMs) / COOK_LENGTH_MS * 100}%`;
     line.classList.add("visible");
-    status.textContent = `Current time: ${formatCookClock(nowMs)} · ${formatCookCountdown(endMs - nowMs)} remaining`;
   } else {
     line.classList.remove("visible");
-    status.textContent = nowMs < startMs
-      ? `Current time: ${formatCookClock(nowMs)} · Cook begins in ${formatCookCountdown(startMs - nowMs)}`
-      : `Current time: ${formatCookClock(nowMs)} · 00:00:00 remaining`;
   }
 }
 
