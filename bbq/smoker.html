@@ -12,7 +12,7 @@
 
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="theme-color" content="#191719" />
+<meta name="theme-color" content="#201c1d" />
 <meta name="apple-mobile-web-app-title" content="Smoker Guy" />
 
 <style>
@@ -38,7 +38,10 @@
 }
 
 * { box-sizing: border-box; }
-html { min-height: 100%; background: var(--ink); }
+html {
+  min-height: 100%;
+  background: var(--ink);
+}
 body {
   min-height: 100%;
   margin: 0;
@@ -64,7 +67,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
 .topbar {
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 100;
   min-height: calc(62px + env(safe-area-inset-top));
   padding: calc(10px + env(safe-area-inset-top)) 14px 10px;
   display: grid;
@@ -75,6 +78,18 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
   background: var(--ink);
   border-bottom: 4px solid var(--red);
   box-shadow: 0 4px 0 rgba(0,0,0,.25);
+  isolation: isolate;
+}
+.topbar::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 260px;
+  background: var(--ink);
+  pointer-events: none;
+  z-index: -1;
 }
 
 .brand {
@@ -132,7 +147,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
 .drawer-overlay {
   position: fixed;
   inset: 0;
-  z-index: 70;
+  z-index: 900;
   background: rgba(10,8,9,.62);
   opacity: 0;
   visibility: hidden;
@@ -143,7 +158,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
 .drawer {
   position: fixed;
   inset: 0 auto 0 0;
-  z-index: 80;
+  z-index: 1000;
   width: min(320px, 86vw);
   padding: calc(18px + env(safe-area-inset-top)) 14px 20px;
   color: var(--paper-2);
@@ -153,8 +168,11 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
   transform: translateX(-105%);
   transition: transform .2s ease;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  isolation: isolate;
 }
 .drawer.open { transform: translateX(0); }
+body.drawer-open { overflow: hidden; touch-action: none; }
 .drawer-head {
   display: flex;
   align-items: center;
@@ -212,8 +230,15 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
 }
 .drawer-foot a:hover { color: var(--orange); text-decoration: underline; }
 
-.app-shell { width: min(960px, 100%); margin: 0 auto; padding: 18px 14px 0; }
-.app-page { display: none; animation: pageIn .18s ease-out; }
+.app-shell {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+  width: min(960px, 100%);
+  margin: 0 auto;
+  padding: 18px 14px 0;
+}
+.app-page { display: none; animation: pageIn .18s ease-out; padding-bottom:100px; }
 .app-page.active { display: block; }
 @keyframes pageIn { from { opacity: 0; transform: translateY(4px); } to { opacity:1; transform:none; } }
 
@@ -342,7 +367,7 @@ h1 {
 }
 .today-heading-row .date-card { align-self: end; }
 
-.cook-widget { padding: 0; }
+.cook-widget { }
 .cook-panel-body { position: relative; z-index: 1; }
 .cook-subtitle, .cook-helper, .timeline-window, .timeline-now-status {
   color: #655c5e;
@@ -704,7 +729,7 @@ details[open] summary::after { content:"−"; }
 .notepad-confirm-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
 
-.calendar-wrap { display:grid; gap:16px; }
+.calendar-wrap { position:relative; z-index:0; display:grid; gap:16px; }
 .calendar-week { margin-bottom:0; padding:14px; }
 .calendar-week::after { inset:5px; }
 .calendar-week-head {
@@ -817,7 +842,7 @@ details[open] summary::after { content:"−"; }
   border-color:#7d9b83;
 }
 .calendar-help { margin:0 0 15px; color:#5d5556; font-size:20px; line-height:1.15; }
-.calendar-legend { display:flex; flex-wrap:wrap; gap:8px 14px; margin-top:12px; color:#655c5e; font-size:17px; }
+.calendar-legend { position:relative; z-index:0; display:flex; flex-wrap:wrap; gap:8px 14px; margin-top:12px; color:#655c5e; font-size:17px; }
 .calendar-legend-item { display:inline-flex; align-items:center; gap:6px; }
 .calendar-legend-swatch { width:15px; height:15px; border:2px solid var(--ink); background:#f2ead8; }
 .calendar-legend-swatch.work { background:#dff0df; border-color:var(--green); }
@@ -937,13 +962,13 @@ details[open] summary::after { content:"−"; }
         </div>
         <p class="cook-helper">Hotdogs use the final hour of the ribs and finish at the same time.</p>
         <div class="cook-error" id="cookSetupError" role="alert"></div>
-        <button class="pixel-btn full-btn" type="button" id="startCookBtn">Start Cooking</button>
+        <button class="pixel-btn full-btn" type="button" id="startCookBtn">Start Schedule</button>
       </div>
 
       <div class="cook-panel-body" id="cookRunningView" hidden>
         <div class="cook-running-header">
           <div>
-            <div class="cook-running-title">COOK IN PROGRESS</div>
+            <div class="cook-running-title">COOK IN PROGRESS!</div>
             <div class="cook-subtitle" id="cookScheduleSummary"></div>
           </div>
           <button class="pixel-btn secondary" type="button" id="cancelCookBtn">Cancel</button>
@@ -1261,6 +1286,7 @@ function generateDates() {
 }
 
 function openDrawer() {
+  document.body.classList.add("drawer-open");
   document.getElementById("appDrawer").classList.add("open");
   document.getElementById("drawerOverlay").classList.add("open");
   document.getElementById("appDrawer").setAttribute("aria-hidden", "false");
@@ -1268,6 +1294,7 @@ function openDrawer() {
 }
 
 function closeDrawer() {
+  document.body.classList.remove("drawer-open");
   document.getElementById("appDrawer").classList.remove("open");
   document.getElementById("drawerOverlay").classList.remove("open");
   document.getElementById("appDrawer").setAttribute("aria-hidden", "true");
@@ -1866,10 +1893,8 @@ function updateCurrentTimeLine(nowMs) {
   let remainingMs = COOK_LENGTH_MS;
   if (nowMs >= startMs) remainingMs = Math.max(0, endMs - nowMs);
 
-  status.innerHTML = `
-    <span>Current time: ${formatCookClock(nowMs)}</span>
-    <span>${formatCookCountdown(remainingMs)} remaining</span>
-  `;
+  status.innerHTML =
+    `${formatCookClock(nowMs)}</span> · ${formatCookCountdown(remainingMs)} remaining`;
 
   if (nowMs >= startMs && nowMs <= endMs) {
     line.style.left = `${(nowMs - startMs) / COOK_LENGTH_MS * 100}%`;
