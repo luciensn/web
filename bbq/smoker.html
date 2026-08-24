@@ -979,7 +979,7 @@ details[open] summary::after { content:"−"; }
       <p class="eyebrow">Shift Schedule</p>
       <h1>Calendar</h1>
     </div>
-    <p class="calendar-help">Tap a day in this week or next week to mark a smoker shift. Tap it again to clear it.</p>
+    <p class="calendar-help">Tap a day to mark a scheduled smoker shift. Tap it again to clear it.</p>
     <div class="calendar-wrap" id="shiftCalendar" aria-live="polite"></div>
     <div class="calendar-legend" aria-label="Calendar legend">
       <span class="calendar-legend-item"><i class="calendar-legend-swatch work"></i>Scheduled shift</span>
@@ -1166,14 +1166,15 @@ details[open] summary::after { content:"−"; }
       <h2 class="card-title">CLEANING CHECKLIST</h2>
       <div class="cleaning-list" id="cleaningChecklist">
         <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task1"><span>Crank the smoker all the way up to 350°F to carbonize the racks.</span></label>
-        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task1"><span>Acquire TARP, SCRAPERS, and SHOVEL from the storage shed.</span></label>
-        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task1"><span>Empty the grease and transport to the grease trap.</span></label>
-        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task2"><span>Scrape off the cooking racks and brush with steel wool.</span></label>
-        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task3"><span>Scoop up scraped debris from the smoker area and take to dumpster.</span></label>
-        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task4"><span>Remove 2 rack cages and clean inside the smoker. Use double bags for grease.</span></label>
-        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task5"><span>Replace rack cages and reassemble the cooking racks. Loose racks should go on the bottom shelves.</span></label>
-        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task5"><span>Run trash to the dumpster and return tools to the shed.</span></label>
-        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task5"><span>Clean front of smoker and hose off the concrete slab (time permitting).</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task2"><span>Acquire TARP, SCRAPERS, and SHOVEL from the storage shed.</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task3"><span>Empty the grease and transport to the grease trap.</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task4"><span>Scrape off the cooking racks and brush with steel wool.</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task5"><span>Scoop up scraped debris from the smoker area and take to dumpster.</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task6"><span>Remove 2 rack cages and clean inside the smoker. Use double bags for grease.</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task7"><span>Replace rack cages and reassemble the cooking racks. Loose racks should go on the bottom shelves.</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task8"><span>Run trash to the dumpster and return tools to the shed.</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task9"><span>Empty the ash and rotate ash cans (time permitting).</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task10"><span>Clean front of smoker and hose off the concrete slab (time permitting).</span></label>
       </div>
       <!--<p class="cleaning-reset-note">Checklist resets automatically at midnight.</p>-->
     </section>
@@ -1314,7 +1315,7 @@ function calculateBuild() {
   const casesNeeded = Math.ceil((pansNeeded * 3) / 8);
   const actualPans = Math.ceil((casesNeeded * 8) / 3);
   const finalTotal = current + actualPans;
-  result.innerHTML = `Recommendation: <strong>Load ${casesNeeded} case${casesNeeded === 1 ? "" : "s"}.</strong><br>${casesNeeded} cases = ${casesNeeded * 8} meats = ${actualPans} pans<br>Final total: <strong>${finalTotal} pans</strong>`;
+  result.innerHTML = `<strong>Load ${casesNeeded} case${casesNeeded === 1 ? "" : "s"}.</strong><br>${casesNeeded} cases = ${casesNeeded * 8} meats = ${actualPans} pans<br>Final total: <strong>${finalTotal} pans</strong>`;
 }
 
 function distributeToRacks(meats) {
@@ -1674,8 +1675,8 @@ function getTimerPhase(key, nowMs, timing) {
 }
 
 function completeMessageFor(key) {
-  if (key === "wings") return "Wings are ready! Verify internal temperature of 165°F+.";
-  if (key === "turkey") return "Turkey breast is ready! Verify internal temperature of 165°F+.";
+  if (key === "wings") return "Wings are ready! Check for internal temp of at least 165°F.";
+  if (key === "turkey") return "Turkey is ready! Check each breast for internal temp of at least 165°F. Cook longer if necessary.";
   if (key === "ribs") return "Ribs & tips are ready! Verify ribs are 195°F+. Tips do not need to be temped.";
   return "Hotdogs are ready! Remove them with the ribs & tips.";
 }
@@ -1764,17 +1765,17 @@ function currentCookAlert(nowMs) {
   }
   if (!activeCookState.dismissed.startFire) {
     const startTemp = requiredSmokerTempAt(startMs);
-    alerts.push(cookAlertMarkup("startFire", `🔥 Keep firebox door slightly open until smoker reaches ${startTemp}°F.`));
+    alerts.push(cookAlertMarkup("startFire", `🔥 Keep the firebox door slightly open until the smoker reaches ${startTemp}°F.`));
   }
   if (nowMs >= oneHourMs && !activeCookState.dismissed.closeFirebox) {
     const oneHourTemp = requiredSmokerTempAt(oneHourMs);
-    alerts.push(cookAlertMarkup("closeFirebox", `🌡️ Smoker should now be up to cooking temperature (${oneHourTemp}°F). Close the firebox door.`));
+    alerts.push(cookAlertMarkup("closeFirebox", `⚠️ Smoker should now be up to cooking temperature (${oneHourTemp}°F). Close the firebox door.`));
   }
   if (selected.ribs && nowMs >= turnDownMs && nowMs < finishMs && !activeCookState.dismissed.turnDown) {
     alerts.push(cookAlertMarkup("turnDown", `⚠️ Turn the smoker down to 225°F now. Ribs & tips finish at ${formatCookClock(finishMs)}.`));
   }
   const finishTimes = Object.keys(selected).filter(key => selected[key]).map(key => getMeatTiming(key).finishMs);
-  if (finishTimes.length && finishTimes.every(time => nowMs >= time)) alerts.push(cookAlertMarkup("complete", "✅ Today’s selected cook is complete. Verify required internal temperatures.", false, "complete-alert"));
+  if (finishTimes.length && finishTimes.every(time => nowMs >= time)) alerts.push(cookAlertMarkup("complete", "✅ Today’s selected cook is complete. Verify all required internal temperatures.", false, "complete-alert"));
   alertsEl.innerHTML = alerts.join("");
 }
 
