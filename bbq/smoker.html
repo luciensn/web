@@ -197,7 +197,13 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
 }
 .nav-icon { font-size: 25px; text-align: center; }
 .nav-label { font-family: var(--pixel); font-size: 10px; line-height: 1.5; }
-.drawer-foot { margin-top: 24px; color: #aaa0a3; font-size: 18px; }
+.drawer-foot { margin-top: 24px; color: #aaa0a3; font-size: 18px; line-height: 1.45; }
+.drawer-foot a {
+  color: var(--paper-2);
+  font-size: 20px;
+  text-decoration: none;
+}
+.drawer-foot a:hover { color: var(--orange); text-decoration: underline; }
 
 .app-shell { width: min(960px, 100%); margin: 0 auto; padding: 18px 14px 0; }
 .app-page { display: none; animation: pageIn .18s ease-out; }
@@ -221,6 +227,15 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
 .breadcrumb:hover { color: var(--red); }
 
 .page-heading { margin-bottom: 16px; }
+.today-heading-row {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  align-items: end;
+  gap: 8px 14px;
+  margin-bottom: 16px;
+}
+.today-heading-main { min-width: 0; }
+.today-page-copy { grid-column: 1 / -1; margin-top: 0; }
 .eyebrow {
   margin: 0 0 7px;
   color: var(--red-dark);
@@ -300,16 +315,18 @@ h1 {
   gap: 5px;
   color: var(--ink);
   font-family: var(--terminal);
-  font-size: clamp(19px, 4.8vw, 24px);
+  font-size: clamp(17px, 4.2vw, 21px);
   line-height: 1;
 }
 #shiftDates strong { color: var(--ink); font-weight: 700; }
 .date-card {
   width: fit-content;
-  min-width: 180px;
-  padding: 10px 13px;
+  min-width: 160px;
+  margin: 0;
+  padding: 8px 11px;
   background: #fff7e8;
 }
+.today-heading-row .date-card { align-self: end; }
 
 .cook-widget { padding: 0; }
 .cook-panel-body { position: relative; z-index: 1; }
@@ -672,6 +689,126 @@ details[open] summary::after { content:"−"; }
 .notepad-confirm p { margin:0 0 11px; font-size:21px; }
 .notepad-confirm-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
+
+.calendar-wrap { display:grid; gap:16px; }
+.calendar-week { margin-bottom:0; padding:14px; }
+.calendar-week::after { inset:5px; }
+.calendar-week-head {
+  position:relative;
+  z-index:1;
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:11px;
+}
+.calendar-week-title {
+  font-family:var(--pixel);
+  font-size:11px;
+  line-height:1.5;
+}
+.calendar-week-range { margin-top:3px; color:#655c5e; font-size:18px; line-height:1; }
+.calendar-week-stats {
+  flex:0 0 auto;
+  display:flex;
+  align-items:stretch;
+  gap:6px;
+}
+.calendar-week-count,
+.calendar-week-hours {
+  padding:5px 7px;
+  color:var(--ink);
+  background:#eee4d2;
+  border:2px solid #9c918f;
+  font-family:var(--pixel);
+  font-size:7px;
+  line-height:1.35;
+  white-space:nowrap;
+}
+.calendar-days {
+  position:relative;
+  z-index:1;
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:7px;
+}
+.calendar-day {
+  position:relative;
+  min-width:0;
+  min-height:91px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  padding:8px 3px 7px;
+  color:var(--ink);
+  background:#f2ead8;
+  border:3px solid var(--ink);
+  border-radius:0;
+  box-shadow:3px 3px 0 rgba(32,28,29,.16);
+  cursor:pointer;
+  touch-action:manipulation;
+}
+.calendar-day:hover:not(:disabled) { transform:translate(-1px,-1px); box-shadow:4px 4px 0 rgba(32,28,29,.2); }
+.calendar-day:active:not(:disabled) { transform:translate(2px,2px); box-shadow:1px 1px 0 rgba(32,28,29,.18); }
+.calendar-day-name { font-family:var(--pixel); font-size:7px; line-height:1.35; }
+.calendar-day-number { font-size:34px; line-height:.75; }
+.calendar-day-status { min-height:11px; font-family:var(--pixel); font-size:6px; line-height:1.35; }
+.calendar-day.selected {
+  color:#244c31;
+  background:#dff0df;
+  border-color:var(--green);
+}
+.calendar-day.selected .calendar-day-status { color:#2e6c42; }
+.calendar-day.today {
+  outline:4px solid var(--orange);
+  outline-offset:2px;
+}
+.calendar-day.today::before {
+  content:"TODAY";
+  position:absolute;
+  top:-8px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:2px 4px;
+  color:var(--ink);
+  background:var(--orange);
+  border:2px solid var(--ink);
+  font-family:var(--pixel);
+  font-size:5px;
+  line-height:1.2;
+  white-space:nowrap;
+}
+.calendar-week.past {
+  color:#6f6869;
+  background:#e5ded2;
+  border-color:#777072;
+  box-shadow:4px 4px 0 rgba(32,28,29,.12);
+}
+.calendar-week.past::after { border-color:rgba(32,28,29,.08); }
+.calendar-week.past .calendar-week-range { color:#7b7475; }
+.calendar-week.past .calendar-week-count,
+.calendar-week.past .calendar-week-hours { color:#6d6668; background:#d7d0c4; border-color:#9b9495; }
+.calendar-week.past .calendar-day {
+  color:#777173;
+  background:#d9d3c9;
+  border-color:#979092;
+  box-shadow:none;
+  cursor:default;
+}
+.calendar-week.past .calendar-day.selected {
+  color:#53685a;
+  background:#cbd7cb;
+  border-color:#7d9b83;
+}
+.calendar-help { margin:0 0 15px; color:#5d5556; font-size:20px; line-height:1.15; }
+.calendar-legend { display:flex; flex-wrap:wrap; gap:8px 14px; margin-top:12px; color:#655c5e; font-size:17px; }
+.calendar-legend-item { display:inline-flex; align-items:center; gap:6px; }
+.calendar-legend-swatch { width:15px; height:15px; border:2px solid var(--ink); background:#f2ead8; }
+.calendar-legend-swatch.work { background:#dff0df; border-color:var(--green); }
+.calendar-legend-swatch.today { background:var(--paper-2); outline:3px solid var(--orange); outline-offset:1px; }
+
 .empty-state { min-height:330px; display:grid; place-items:center; text-align:center; }
 .empty-screen { max-width:520px; padding:28px 20px; color:#eae0cd; background:var(--screen); border:5px solid var(--ink); box-shadow:8px 8px 0 rgba(32,28,29,.25); }
 .empty-icon { font-size:54px; margin-bottom:14px; }
@@ -679,7 +816,26 @@ details[open] summary::after { content:"−"; }
 .empty-copy { margin:11px 0 0; font-size:22px; color:#c9bec1; }
 
 @media (max-width: 680px) {
+
+  .calendar-wrap { gap:13px; }
+  .calendar-week { padding:10px 8px 9px; }
+  .calendar-week-head { align-items:center; margin-bottom:10px; }
+  .calendar-week-title { font-size:9px; }
+  .calendar-week-range { font-size:16px; }
+  .calendar-week-stats { gap:4px; }
+  .calendar-week-count, .calendar-week-hours { font-size:5px; padding:4px 4px; }
+  .calendar-days { gap:4px; }
+  .calendar-day { min-height:72px; padding:7px 1px 5px; border-width:2px; box-shadow:2px 2px 0 rgba(32,28,29,.16); }
+  .calendar-day-name { font-size:5px; }
+  .calendar-day-number { font-size:29px; }
+  .calendar-day-status { font-size:5px; min-height:9px; }
+  .calendar-day.today { outline-width:3px; outline-offset:1px; }
+  .calendar-day.today::before { top:-7px; font-size:4px; border-width:1px; }
   .app-shell { padding-left:10px; padding-right:10px; }
+  .today-heading-row { grid-template-columns: minmax(0,1fr) auto; gap: 7px 8px; align-items: end; }
+  .today-heading-main h1 { font-size: clamp(16px, 4.8vw, 24px); }
+  .today-heading-row .date-card { min-width: 138px; padding: 7px 8px; }
+  #shiftDates { font-size: clamp(15px, 3.8vw, 19px); }
   .pixel-card { padding:13px; box-shadow:4px 4px 0 rgba(32,28,29,.22); }
   .widget-grid { grid-template-columns:1fr; gap:15px; }
   .widget-grid .wide { grid-column:auto; }
@@ -712,42 +868,44 @@ details[open] summary::after { content:"−"; }
   </div>
   <nav class="nav-list" aria-label="App pages">
     <button class="nav-item active" data-page="today"><span class="nav-icon">🔥</span><span class="nav-label">Today's Cook</span></button>
+    <button class="nav-item" data-page="calendar"><span class="nav-icon">📅</span><span class="nav-label">Calendar</span></button>
     <button class="nav-item" data-page="notepad"><span class="nav-icon">📝</span><span class="nav-label">Notepad</span></button>
     <button class="nav-item" data-page="helpers"><span class="nav-icon">📱</span><span class="nav-label">Helper Widgets</span></button>
     <button class="nav-item" data-page="faq"><span class="nav-icon">📖</span><span class="nav-label">Smoker FAQ</span></button>
     <button class="nav-item" data-page="cleaning"><span class="nav-icon">🧹</span><span class="nav-label">Smoker Cleaning</span></button>
     <button class="nav-item" data-page="sides"><span class="nav-icon">🥣</span><span class="nav-label">Sides Recipes</span></button>
-    <button class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span><span class="nav-label">Settings</span></button>
+    <button class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span><span class="nav-label">Preferences</span></button>
   </nav>
   <div class="drawer-foot">
     Links:
     <br>
     <a target="_blank" href="https://www.elisbarbeque.com">Eli's BBQ ↗</a>
     <br>
-    <a target="_blank" href="https://www.elisbarbeque.com">HotSchedules ↗</a>
+    <a target="_blank" href="https://www.hotschedules.com/hs/login.jsp">HotSchedules ↗</a>
     <br>
-    <a target="_blank" href="https://www.elisbarbeque.com">Paycor ↗</a>
+    <a target="_blank" href="https://hcm.paycor.com/authentication/signin">Paycor ↗</a>
   </div>
 </aside>
 
 <main class="app-shell">
   <section class="app-page active" id="page-today" data-page-section="today">
-    <div class="page-heading">
-      <p class="eyebrow today-eyebrow">
-        <span id="todayWeekday"></span>
-        <span aria-hidden="true">·</span>
-        <span id="todayLongDate"></span>
-      </p>
-      <h1>Today's Cook</h1>
-      <p class="page-copy">Build the schedule, watch the temperatures, and clear each timer.</p>
-    </div>
-
-    <section class="pixel-card date-card" aria-label="Label dates">
-      <div id="shiftDates">
-        <span><strong>Today:</strong> <span id="todayDate"></span></span>
-        <span><strong>Use By:</strong> <span id="useByDate"></span></span>
+    <div class="today-heading-row">
+      <div class="today-heading-main">
+        <p class="eyebrow today-eyebrow">
+          <span id="todayWeekday"></span>
+          <span aria-hidden="true">·</span>
+          <span id="todayLongDate"></span>
+        </p>
+        <h1>Today's Cook</h1>
       </div>
-    </section>
+      <section class="pixel-card date-card" aria-label="Label dates">
+        <div id="shiftDates">
+          <span><strong>Today:</strong> <span id="todayDate"></span></span>
+          <span><strong>Use By:</strong> <span id="useByDate"></span></span>
+        </div>
+      </section>
+      <p class="page-copy today-page-copy">Build the schedule, watch the temperatures, and clear each timer.</p>
+    </div>
 
     <section class="pixel-card cook-widget" id="liveCookWidget">
       <div class="cook-panel-body" id="cookSetupView">
@@ -806,6 +964,20 @@ details[open] summary::after { content:"−"; }
         <div class="cook-timer-list" id="cookTimerList" aria-live="polite"></div>
       </div>
     </section>
+  </section>
+
+  <section class="app-page" id="page-calendar" data-page-section="calendar">
+    <button class="breadcrumb" data-go-home>◀ Today's Cook</button>
+    <div class="page-heading">
+      <p class="eyebrow">Shift Schedule</p>
+      <h1>Calendar</h1>
+    </div>
+    <p class="calendar-help">Tap a day to mark a scheduled smoker shift. Tap it again to clear it.</p>
+    <div class="calendar-wrap" id="shiftCalendar" aria-live="polite"></div>
+    <div class="calendar-legend" aria-label="Calendar legend">
+      <span class="calendar-legend-item"><i class="calendar-legend-swatch work"></i>Scheduled shift</span>
+      <span class="calendar-legend-item"><i class="calendar-legend-swatch today"></i>Today</span>
+    </div>
   </section>
 
   <section class="app-page" id="page-notepad" data-page-section="notepad">
@@ -888,7 +1060,7 @@ details[open] summary::after { content:"−"; }
     </div>
     <div class="faq-list">
       <details>
-        <summary>🍗 Wings (165°F)</summary>
+        <summary>🍗 Wings</summary>
         <div class="faq-body"><ul>
           <li>Cook 2 hours at 250°F, then check temp.</li>
           <li>Minimum internal temperature: 165°F.</li>
@@ -898,7 +1070,7 @@ details[open] summary::after { content:"−"; }
         </ul></div>
       </details>
       <details>
-        <summary>🦃 Turkey Breast (165°F)</summary>
+        <summary>🦃 Turkey Breast</summary>
         <div class="faq-body"><ul>
           <li>Cook 3 hours at 250°F, then check temp.</li>
           <li>Minimum internal temperature: 165°F.</li>
@@ -908,7 +1080,7 @@ details[open] summary::after { content:"−"; }
         </ul></div>
       </details>
       <details>
-        <summary>🥓 Ribs &amp; Tips (195-210°F)</summary>
+        <summary>🥓 Ribs &amp; Tips</summary>
         <div class="faq-body"><ul>
           <li>Cook 5 hours total.</li>
           <li>Start at 250°F and finish at 225°F.</li>
@@ -920,9 +1092,9 @@ details[open] summary::after { content:"−"; }
         </ul></div>
       </details>
       <details>
-        <summary>🌭 Hotdogs (1 Hour)</summary>
+        <summary>🌭 Hotdogs</summary>
         <div class="faq-body"><ul>
-          <li>Smoke for 1 hour at 225°F (or 40 mins at 250°F).</li>
+          <li>Smoke for 1 hour at 225°F (or 40 minutes at 250°F).</li>
           <li>⚠️ Hotdogs can be smoked any time after the first 2 hours (do not mix with raw meats).</li>
           <li>Recommendation: Load during the final hour of ribs & tips and remove at the same time.</li>
         </ul></div>
@@ -960,11 +1132,18 @@ details[open] summary::after { content:"−"; }
         </ul></div>
       </details>
       <details>
+        <summary>Smoker Loading</summary>
+        <div class="faq-body"><ul>
+          <li>⚠️ Coming Soon</li>
+        </ul></div>
+      </details>
+      <details>
         <summary>Pulling Pork</summary>
         <div class="faq-body"><ul>
           <li>⚠️ Coming Soon</li>
         </ul></div>
       </details>
+      
     </div>
   </section>
 
@@ -981,13 +1160,13 @@ details[open] summary::after { content:"−"; }
       <div class="cleaning-list" id="cleaningChecklist">
         <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task1"><span>Crank the smoker all the way up to 350°F to carbonize the racks.</span></label>
         <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task1"><span>Acquire TARP, SCRAPERS, and SHOVEL from the storage shed.</span></label>
-        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task1"><span>Empty the grease and transport to grease trap.</span></label>
-        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task2"><span>Scrape cooking racks and brush with steel wool.</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task1"><span>Empty the grease and transport to the grease trap.</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task2"><span>Scrape off the cooking racks and brush with steel wool.</span></label>
         <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task3"><span>Scoop up scraped debris from the smoker area and take to dumpster.</span></label>
-        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task4"><span>Remove 2 rack cages and clean inside smoker (use double bags for grease).</span></label>
-        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task5"><span>Replace rack cages and reassemble cooking racks (loose racks should go on the bottom shelves).</span></label>
-        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task5"><span>Run trash to dumpster and return tools to the shed.</span></label>
-        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task5"><span>Clean smoker doors and hose off the concrete slab (time permitting).</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task4"><span>Remove 2 rack cages and clean inside the smoker. Use double bags for grease.</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task5"><span>Replace rack cages and reassemble the cooking racks. Loose racks should go on the bottom shelves.</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task5"><span>Run trash to the dumpster and return tools to the shed.</span></label>
+        <label class="cleaning-check"><input type="checkbox" data-cleaning-id="task5"><span>Clean front of smoker and hose off the concrete slab (time permitting).</span></label>
       </div>
       <!--<p class="cleaning-reset-note">Checklist resets automatically at midnight.</p>-->
     </section>
@@ -1006,7 +1185,7 @@ details[open] summary::after { content:"−"; }
     <button class="breadcrumb" data-go-home>◀ Today's Cook</button>
     <div class="page-heading">
       <p class="eyebrow">System Menu</p>
-      <h1>Settings</h1>
+      <h1>Preferences</h1>
     </div>
     <div class="empty-state"><div class="empty-screen"><div class="empty-icon">⚙️</div><div class="empty-title">NO OPTIONS YET</div><p class="empty-copy">Future display, sound, and cook defaults can live here.</p></div></div>
   </section>
@@ -1018,6 +1197,7 @@ details[open] summary::after { content:"−"; }
 const COOK_STORAGE_KEY = "smokerLiveCookStateV1";
 const CLEANING_STORAGE_KEY = "smokerCleaningStateV1";
 const NOTEPAD_STORAGE_KEY = "smokerNotepadV1";
+const CALENDAR_STORAGE_KEY = "smokerShiftCalendarV1";
 const COOK_HOUR = 60 * 60 * 1000;
 const COOK_LENGTH_MS = 5 * COOK_HOUR;
 const MEAT_CONFIG = {
@@ -1218,6 +1398,131 @@ function safeStorageSet(key, value) {
 
 function safeStorageRemove(key) {
   try { window.localStorage.removeItem(key); } catch {}
+}
+
+
+function calendarDateAtNoon(date = new Date()) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0, 0);
+}
+
+function calendarAddDays(date, amount) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + amount, 12, 0, 0, 0);
+}
+
+function calendarWeekStart(date = new Date()) {
+  const day = calendarDateAtNoon(date);
+  return calendarAddDays(day, -day.getDay());
+}
+
+function formatCalendarRange(start) {
+  const end = calendarAddDays(start, 6);
+  const sameMonth = start.getMonth() === end.getMonth();
+  const startText = start.toLocaleDateString([], { month:"short", day:"numeric" });
+  const endText = end.toLocaleDateString([], sameMonth ? { day:"numeric" } : { month:"short", day:"numeric" });
+  return `${startText}–${endText}`;
+}
+
+function loadCalendarState() {
+  let state = { worked:{} };
+  try {
+    const raw = safeStorageGet(CALENDAR_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object" && parsed.worked && typeof parsed.worked === "object") state = parsed;
+    }
+  } catch {}
+  state.worked ||= {};
+
+  const lastWeekStartKey = localDateKey(calendarAddDays(calendarWeekStart(), -7));
+  let changed = false;
+  Object.keys(state.worked).forEach(key => {
+    if (key < lastWeekStartKey) {
+      delete state.worked[key];
+      changed = true;
+    }
+  });
+  if (changed) safeStorageSet(CALENDAR_STORAGE_KEY, JSON.stringify(state));
+  return state;
+}
+
+function saveCalendarState(state) {
+  safeStorageSet(CALENDAR_STORAGE_KEY, JSON.stringify(state));
+}
+
+function renderShiftCalendar(state) {
+  const calendar = document.getElementById("shiftCalendar");
+  if (!calendar) return;
+  const today = calendarDateAtNoon();
+  const todayKey = localDateKey(today);
+  const currentStart = calendarWeekStart(today);
+  const weeks = [
+    { label:"LAST WEEK", start:calendarAddDays(currentStart, -7), past:true },
+    { label:"THIS WEEK", start:currentStart, past:false },
+    { label:"NEXT WEEK", start:calendarAddDays(currentStart, 7), past:false }
+  ];
+
+  calendar.innerHTML = "";
+  weeks.forEach(week => {
+    const card = document.createElement("section");
+    card.className = `pixel-card calendar-week${week.past ? " past" : ""}`;
+
+    const days = Array.from({length:7}, (_, index) => calendarAddDays(week.start, index));
+    const selectedCount = days.filter(day => Boolean(state.worked[localDateKey(day)])).length;
+    const countText = week.past
+      ? `${selectedCount} SHIFTS`
+      : `${selectedCount} SHIFT${selectedCount === 1 ? "" : "S"}`;
+    const hoursText = `${selectedCount * 8} HOURS`;
+
+    const head = document.createElement("div");
+    head.className = "calendar-week-head";
+    head.innerHTML = `<div><div class="calendar-week-title">${week.label}</div><div class="calendar-week-range">${formatCalendarRange(week.start)}</div></div><div class="calendar-week-stats"><div class="calendar-week-count">${countText}</div><div class="calendar-week-hours">${hoursText}</div></div>`;
+    card.appendChild(head);
+
+    const dayGrid = document.createElement("div");
+    dayGrid.className = "calendar-days";
+    days.forEach(day => {
+      const key = localDateKey(day);
+      const selected = Boolean(state.worked[key]);
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `calendar-day${selected ? " selected" : ""}${key === todayKey ? " today" : ""}`;
+      button.dataset.calendarDate = key;
+      button.disabled = week.past;
+      button.setAttribute("aria-pressed", String(selected));
+      button.setAttribute("aria-label", `${day.toLocaleDateString([], { weekday:"long", month:"long", day:"numeric" })}${selected ? ", smoker shift selected" : ", no smoker shift selected"}${week.past ? ", previous week read only" : ""}`);
+      button.innerHTML = `<span class="calendar-day-name">${day.toLocaleDateString([], { weekday:"short" }).toUpperCase()}</span><span class="calendar-day-number">${day.getDate()}</span><span class="calendar-day-status">${selected ? "SMOKER" : ""}</span>`;
+      dayGrid.appendChild(button);
+    });
+    card.appendChild(dayGrid);
+    calendar.appendChild(card);
+  });
+}
+
+function initializeShiftCalendar() {
+  const calendar = document.getElementById("shiftCalendar");
+  if (!calendar) return;
+  let state = loadCalendarState();
+  let renderedDateKey = localDateKey();
+  renderShiftCalendar(state);
+
+  calendar.addEventListener("click", event => {
+    const button = event.target.closest("[data-calendar-date]");
+    if (!button || button.disabled) return;
+    const key = button.dataset.calendarDate;
+    if (state.worked[key]) delete state.worked[key];
+    else state.worked[key] = true;
+    saveCalendarState(state);
+    renderShiftCalendar(state);
+  });
+
+  setInterval(() => {
+    const currentKey = localDateKey();
+    if (currentKey !== renderedDateKey) {
+      renderedDateKey = currentKey;
+      state = loadCalendarState();
+      renderShiftCalendar(state);
+    }
+  }, 60000);
 }
 
 function defaultCleaningState() {
@@ -1601,6 +1906,7 @@ function initializeHelpers() {
 
 generateDates();
 initializeNavigation();
+initializeShiftCalendar();
 initializeHelpers();
 initializeCleaningChecklist();
 initializeNotepad();
