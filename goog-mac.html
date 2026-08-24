@@ -76,6 +76,9 @@
 			<input type="text" id="searchBox" placeholder="Search" autofocus>
 			<div class="btn">
 		    <button type="submit" onclick="javascript:doSearch();">Give it a Goog!</button>
+		    <br>
+		    <br>
+		    <button type="submit" onclick="javascript:doAISearch();">AI Mode</button>
 		  </div>
 	</div>
 
@@ -91,6 +94,10 @@
     		var term = box.value;
     		window.open("https://www.google.com/search?q="+term,"_self");
     	}
+    	function doAISearch() {
+            var term = box.value;
+            window.open("https://www.google.com/search?q="+term+"&udm=50","_self");
+        }
   </script>
 
 </body>
