@@ -13,7 +13,7 @@
     <!-- Press Start 2P -->
     <link rel="preconnect nofollow" href="https://fonts.googleapis.com">
     <link rel="preconnect nofollow" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet nofollow">
 
     <style type="text/css">
         :root {
@@ -81,11 +81,12 @@
             content: "GIVE IT A GOOG!";
             display: block;
             margin-bottom: 22px;
-            color: var(--yellow);
-            font-size: clamp(10px, 2vw, 14px);
+            color: var(--muted);
+            opacity: .7;
+            font-size: clamp(9px, 1.7vw, 12px);
             line-height: 1.5;
             text-align: center;
-            text-shadow: 3px 3px 0 var(--shadow);
+            text-shadow: none;
         }
 
         .input-wrap {
@@ -149,48 +150,55 @@
             width: 100%;
             min-height: 58px;
             padding: 14px 12px;
-            border: var(--pixel) solid var(--ink);
+            border: var(--pixel) solid #4f5870;
             border-radius: 0;
             cursor: pointer;
-            color: #09100c;
+            background: var(--panel-dark);
+            color: var(--muted);
             font-family: "Press Start 2P", monospace;
             font-size: clamp(9px, 1.7vw, 12px);
             line-height: 1.4;
             text-align: center;
             text-transform: uppercase;
-            transition: transform 70ms linear, box-shadow 70ms linear, filter 120ms linear;
+            box-shadow: 4px 4px 0 var(--shadow);
+            transition: transform 70ms linear, box-shadow 70ms linear, color 120ms linear, border-color 120ms linear, background 120ms linear;
             -webkit-tap-highlight-color: transparent;
         }
 
-        button:first-of-type {
-            background: var(--green);
-            box-shadow: 6px 6px 0 var(--green-dark), 10px 10px 0 var(--shadow);
-        }
-
-        button:last-of-type {
-            background: var(--blue);
-            box-shadow: 6px 6px 0 var(--blue-dark), 10px 10px 0 var(--shadow);
-        }
-
         button:hover {
-            filter: brightness(1.08);
+            background: #1b2132;
+            color: var(--ink);
+            border-color: #69738d;
         }
 
         button:focus-visible {
-            outline: var(--pixel) dashed var(--yellow);
-            outline-offset: 8px;
+            outline: var(--pixel) dashed var(--muted);
+            outline-offset: 6px;
         }
 
         button:active {
-            transform: translate(6px, 6px);
+            transform: translate(3px, 3px);
+            box-shadow: 1px 1px 0 var(--shadow);
         }
 
-        button:first-of-type:active {
-            box-shadow: 0 0 0 var(--green-dark), 4px 4px 0 var(--shadow);
+        .speed-test-link {
+            display: block;
+            width: fit-content;
+            max-width: 100%;
+            margin: 30px auto 0;
+            color: var(--muted);
+            opacity: .72;
+            font-size: clamp(8px, 1.5vw, 10px);
+            line-height: 1.6;
+            text-align: center;
+            text-decoration: none;
+            transition: opacity 120ms linear, color 120ms linear;
         }
 
-        button:last-of-type:active {
-            box-shadow: 0 0 0 var(--blue-dark), 4px 4px 0 var(--shadow);
+        .speed-test-link:hover,
+        .speed-test-link:focus-visible {
+            color: var(--ink);
+            opacity: 1;
         }
 
         @media (max-width: 600px) {
@@ -242,13 +250,14 @@
     <div class="center">
         <div class="search-card">
             <div class="input-wrap">
-                <input type="text" id="searchBox" placeholder="" autofocus>
+                <input type="text" id="searchBox" placeholder="?" autofocus>
             </div>
             <div class="btn">
                 <button type="submit" onclick="javascript:doSearch();">Search</button>
                 <button type="submit" onclick="javascript:doAISearch();">AI Mode</button>
             </div>
         </div>
+        <a class="speed-test-link" href="https://www.google.com/search?q=internet%20speed%20test" target="">Internet Speed Test</a>
     </div>
 
     <!-- JavaScript -->
