@@ -56,6 +56,17 @@ body {
   line-height: 1.15;
   padding-bottom: calc(26px + env(safe-area-inset-bottom));
 }
+body::before {
+  content: "";
+  position: fixed;
+  z-index: 49;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(0px + env(safe-area-inset-top));
+  background: var(--ink);
+  pointer-events: none;
+}
 
 button, input, summary { font: inherit; }
 button { -webkit-tap-highlight-color: transparent; }
@@ -79,17 +90,6 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
   border-bottom: 4px solid var(--red);
   box-shadow: 0 4px 0 rgba(0,0,0,.25);
   isolation: isolate;
-}
-.topbar::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 100%;
-  height: 260px;
-  background: var(--ink);
-  pointer-events: none;
-  z-index: -1;
 }
 
 .brand {
@@ -169,10 +169,10 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
   transition: transform .2s ease;
   overflow-y: auto;
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   isolation: isolate;
 }
 .drawer.open { transform: translateX(0); }
-body.drawer-open { overflow: hidden; touch-action: none; }
 .drawer-head {
   display: flex;
   align-items: center;
@@ -1250,6 +1250,7 @@ const MEAT_CONFIG = {
 let activeCookState = null;
 let cookTicker = null;
 let buildTarget = 30;
+let drawerScrollY = 0;
 
 function localDateKey(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
@@ -1286,7 +1287,14 @@ function generateDates() {
 }
 
 function openDrawer() {
-  document.body.classList.add("drawer-open");
+  drawerScrollY = window.scrollY;
+
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${drawerScrollY}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
+
   document.getElementById("appDrawer").classList.add("open");
   document.getElementById("drawerOverlay").classList.add("open");
   document.getElementById("appDrawer").setAttribute("aria-hidden", "false");
@@ -1294,11 +1302,18 @@ function openDrawer() {
 }
 
 function closeDrawer() {
-  document.body.classList.remove("drawer-open");
   document.getElementById("appDrawer").classList.remove("open");
   document.getElementById("drawerOverlay").classList.remove("open");
   document.getElementById("appDrawer").setAttribute("aria-hidden", "true");
   document.getElementById("menuButton").setAttribute("aria-expanded", "false");
+
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.style.width = "";
+
+  window.scrollTo(0, drawerScrollY);
 }
 
 function showPage(page) {
