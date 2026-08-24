@@ -317,12 +317,18 @@ h1 {
   font-family: var(--terminal);
   font-size: clamp(16px, 3.8vw, 20px);
   line-height: 1;
-  text-align: right;
 }
-#shiftDates strong { color: var(--ink); font-weight: 700; }
+#shiftDates > span {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 5px;
+  align-items: baseline;
+}
+#shiftDates strong { color: var(--ink); font-weight: 700; text-align: left; }
+#shiftDates > span > span { text-align: right; }
 .date-card {
   width: fit-content;
-  min-width: 148px;
+  min-width: 0;
   margin: 0;
   padding: 7px 9px;
   background: #fff7e8;
@@ -835,7 +841,7 @@ details[open] summary::after { content:"−"; }
   .app-shell { padding-left:10px; padding-right:10px; }
   .today-heading-row { grid-template-columns: minmax(0,1fr) auto; gap: 7px 8px; align-items: end; }
   .today-heading-main h1 { font-size: clamp(16px, 4.8vw, 24px); }
-  .today-heading-row .date-card { min-width: 122px; padding: 6px 7px; }
+  .today-heading-row .date-card { min-width: 0; padding: 6px 7px; }
   #shiftDates { font-size: clamp(14px, 3.5vw, 18px); }
   .pixel-card { padding:13px; box-shadow:4px 4px 0 rgba(32,28,29,.22); }
   .widget-grid { grid-template-columns:1fr; gap:15px; }
