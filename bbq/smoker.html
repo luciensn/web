@@ -312,18 +312,19 @@ h1 {
   position: relative;
   z-index: 1;
   display: grid;
-  gap: 5px;
+  gap: 4px;
   color: var(--ink);
   font-family: var(--terminal);
-  font-size: clamp(17px, 4.2vw, 21px);
+  font-size: clamp(16px, 3.8vw, 20px);
   line-height: 1;
+  text-align: right;
 }
 #shiftDates strong { color: var(--ink); font-weight: 700; }
 .date-card {
   width: fit-content;
-  min-width: 160px;
+  min-width: 148px;
   margin: 0;
-  padding: 8px 11px;
+  padding: 7px 9px;
   background: #fff7e8;
 }
 .today-heading-row .date-card { align-self: end; }
@@ -834,8 +835,8 @@ details[open] summary::after { content:"−"; }
   .app-shell { padding-left:10px; padding-right:10px; }
   .today-heading-row { grid-template-columns: minmax(0,1fr) auto; gap: 7px 8px; align-items: end; }
   .today-heading-main h1 { font-size: clamp(16px, 4.8vw, 24px); }
-  .today-heading-row .date-card { min-width: 138px; padding: 7px 8px; }
-  #shiftDates { font-size: clamp(15px, 3.8vw, 19px); }
+  .today-heading-row .date-card { min-width: 122px; padding: 6px 7px; }
+  #shiftDates { font-size: clamp(14px, 3.5vw, 18px); }
   .pixel-card { padding:13px; box-shadow:4px 4px 0 rgba(32,28,29,.22); }
   .widget-grid { grid-template-columns:1fr; gap:15px; }
   .widget-grid .wide { grid-column:auto; }
@@ -972,7 +973,7 @@ details[open] summary::after { content:"−"; }
       <p class="eyebrow">Shift Schedule</p>
       <h1>Calendar</h1>
     </div>
-    <p class="calendar-help">Tap a day to mark a scheduled smoker shift. Tap it again to clear it.</p>
+    <p class="calendar-help">Tap a day in this week or next week to mark a smoker shift. Tap it again to clear it.</p>
     <div class="calendar-wrap" id="shiftCalendar" aria-live="polite"></div>
     <div class="calendar-legend" aria-label="Calendar legend">
       <span class="calendar-legend-item"><i class="calendar-legend-swatch work"></i>Scheduled shift</span>
