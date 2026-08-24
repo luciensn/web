@@ -12,7 +12,7 @@
 
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="theme-color" content="#201c1d" />
+<meta name="theme-color" content="#191719" />
 <meta name="apple-mobile-web-app-title" content="Smoker Guy" />
 
 <style>
@@ -38,10 +38,7 @@
 }
 
 * { box-sizing: border-box; }
-html {
-  min-height: 100%;
-  background: var(--ink);
-}
+html { min-height: 100%; background: var(--ink); }
 body {
   min-height: 100%;
   margin: 0;
@@ -56,17 +53,6 @@ body {
   line-height: 1.15;
   padding-bottom: calc(26px + env(safe-area-inset-bottom));
 }
-body::before {
-  content: "";
-  position: fixed;
-  z-index: 49;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: calc(0px + env(safe-area-inset-top));
-  background: var(--ink);
-  pointer-events: none;
-}
 
 button, input, summary { font: inherit; }
 button { -webkit-tap-highlight-color: transparent; }
@@ -78,7 +64,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
 .topbar {
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 50;
   min-height: calc(62px + env(safe-area-inset-top));
   padding: calc(10px + env(safe-area-inset-top)) 14px 10px;
   display: grid;
@@ -89,7 +75,6 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
   background: var(--ink);
   border-bottom: 4px solid var(--red);
   box-shadow: 0 4px 0 rgba(0,0,0,.25);
-  isolation: isolate;
 }
 
 .brand {
@@ -147,7 +132,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
 .drawer-overlay {
   position: fixed;
   inset: 0;
-  z-index: 900;
+  z-index: 70;
   background: rgba(10,8,9,.62);
   opacity: 0;
   visibility: hidden;
@@ -158,7 +143,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
 .drawer {
   position: fixed;
   inset: 0 auto 0 0;
-  z-index: 1000;
+  z-index: 80;
   width: min(320px, 86vw);
   padding: calc(18px + env(safe-area-inset-top)) 14px 20px;
   color: var(--paper-2);
@@ -168,9 +153,6 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
   transform: translateX(-105%);
   transition: transform .2s ease;
   overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  isolation: isolate;
 }
 .drawer.open { transform: translateX(0); }
 .drawer-head {
@@ -230,14 +212,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
 }
 .drawer-foot a:hover { color: var(--orange); text-decoration: underline; }
 
-.app-shell {
-  position: relative;
-  z-index: 0;
-  isolation: isolate;
-  width: min(960px, 100%);
-  margin: 0 auto;
-  padding: 18px 14px 0;
-}
+.app-shell { width: min(960px, 100%); margin: 0 auto; padding: 18px 14px 0; }
 .app-page { display: none; animation: pageIn .18s ease-out; padding-bottom:100px; }
 .app-page.active { display: block; }
 @keyframes pageIn { from { opacity: 0; transform: translateY(4px); } to { opacity:1; transform:none; } }
@@ -729,7 +704,7 @@ details[open] summary::after { content:"−"; }
 .notepad-confirm-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
 
-.calendar-wrap { position:relative; z-index:0; display:grid; gap:16px; }
+.calendar-wrap { display:grid; gap:16px; }
 .calendar-week { margin-bottom:0; padding:14px; }
 .calendar-week::after { inset:5px; }
 .calendar-week-head {
@@ -842,7 +817,7 @@ details[open] summary::after { content:"−"; }
   border-color:#7d9b83;
 }
 .calendar-help { margin:0 0 15px; color:#5d5556; font-size:20px; line-height:1.15; }
-.calendar-legend { position:relative; z-index:0; display:flex; flex-wrap:wrap; gap:8px 14px; margin-top:12px; color:#655c5e; font-size:17px; }
+.calendar-legend { display:flex; flex-wrap:wrap; gap:8px 14px; margin-top:12px; color:#655c5e; font-size:17px; }
 .calendar-legend-item { display:inline-flex; align-items:center; gap:6px; }
 .calendar-legend-swatch { width:15px; height:15px; border:2px solid var(--ink); background:#f2ead8; }
 .calendar-legend-swatch.work { background:#dff0df; border-color:var(--green); }
@@ -962,7 +937,7 @@ details[open] summary::after { content:"−"; }
         </div>
         <p class="cook-helper">Hotdogs use the final hour of the ribs and finish at the same time.</p>
         <div class="cook-error" id="cookSetupError" role="alert"></div>
-        <button class="pixel-btn full-btn" type="button" id="startCookBtn">Start Schedule</button>
+        <button class="pixel-btn full-btn" type="button" id="startCookBtn">Start Cooking</button>
       </div>
 
       <div class="cook-panel-body" id="cookRunningView" hidden>
@@ -1250,7 +1225,6 @@ const MEAT_CONFIG = {
 let activeCookState = null;
 let cookTicker = null;
 let buildTarget = 30;
-let drawerScrollY = 0;
 
 function localDateKey(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
@@ -1287,14 +1261,6 @@ function generateDates() {
 }
 
 function openDrawer() {
-  drawerScrollY = window.scrollY;
-
-  document.body.style.position = "fixed";
-  document.body.style.top = `-${drawerScrollY}px`;
-  document.body.style.left = "0";
-  document.body.style.right = "0";
-  document.body.style.width = "100%";
-
   document.getElementById("appDrawer").classList.add("open");
   document.getElementById("drawerOverlay").classList.add("open");
   document.getElementById("appDrawer").setAttribute("aria-hidden", "false");
@@ -1306,14 +1272,6 @@ function closeDrawer() {
   document.getElementById("drawerOverlay").classList.remove("open");
   document.getElementById("appDrawer").setAttribute("aria-hidden", "true");
   document.getElementById("menuButton").setAttribute("aria-expanded", "false");
-
-  document.body.style.position = "";
-  document.body.style.top = "";
-  document.body.style.left = "";
-  document.body.style.right = "";
-  document.body.style.width = "";
-
-  window.scrollTo(0, drawerScrollY);
 }
 
 function showPage(page) {
@@ -1908,8 +1866,7 @@ function updateCurrentTimeLine(nowMs) {
   let remainingMs = COOK_LENGTH_MS;
   if (nowMs >= startMs) remainingMs = Math.max(0, endMs - nowMs);
 
-  status.innerHTML =
-    `${formatCookClock(nowMs)}</span> · ${formatCookCountdown(remainingMs)} remaining`;
+  status.innerHTML = `${formatCookClock(nowMs)} · ${formatCookCountdown(remainingMs)} remaining`;
 
   if (nowMs >= startMs && nowMs <= endMs) {
     line.style.left = `${(nowMs - startMs) / COOK_LENGTH_MS * 100}%`;
