@@ -1,1 +1,874 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Tasks</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #000;
+      --panel: #101019;
+      --panel-hi: #151522;
+      --line: rgba(0,0,0,.88);
+      --text: #f5f5f7;
+      --muted: #777788;
+      --purple: #9d12ee;
+      --purple-2: #b62dff;
+      --green: #5fc18a;
+      --danger: #d94343;
+      --row-x: 0px;
+      --pull: 0px;
+    }
 
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { width:100%; height:100%; margin:0; background:var(--bg); overflow:hidden; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    button { font: inherit; }
+
+    .app {
+      width: min(100%, 440px);
+      height: 100dvh;
+      min-height: 100%;
+      margin: 0 auto;
+      padding-top: max(18px, env(safe-area-inset-top));
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+      position: relative;
+      display: block;
+      background: #000;
+      isolation: isolate;
+    }
+
+    /* Hidden reveal area. The list panel sits on top of this at rest and
+       physically uncovers it as the user pulls down. */
+    .stage {
+      height: 100%;
+      min-height: 0;
+      position: relative;
+      padding: 0 22px;
+      overflow: hidden;
+    }
+
+    .reveal-layer {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      top: 0;
+      height: 150px;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    /* The weekday belongs to the stationary layer behind the list. It never
+       follows the pull gesture; the panel simply uncovers it. */
+    .day {
+      position: absolute;
+      top: 18px;
+      left: 30px;
+      margin: 0;
+      font-size: 29px;
+      line-height: 1.04;
+      letter-spacing: -1.05px;
+      font-weight: 720;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      color: var(--purple);
+      background: linear-gradient(180deg, #b62dff 0%, #9510e5 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 1px 8px rgba(157,18,238,.10);
+      white-space: nowrap;
+    }
+
+    /* Pull indicator is pinned just above the panel's upper-right corner.
+       Because its Y position uses --pull, it travels with the panel instead
+       of staying with the weekday reveal layer. */
+    .pull-indicator {
+      /* The faint track is always a complete circle.  The stronger grey arc
+         grows clockwise from 12 o'clock as the list is pulled down. */
+      --ring-track: #2c2c37;
+      --ring-progress: #555563;
+      position: absolute;
+      z-index: 4;
+      top: -62px;
+      right: 48px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      transform: translateY(var(--pull));
+      will-change: transform;
+      pointer-events: none;
+      opacity: 1;
+      background: conic-gradient(from 0deg,
+        var(--ring-progress) 0deg var(--pull-angle, 0deg),
+        var(--ring-track) var(--pull-angle, 0deg) 360deg);
+      box-shadow: 0 2px 8px rgba(0,0,0,.24);
+      transition: transform 360ms cubic-bezier(.2,.75,.22,1), background-color .12s linear;
+    }
+    .stage.pulling .pull-indicator { transition: none; }
+
+    .pull-indicator::before {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: #000;
+      transition: background 90ms linear;
+    }
+
+    .pull-symbol {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+    }
+    .pull-symbol svg {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: block;
+      overflow: visible;
+      transition: opacity 90ms linear, transform 110ms ease;
+    }
+    .pull-arrow {
+      width: 20px;
+      height: 20px;
+      opacity: 1;
+      color: #555563;
+    }
+    .pull-plus {
+      width: 20px;
+      height: 20px;
+      opacity: 0;
+      color: #0c2418;
+      transform: translate(-50%, -50%) scale(.72) !important;
+    }
+
+    .stage.ready .pull-indicator,
+    .stage.committing .pull-indicator {
+      background: var(--green);
+      filter: drop-shadow(0 0 8px rgba(95,193,138,.22));
+    }
+    .stage.ready .pull-indicator::before,
+    .stage.committing .pull-indicator::before { background: var(--green); }
+    .stage.ready .pull-arrow,
+    .stage.committing .pull-arrow {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(.72);
+    }
+    .stage.ready .pull-plus,
+    .stage.committing .pull-plus {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1) !important;
+    }
+
+    .panel {
+      height: 100%;
+      min-height: 0;
+      border-radius: 34px 34px 0 0;
+      overflow: hidden;
+      position: relative;
+      z-index: 2;
+      background: var(--panel);
+      box-shadow: none;
+      transform: translateY(var(--pull));
+      will-change: transform;
+      transition: transform 360ms cubic-bezier(.2,.75,.22,1);
+    }
+    .stage.pulling .panel { transition: none; }
+
+    .scroller {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      touch-action: none;
+      cursor: default;
+      z-index: 3;
+    }
+
+    .list {
+      padding: 18px 0 18px;
+      min-height: 100%;
+      transform: translateY(var(--scroll-y, 0px));
+      will-change: transform;
+    }
+
+    .row-wrap {
+      position: relative;
+      overflow: hidden;
+      min-height: 66px;
+      transition: height 260ms cubic-bezier(.2,.72,.25,1), opacity 180ms ease;
+      background: transparent;
+    }
+
+    .row-wrap::after {
+      content:"";
+      position:absolute; left:22px; right:0; bottom:0; height:1px;
+      background: var(--line);
+      z-index: 5;
+      pointer-events:none;
+    }
+
+    .delete-tray {
+      position:absolute; inset:0;
+      background: linear-gradient(90deg, #7f2528, var(--danger));
+      display:flex; align-items:center; justify-content:flex-end;
+      padding-right:22px;
+      font-size:14px; font-weight:700; letter-spacing:.2px;
+      opacity: min(1, calc(var(--swipe-progress, 0) * 1.5));
+    }
+    .trash {
+      width:28px; height:28px; display:grid; place-items:center;
+      transform: scale(calc(.72 + var(--swipe-progress, 0) * .28));
+    }
+
+    .task-row {
+      position:relative;
+      z-index:2;
+      width:100%;
+      min-height:66px;
+      padding: 19px 26px 18px;
+      display:flex;
+      align-items:center;
+      background: transparent;
+      transform: translateX(var(--row-x));
+      will-change: transform;
+      transition: transform 280ms cubic-bezier(.2,.75,.2,1), filter .18s ease;
+    }
+    .row-wrap.swiping .task-row { transition: none; }
+    .row-wrap.pressed .task-row { filter: brightness(1.12); }
+
+    .task-text {
+      width:100%;
+      min-height: 28px;
+      color: var(--text);
+      font-size: clamp(20px, 5.6vw, 24px);
+      line-height: 1.22;
+      letter-spacing: -.4px;
+      outline: none;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .task-text[contenteditable="true"] {
+      user-select: text;
+      -webkit-user-select: text;
+      caret-color: #597aff;
+    }
+    .task-text:empty::before { content:"New task"; color:#59596b; }
+
+    .new-row .task-row { animation: rowIn 360ms cubic-bezier(.15,.8,.2,1) both; }
+    @keyframes rowIn {
+      from { opacity:0; transform:translateY(-20px) scale(.985); }
+      to { opacity:1; transform:translateY(0) scale(1); }
+    }
+
+    .drag-placeholder {
+      min-height:66px;
+      background: rgba(8,8,14,.45);
+      box-shadow: inset 0 0 0 1px rgba(98,98,127,.15);
+      transition: height 180ms cubic-bezier(.2,.7,.2,1);
+    }
+    .drag-placeholder::after { display:none; }
+
+    .drag-ghost {
+      position: fixed;
+      z-index: 9999;
+      pointer-events:none;
+      border-radius: 11px;
+      overflow:hidden;
+      background: linear-gradient(180deg, #1f1f31, #171726);
+      box-shadow: 0 16px 42px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.045);
+      transform: scale(1.035);
+      opacity: .98;
+      transition: box-shadow .15s ease, transform .15s ease;
+    }
+    .drag-ghost .task-row { background: transparent; transform:none; transition:none; }
+    .drag-ghost .delete-tray { display:none; }
+    .drag-ghost::after { display:none; }
+
+    @media (min-width: 700px) {
+      body { background: #07070a; }
+      .app {
+        height: min(900px, calc(100dvh - 44px));
+        margin-top: 22px;
+        margin-bottom: 22px;
+        border-radius: 48px;
+        overflow:hidden;
+        box-shadow: 0 30px 80px rgba(0,0,0,.52), 0 0 0 1px #14141c;
+      }
+      .stage { padding-left:26px; padding-right:26px; }
+      .reveal-layer { left:26px; right:26px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration:.001ms !important; transition-duration:.001ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" aria-label="Tasks app">
+    <section class="stage" id="stage">
+      <div class="reveal-layer" aria-hidden="true">
+        <h1 class="day" id="dayName">Wednesday</h1>
+      </div>
+
+      <div class="pull-indicator" id="pullIndicator" aria-hidden="true">
+        <span class="pull-symbol">
+          <svg class="pull-arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M10 3.5v10.2M5.7 9.9 10 14.2l4.3-4.3" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg class="pull-plus" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/>
+          </svg>
+        </span>
+      </div>
+
+      <div class="panel" id="panel">
+        <div class="scroller" id="scroller">
+          <div class="list" id="list" role="list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+  (() => {
+    'use strict';
+
+    const STORAGE_KEY = 'tasks-recreated-v1';
+    const DEFAULTS = [
+      'Welcome to Tasks!',
+      'Pull down to create new',
+      'Double tap to edit',
+      'Tap and hold to rearrange',
+      'Swipe left to delete'
+    ];
+
+    const stage = document.getElementById('stage');
+    const panel = document.getElementById('panel');
+    const scroller = document.getElementById('scroller');
+    const list = document.getElementById('list');
+    const dayName = document.getElementById('dayName');
+    const pullIndicator = document.getElementById('pullIndicator');
+
+    let tasks = loadTasks();
+    let scrollY = 0;
+    let maxScroll = 0;
+    let gesture = null;
+    let lastTap = { id: null, at: 0 };
+    let drag = null;
+
+    function uid() {
+      if (crypto && crypto.randomUUID) return crypto.randomUUID();
+      return 't_' + Date.now().toString(36) + Math.random().toString(36).slice(2);
+    }
+
+    function normalize(raw) {
+      if (!Array.isArray(raw)) return DEFAULTS.map(text => ({ id: uid(), text }));
+      return raw.filter(Boolean).map(x => typeof x === 'string' ? {id:uid(),text:x} : ({id:String(x.id || uid()), text:String(x.text ?? '')}));
+    }
+
+    function loadTasks() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) return normalize(JSON.parse(stored));
+      } catch (_) {}
+      return DEFAULTS.map(text => ({ id: uid(), text }));
+    }
+
+    function saveTasks() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); } catch (_) {}
+    }
+
+    function setDay() {
+      dayName.textContent = new Intl.DateTimeFormat(undefined, { weekday: 'long' }).format(new Date());
+    }
+
+    function escapeText(s) {
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function rowHTML(task) {
+      return `
+        <div class="row-wrap" data-id="${escapeText(task.id)}" role="listitem">
+          <div class="delete-tray" aria-hidden="true"><div class="trash">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none"><path d="M7 8v10m5-10v10m5-10v10M5 6h14M9 6V4h6v2m-8 0 1 15h8l1-15" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div></div>
+          <div class="task-row">
+            <div class="task-text" spellcheck="false">${escapeText(task.text)}</div>
+          </div>
+        </div>`;
+    }
+
+    function render() {
+      list.innerHTML = tasks.map(rowHTML).join('');
+      bindTextHandlers();
+      requestAnimationFrame(updateScrollBounds);
+    }
+
+    function bindTextHandlers() {
+      list.querySelectorAll('.task-text').forEach(el => {
+        if (el.dataset.bound === '1') return;
+        el.dataset.bound = '1';
+        el.addEventListener('keydown', e => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            el.blur();
+          }
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            const row = el.closest('.row-wrap');
+            const task = tasks.find(t => t.id === row.dataset.id);
+            el.textContent = task ? task.text : '';
+            el.blur();
+          }
+        });
+        el.addEventListener('input', () => {
+          const row = el.closest('.row-wrap');
+          const task = tasks.find(t => t.id === row.dataset.id);
+          if (task) task.text = cleanEditableText(el.innerText);
+          requestAnimationFrame(updateScrollBounds);
+        });
+        el.addEventListener('blur', () => finishEditing(el));
+      });
+    }
+
+    function cleanEditableText(text) {
+      return String(text).replace(/\r/g,'').replace(/\n+$/,'');
+    }
+
+    function startEditing(row, selectAll = false) {
+      if (!row) return;
+      const el = row.querySelector('.task-text');
+      if (el.getAttribute('contenteditable') === 'true') return;
+      el.setAttribute('contenteditable', 'true');
+      row.classList.add('editing');
+      requestAnimationFrame(() => {
+        el.focus({ preventScroll: true });
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(!selectAll);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        ensureRowVisible(row);
+      });
+    }
+
+    function finishEditing(el) {
+      const row = el.closest('.row-wrap');
+      if (!row) return;
+      el.removeAttribute('contenteditable');
+      row.classList.remove('editing');
+      const task = tasks.find(t => t.id === row.dataset.id);
+      if (task) {
+        task.text = cleanEditableText(el.innerText);
+        el.textContent = task.text;
+      }
+      saveTasks();
+      updateScrollBounds();
+    }
+
+    function addTask() {
+      const task = { id: uid(), text: '' };
+      tasks.unshift(task);
+      saveTasks();
+      const shell = document.createElement('div');
+      shell.innerHTML = rowHTML(task).trim();
+      const row = shell.firstElementChild;
+      row.classList.add('new-row');
+      list.prepend(row);
+      bindTextHandlers();
+      scrollY = 0;
+      applyScroll();
+      requestAnimationFrame(() => {
+        updateScrollBounds();
+        startEditing(row);
+        row.addEventListener('animationend', () => row.classList.remove('new-row'), { once:true });
+      });
+      haptic(10);
+    }
+
+    function deleteTask(row) {
+      const id = row.dataset.id;
+      const h = row.offsetHeight;
+      row.style.height = h + 'px';
+      row.style.setProperty('--row-x', '-115%');
+      row.style.opacity = '0';
+      setTimeout(() => {
+        row.style.height = '0px';
+        setTimeout(() => {
+          tasks = tasks.filter(t => t.id !== id);
+          saveTasks();
+          row.remove();
+          updateScrollBounds();
+        }, 260);
+      }, 140);
+      haptic(18);
+    }
+
+    function updateScrollBounds() {
+      maxScroll = Math.max(0, list.scrollHeight - scroller.clientHeight);
+      scrollY = Math.max(0, Math.min(maxScroll, scrollY));
+      applyScroll();
+    }
+
+    function applyScroll() {
+      list.style.setProperty('--scroll-y', `${-scrollY}px`);
+    }
+
+    function ensureRowVisible(row) {
+      const s = scroller.getBoundingClientRect();
+      const r = row.getBoundingClientRect();
+      if (r.bottom > s.bottom - 90) scrollY = Math.min(maxScroll, scrollY + (r.bottom - (s.bottom - 90)));
+      if (r.top < s.top + 4) scrollY = Math.max(0, scrollY - ((s.top + 4) - r.top));
+      applyScroll();
+    }
+
+    const PULL_MAX = 148;
+    const PULL_THRESHOLD = 112;
+
+    function setPull(v) {
+      const px = Math.max(0, Math.min(PULL_MAX, v));
+      const progress = Math.max(0, Math.min(1, px / PULL_THRESHOLD));
+      stage.style.setProperty('--pull', `${px}px`);
+      stage.style.setProperty('--pull-progress', progress.toFixed(3));
+      stage.style.setProperty('--pull-angle', `${(progress * 360).toFixed(1)}deg`);
+      stage.classList.toggle('pulling', px > 0);
+      stage.classList.toggle('ready', px >= PULL_THRESHOLD);
+    }
+
+    function releasePull(commit) {
+      const current = gesture ? gesture.pull : 0;
+      const shouldAdd = commit || current >= PULL_THRESHOLD;
+      stage.classList.remove('pulling', 'ready');
+      if (shouldAdd) stage.classList.add('committing');
+      stage.style.setProperty('--pull', '0px');
+      stage.style.setProperty('--pull-progress', '0');
+      stage.style.setProperty('--pull-angle', '0deg');
+      if (shouldAdd) {
+        haptic(12);
+        setTimeout(addTask, 125);
+        setTimeout(() => stage.classList.remove('committing'), 260);
+      }
+    }
+
+    function haptic(ms) {
+      try { if (navigator.vibrate) navigator.vibrate(ms); } catch (_) {}
+    }
+
+    function rowFromTarget(target) { return target.closest ? target.closest('.row-wrap') : null; }
+
+    function beginLongPress(row, e) {
+      if (!row || row.classList.contains('editing')) return 0;
+      return window.setTimeout(() => {
+        if (!gesture || gesture.state !== 'pending' || gesture.row !== row) return;
+        startReorder(row, gesture.lastY);
+      }, 430);
+    }
+
+    function startReorder(row, pointerY) {
+      gesture.state = 'reorder';
+      clearTimeout(gesture.holdTimer);
+      haptic(18);
+
+      const rect = row.getBoundingClientRect();
+      const placeholder = document.createElement('div');
+      placeholder.className = 'row-wrap drag-placeholder';
+      placeholder.style.height = rect.height + 'px';
+      placeholder.dataset.id = row.dataset.id;
+
+      const ghost = row.cloneNode(true);
+      ghost.classList.add('drag-ghost');
+      ghost.classList.remove('pressed','swiping');
+      ghost.style.left = rect.left + 'px';
+      ghost.style.top = rect.top + 'px';
+      ghost.style.width = rect.width + 'px';
+      ghost.style.height = rect.height + 'px';
+      ghost.style.setProperty('--row-x','0px');
+      document.body.appendChild(ghost);
+
+      row.replaceWith(placeholder);
+      drag = {
+        row,
+        placeholder,
+        ghost,
+        offsetY: pointerY - rect.top,
+        height: rect.height
+      };
+      moveReorder(pointerY);
+    }
+
+    function getReorderRows() {
+      return [...list.querySelectorAll('.row-wrap:not(.drag-placeholder)')];
+    }
+
+    function moveReorder(pointerY) {
+      if (!drag) return;
+      const stageRect = scroller.getBoundingClientRect();
+      const edge = 72;
+      if (pointerY < stageRect.top + edge && scrollY > 0) {
+        scrollY = Math.max(0, scrollY - 7);
+        applyScroll();
+      } else if (pointerY > stageRect.bottom - edge && scrollY < maxScroll) {
+        scrollY = Math.min(maxScroll, scrollY + 7);
+        applyScroll();
+      }
+
+      drag.ghost.style.top = (pointerY - drag.offsetY) + 'px';
+      const rows = getReorderRows();
+      let before = null;
+      for (const r of rows) {
+        const rr = r.getBoundingClientRect();
+        if (pointerY < rr.top + rr.height / 2) { before = r; break; }
+      }
+      const parent = drag.placeholder.parentNode;
+      const oldNext = drag.placeholder.nextElementSibling;
+      if (before && before !== oldNext) {
+        flipMove(() => parent.insertBefore(drag.placeholder, before));
+      } else if (!before && drag.placeholder !== parent.lastElementChild) {
+        flipMove(() => parent.appendChild(drag.placeholder));
+      }
+    }
+
+    function flipMove(mutator) {
+      const before = new Map();
+      [...list.children].forEach(el => before.set(el, el.getBoundingClientRect().top));
+      mutator();
+      [...list.children].forEach(el => {
+        if (el === drag?.placeholder) return;
+        const old = before.get(el);
+        if (old == null) return;
+        const now = el.getBoundingClientRect().top;
+        const dy = old - now;
+        if (Math.abs(dy) > .5) {
+          el.style.transition = 'none';
+          el.style.transform = `translateY(${dy}px)`;
+          requestAnimationFrame(() => {
+            el.style.transition = 'transform 180ms cubic-bezier(.2,.7,.2,1)';
+            el.style.transform = 'translateY(0)';
+            setTimeout(() => { el.style.transition=''; el.style.transform=''; }, 190);
+          });
+        }
+      });
+    }
+
+    function finishReorder() {
+      if (!drag) return;
+      const targetRect = drag.placeholder.getBoundingClientRect();
+      const ghost = drag.ghost;
+      ghost.style.transition = 'top 180ms cubic-bezier(.2,.75,.2,1), transform 180ms ease, opacity 180ms ease';
+      ghost.style.top = targetRect.top + 'px';
+      ghost.style.transform = 'scale(1)';
+      setTimeout(() => {
+        drag.placeholder.replaceWith(drag.row);
+        ghost.remove();
+        drag = null;
+        tasks = [...list.querySelectorAll('.row-wrap')].map(r => {
+          const original = tasks.find(t => t.id === r.dataset.id);
+          return original || {id:r.dataset.id,text:r.querySelector('.task-text')?.innerText || ''};
+        });
+        saveTasks();
+        updateScrollBounds();
+      }, 185);
+    }
+
+    function cancelGesture() {
+      if (!gesture) return;
+      clearTimeout(gesture.holdTimer);
+      if (gesture.row) {
+        gesture.row.classList.remove('pressed','swiping');
+        gesture.row.style.setProperty('--row-x','0px');
+        gesture.row.style.setProperty('--swipe-progress','0');
+      }
+      if (gesture.state === 'pull') releasePull(false);
+      if (gesture.state === 'reorder') finishReorder();
+      gesture = null;
+    }
+
+    scroller.addEventListener('pointerdown', e => {
+      if (e.button !== undefined && e.button !== 0) return;
+      const row = rowFromTarget(e.target);
+      if (e.target.closest?.('[contenteditable="true"]')) return;
+      scroller.setPointerCapture?.(e.pointerId);
+      gesture = {
+        id: e.pointerId,
+        row,
+        startX: e.clientX,
+        startY: e.clientY,
+        lastX: e.clientX,
+        lastY: e.clientY,
+        startScroll: scrollY,
+        state: 'pending',
+        pull: 0,
+        swipeX: 0,
+        startedAt: performance.now(),
+        velocityY: 0,
+        lastMoveAt: performance.now(),
+        holdTimer: 0
+      };
+      if (row) {
+        row.classList.add('pressed');
+        gesture.holdTimer = beginLongPress(row, e);
+      }
+    });
+
+    scroller.addEventListener('pointermove', e => {
+      if (!gesture || e.pointerId !== gesture.id) return;
+      const dx = e.clientX - gesture.startX;
+      const dy = e.clientY - gesture.startY;
+      const now = performance.now();
+      const dt = Math.max(1, now - gesture.lastMoveAt);
+      gesture.velocityY = (e.clientY - gesture.lastY) / dt;
+      gesture.lastMoveAt = now;
+      gesture.lastX = e.clientX;
+      gesture.lastY = e.clientY;
+
+      if (gesture.state === 'reorder') {
+        e.preventDefault();
+        moveReorder(e.clientY);
+        return;
+      }
+
+      if (gesture.state === 'pending' && Math.hypot(dx,dy) > 9) {
+        clearTimeout(gesture.holdTimer);
+        gesture.row?.classList.remove('pressed');
+        if (gesture.row && dx < -8 && Math.abs(dx) > Math.abs(dy) * .85) {
+          gesture.state = 'swipe';
+          gesture.row.classList.add('swiping');
+        } else if (scrollY <= .5 && dy > 0) {
+          gesture.state = 'pull';
+        } else {
+          gesture.state = 'scroll';
+        }
+      }
+
+      if (gesture.state === 'swipe') {
+        e.preventDefault();
+        const x = Math.min(0, Math.max(-150, dx));
+        gesture.swipeX = x;
+        gesture.row.style.setProperty('--row-x', `${x}px`);
+        gesture.row.style.setProperty('--swipe-progress', String(Math.min(1, Math.abs(x)/105)));
+      } else if (gesture.state === 'pull') {
+        e.preventDefault();
+        const raw = Math.max(0, dy);
+        const resisted = raw <= PULL_THRESHOLD
+          ? raw
+          : PULL_THRESHOLD + (raw - PULL_THRESHOLD) * .30;
+        gesture.pull = resisted;
+        setPull(resisted);
+      } else if (gesture.state === 'scroll') {
+        e.preventDefault();
+        scrollY = Math.max(0, Math.min(maxScroll, gesture.startScroll - dy));
+        applyScroll();
+      }
+    }, { passive:false });
+
+    function endPointer(e) {
+      if (!gesture || e.pointerId !== gesture.id) return;
+      clearTimeout(gesture.holdTimer);
+      const g = gesture;
+      gesture = null;
+      g.row?.classList.remove('pressed');
+
+      if (g.state === 'reorder') {
+        finishReorder();
+        return;
+      }
+      if (g.state === 'pull') {
+        const shouldAdd = g.pull >= PULL_THRESHOLD;
+        stage.classList.remove('pulling','ready');
+        if (shouldAdd) stage.classList.add('committing');
+        stage.style.setProperty('--pull','0px');
+        stage.style.setProperty('--pull-progress','0');
+        stage.style.setProperty('--pull-angle','0deg');
+        if (shouldAdd) {
+          haptic(12);
+          setTimeout(addTask, 125);
+          setTimeout(() => stage.classList.remove('committing'), 260);
+        }
+        return;
+      }
+      if (g.state === 'swipe' && g.row) {
+        g.row.classList.remove('swiping');
+        if (Math.abs(g.swipeX) > 82) deleteTask(g.row);
+        else {
+          g.row.style.setProperty('--row-x','0px');
+          g.row.style.setProperty('--swipe-progress','0');
+        }
+        return;
+      }
+      if (g.state === 'scroll') {
+        const vy = g.velocityY;
+        if (Math.abs(vy) > .18) inertialScroll(-vy * 550);
+        return;
+      }
+      if (g.state === 'pending' && g.row) {
+        const now = performance.now();
+        const id = g.row.dataset.id;
+        if (lastTap.id === id && now - lastTap.at < 330) {
+          lastTap = {id:null, at:0};
+          startEditing(g.row);
+        } else {
+          lastTap = {id, at:now};
+        }
+      }
+    }
+
+    scroller.addEventListener('pointerup', endPointer);
+    scroller.addEventListener('pointercancel', e => {
+      if (!gesture || e.pointerId !== gesture.id) return;
+      cancelGesture();
+    });
+
+    scroller.addEventListener('wheel', e => {
+      if (document.activeElement?.getAttribute?.('contenteditable') === 'true') return;
+      e.preventDefault();
+      scrollY = Math.max(0, Math.min(maxScroll, scrollY + e.deltaY));
+      applyScroll();
+    }, { passive:false });
+
+    function inertialScroll(delta) {
+      const start = scrollY;
+      const dest = Math.max(0, Math.min(maxScroll, start + delta));
+      const duration = 420;
+      const t0 = performance.now();
+      const ease = t => 1 - Math.pow(1 - t, 4);
+      function tick(now) {
+        const p = Math.min(1, (now - t0)/duration);
+        scrollY = start + (dest - start) * ease(p);
+        applyScroll();
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+
+
+    window.addEventListener('resize', updateScrollBounds);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) setDay(); });
+    window.setInterval(setDay, 60_000);
+
+    stage.style.setProperty('--pull', '0px');
+    stage.style.setProperty('--pull-progress', '0');
+      stage.style.setProperty('--pull-angle', '0deg');
+    setDay();
+    render();
+  })();
+  </script>
+</body>
+</html>
